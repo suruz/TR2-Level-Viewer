@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+	<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+	<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+	<ProductVersion>10.0.20506</ProductVersion>
+	<SchemaVersion>2.0</SchemaVersion>
+	<ProjectGuid>{66EC5DF2-4772-4F7B-22FC-4868B2006714}</ProjectGuid>
+	<OutputType>Library</OutputType>
+	<AppDesignerFolder>Properties</AppDesignerFolder>
+	<RootNamespace></RootNamespace>
+	<AssemblyName>Assembly-CSharp</AssemblyName>
+	<TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+	<FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+	<DebugSymbols>true</DebugSymbols>
+	<DebugType>full</DebugType>
+	<Optimize>false</Optimize>
+	<OutputPath>Temp\bin\Debug\</OutputPath>
+	<DefineConstants>DEBUG;TRACE;UNITY_3_5_2;UNITY_3_5;UNITY_EDITOR;ENABLE_PROFILER;UNITY_STANDALONE_WIN;ENABLE_GENERICS;ENABLE_DUCK_TYPING;ENABLE_TERRAIN;ENABLE_MOVIES;ENABLE_WEBCAM;ENABLE_MICROPHONE;ENABLE_NETWORK;ENABLE_CLOTH;ENABLE_WWW;ENABLE_SUBSTANCE</DefineConstants>
+	<ErrorReport>prompt</ErrorReport>
+	<WarningLevel>4</WarningLevel>
+	<NoWarn>0169</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+	<DebugType>pdbonly</DebugType>
+	<Optimize>true</Optimize>
+	<OutputPath>Temp\bin\Release\</OutputPath>
+	<DefineConstants>TRACE</DefineConstants>
+	<ErrorReport>prompt</ErrorReport>
+	<WarningLevel>4</WarningLevel>
+	<NoWarn>0169</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+	<Reference Include="System" />
+    <Reference Include="System.XML" />
+	<Reference Include="System.Core" />
+	<Reference Include="UnityEngine">
+	  <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine.dll</HintPath>
+	</Reference>
+	<Reference Include="UnityEditor">
+	  <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEditor.dll</HintPath>
+	</Reference>
+  </ItemGroup>
+  <ItemGroup>
+     <Compile Include="Assets\Loader.cs" />
+     <Compile Include="Assets\Settings.cs" />
+     <Compile Include="Assets\scripts\Animation Helper\AnimationStateMapper.cs" />
+     <Compile Include="Assets\scripts\Animation Helper\Animator.cs" />
+     <Compile Include="Assets\scripts\Behaviour\AICallBackHandler.cs" />
+     <Compile Include="Assets\scripts\Behaviour\BoulderStatePlayer.cs" />
+     <Compile Include="Assets\scripts\Behaviour\ButtlerStatePlayer.cs" />
+     <Compile Include="Assets\scripts\Behaviour\CrowStatePlayer.cs" />
+     <Compile Include="Assets\scripts\Behaviour\DefaultStatePlayer.cs" />
+     <Compile Include="Assets\scripts\Behaviour\DogStatePlayer.cs" />
+     <Compile Include="Assets\scripts\Behaviour\DoorStatePlayer.cs" />
+     <Compile Include="Assets\scripts\Behaviour\EgleStatePlayer.cs" />
+     <Compile Include="Assets\scripts\Behaviour\GoonWithRoolerStatePlayer.cs" />
+     <Compile Include="Assets\scripts\Behaviour\Inventory Item\FlashLightStatePlayer.cs" />
+     <Compile Include="Assets\scripts\Behaviour\LaraStatePlayer.cs" />
+     <Compile Include="Assets\scripts\Behaviour\SharkGoldenStatePlayer.cs" />
+     <Compile Include="Assets\scripts\Behaviour\SwitchStatePlayer.cs" />
+     <Compile Include="Assets\scripts\Behaviour\TRexStatePlayer.cs" />
+     <Compile Include="Assets\scripts\Behaviour\TigerStatePlayer.cs" />
+     <Compile Include="Assets\scripts\Camera\DoorOpeningCam.cs" />
+     <Compile Include="Assets\scripts\Camera\ThirdPersonCam.cs" />
+     <Compile Include="Assets\scripts\Environment\DayNightSystem.cs" />
+     <Compile Include="Assets\scripts\FileIO\Browser Data\FileBrowser.cs" />
+     <Compile Include="Assets\scripts\FileIO\Browser Data\GUILayoutx .cs" />
+     <Compile Include="Assets\scripts\FileIO\Browser.cs" />
+     <Compile Include="Assets\scripts\FileIO\Parser.cs" />
+     <Compile Include="Assets\scripts\Geometry Helper\MeshBuilder.cs" />
+     <Compile Include="Assets\scripts\Geometry Helper\MeshModifier.cs" />
+     <Compile Include="Assets\scripts\Geometry Helper\Primtives\Edge.cs" />
+     <Compile Include="Assets\scripts\Geometry Helper\Primtives\Triangle.cs" />
+     <Compile Include="Assets\scripts\Geometry Helper\Primtives\Vector2i.cs" />
+     <Compile Include="Assets\scripts\Geometry Helper\Primtives\Vertex.cs" />
+     <Compile Include="Assets\scripts\Geometry Helper\SurfaceAnalyzer.cs" />
+     <Compile Include="Assets\scripts\HealthSystem\HealthMonitor.cs" />
+     <Compile Include="Assets\scripts\Layer Defination\MaskedLayer.cs" />
+     <Compile Include="Assets\scripts\Layer Defination\UnityLayer.cs" />
+     <Compile Include="Assets\scripts\Level Builder\Level.cs" />
+     <Compile Include="Assets\scripts\Level Builder\RoomEx.cs" />
+     <Compile Include="Assets\scripts\Obj\ObjectExt.cs" />
+     <Compile Include="Assets\scripts\Obj\Player.cs" />
+     <Compile Include="Assets\scripts\Obj\TODO\Actor\Actor.cs" />
+     <Compile Include="Assets\scripts\Obj\TODO\Actor\NonPlayableActor.cs" />
+     <Compile Include="Assets\scripts\Obj\TODO\Actor\PlayableActor.cs" />
+     <Compile Include="Assets\scripts\Physics\Physic3D.cs" />
+     <Compile Include="Assets\scripts\Physics\PlayerCollisionHandler.cs" />
+     <Compile Include="Assets\scripts\UI\GUI\GUIManager.cs" />
+     <Compile Include="Assets\scripts\UI\KeyMapper.cs" />
+     <Compile Include="Assets\scripts\UI\Mouse.cs" />
+     <Compile Include="Assets\scripts\UI\TODO\EditView.cs" />
+     <Compile Include="Assets\scripts\UI\TODO\ViewPort.cs" />
+     <Compile Include="Assets\scripts\Unit Test\AnimationTester.cs" />
+     <Compile Include="Assets\scripts\Unit Test\RaycastTest.cs" />
+     <Compile Include="Assets\scripts\Utility\ComputionModel.cs" />
+     <Compile Include="Assets\scripts\Utility\TextureUV.cs" />
+     <Compile Include="Assets\scripts\Utility\Zip.cs" />
+     <None Include="Assets\scripts\Behaviour\TigerStatePlayer.cs.txt" />
+     <None Include="Assets\Level Texture\read me.txt" />
+     <None Include="Assets\doc\ClassMap.txt" />
+     <None Include="Assets\sfx\extra\sfx.txt" />
+     <None Include="Assets\Resources\Demo Level.txt" />
+     <None Include="Assets\doc\log.txt" />
+     <None Include="Assets\doc\read me.txt" />
+     <None Include="Assets\shader\Lightmapped_Diffuse.shader" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+	   Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  
+</Project>
