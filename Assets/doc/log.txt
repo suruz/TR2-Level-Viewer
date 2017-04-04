@@ -354,3 +354,7 @@ Fixed error obsolete constant Physics.kDefaultRaycastLayers for for unity versio
 Fixed load ligacy animation clip for unity version 5.3 or higher by setting clip.legacy = true in Animator.cs
 Fixed error concave room mesh can not be used as trigger for unity version 5.3 or higher
 
+Fixed: remove behabiour scripts for movable object while creating level in Editor
+Fixed error while interacting uninitialised script and game object
+Fixed stand alone unity player's runtime exception due to legacy material use in level.cs for unity version 5.3 or higher
+
