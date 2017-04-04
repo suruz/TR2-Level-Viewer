@@ -484,7 +484,7 @@ public class Player : ObjectExt {
 			RaycastHit hit2 = new RaycastHit();
 
 			#if UNITY_5_3_OR_NEWER
-			int mask = Physics.DefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
+			int mask = Physics.kDefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
 			#else
 			int mask = Physics.kDefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
 			#endif
