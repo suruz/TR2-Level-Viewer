@@ -346,3 +346,11 @@ Is there any way to set Time.fixedTime from script? Otherwise  random fixed time
 some built in component variables (like light, camera) has been deprecated. Now I have to use GetComponent to access
 those components. wtf! 
 
+4/4/2017
+
+After so many days!
+
+Fixed error obsolete constant Physics.kDefaultRaycastLayers for for unity version 5.3 or higher
+Fixed load ligacy animation clip for unity version 5.3 or higher by setting clip.legacy = true in Animator.cs
+Fixed error concave room mesh can not be used as trigger for unity version 5.3 or higher
+
