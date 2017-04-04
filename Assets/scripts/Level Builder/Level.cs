@@ -122,11 +122,20 @@ public class Level
 		go.transform.rotation = Quaternion.identity;
 		if(Settings.PlatformUnityPro)
 		{
+			#if UNITY_5_3_OR_NEWER
+			renderer.material = Resources.Load("room_material", typeof(Material)) as Material;
+			#else
 			renderer.material = new Material(Shader.Find("Transparent/Cutout/Diffuse"));
+			#endif
 		}
 		else
 		{
+			#if UNITY_5_3_OR_NEWER
+			renderer.material = Resources.Load("room_material", typeof(Material)) as Material;
+			#else
 			renderer.material = new Material(Shader.Find("Diffuse"));
+			#endif
+
 		}
 		renderer.material.mainTexture =  m_LevelTextureTile;
 		renderer.material.color = new Color(1f,1f,1f,1.0f);
@@ -169,11 +178,19 @@ public class Level
 		go.transform.rotation = rotation;
 		if(Settings.PlatformUnityPro)
 		{
+			#if UNITY_5_3_OR_NEWER
+			renderer.material = Resources.Load("room_material", typeof(Material)) as Material;
+			#else
 			renderer.material = new Material(Shader.Find("Transparent/Cutout/Diffuse"));
+			#endif
 		}
 		else
 		{
+			#if UNITY_5_3_OR_NEWER
+			renderer.material = Resources.Load("room_material", typeof(Material)) as Material;
+			#else
 			renderer.material = new Material(Shader.Find("Diffuse"));
+			#endif
 		}
 		
 		renderer.material.mainTexture =  m_LevelTextureTile;
@@ -430,49 +447,59 @@ public class Level
 	{
 		GameObject go = tr2item.UnityObject;
 		go.name +=" " + tr2item.ObjectID;
-		if(tr2item.ObjectID == 0 )
-		{
+		if (tr2item.ObjectID == 0) {
 			//playable character found!
 			m_Player = go;
 			m_Player.layer = UnityLayer.Player;
 			m_PrevPlayPos = m_Player.transform.position;
 			m_Player.transform.parent = null;
 
-			if(m_leveldata.Camera !=null)
-			{
-				m_leveldata.Camera.target= m_Player.transform;
+			if (m_leveldata.Camera != null) {
+				m_leveldata.Camera.target = m_Player.transform;
 			}
-			LaraStatePlayer stateplayer = m_Player.AddComponent<LaraStatePlayer>();
-			stateplayer.tranimations = m_DynamicPrefabs[0].AnimClips;
+			LaraStatePlayer stateplayer = m_Player.AddComponent<LaraStatePlayer> ();
+			stateplayer.tranimations = m_DynamicPrefabs [0].AnimClips;
 			m_Player.name = "Lara";
 
-			GameObject FlashLight = new GameObject("Fire Torch");
-			FlashLight.AddComponent <FlashLightStatePlayer>();
-			Light lt = FlashLight.AddComponent<Light>();
+			GameObject FlashLight = new GameObject ("Fire Torch");
+			FlashLight.AddComponent <FlashLightStatePlayer> ();
+			Light lt = FlashLight.AddComponent<Light> ();
 			lt.type = LightType.Spot;
 			lt.range = 10000;
 			lt.spotAngle = 70;
 			lt.intensity = 1;
 
-			FlashLight.transform.parent = m_Player.transform.FindChild("objPart:0");//.Find("objPart:7").Find("objPart:14");
+			FlashLight.transform.parent = m_Player.transform.FindChild ("objPart:0");//.Find("objPart:7").Find("objPart:14");
 			FlashLight.transform.position = FlashLight.transform.parent.position;
-			FlashLight.transform.forward =  FlashLight.transform.parent.forward;
+			FlashLight.transform.forward = FlashLight.transform.parent.forward;
 			lt.enabled = false;
 		
-			Player player = go.AddComponent<Player>();
+			Player player = go.AddComponent<Player> ();
 			player.m_Tr2Item = tr2item;
-			HealthMonitor healthmon = go.AddComponent<HealthMonitor>();
-			PlayerCollisionHandler playercollider =  go.AddComponent<PlayerCollisionHandler>();
+			HealthMonitor healthmon = go.AddComponent<HealthMonitor> ();
+			PlayerCollisionHandler playercollider = go.AddComponent<PlayerCollisionHandler> ();
 
 			//Initialise Current Active Room for player
-			player.m_Room = SetRoomForPlayer();
-			go.SetActiveRecursively(true);
+			player.m_Room = SetRoomForPlayer ();
+			go.SetActiveRecursively (true);
 		}
+
 		//check if we have any custom behabiour  script for object
-		else if(m_OnAttachBehabiourScript!= null && !m_OnAttachBehabiourScript(tr2item.UnityObject,tr2item.ObjectID,m_Player,tr2item) ) 
+		else if (!(Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.LinuxEditor || Application.platform == RuntimePlatform.OSXEditor))
 		{	
-			go.AddComponent<DefaultStatePlayer>(); // user did not attached any custom behabiour. so use default one
-		}
+
+			if (m_OnAttachBehabiourScript != null && !m_OnAttachBehabiourScript (tr2item.UnityObject, tr2item.ObjectID, m_Player, tr2item)) 
+			{
+				go.AddComponent<DefaultStatePlayer> (); // user did not attached any custom behabiour. so use default one
+			}
+
+		} 
+
+		#if UNITY_5_3_OR_NEWER
+		go.SetActiveRecursively(true);
+		#elif
+		go.SetActiveRecursively (true);
+		#endif
 			
 	}
 	
