@@ -1,21 +1,31 @@
 
 
 
+<b>Features: </b>
+- It parses Tomb Raider 2 level data like models, animation, textures. Then it renders them back in unity3D.
+- It uses data driven shader model instead of fixed function render pipeline. 
+- Uses vertex buffer instead of separate geometry commands. 
+- Original texture Id based UV mapping is replaced with single large texture atlas for performance gain. 
+- In original file models were not defined in complete mesh. Model parts are stored separately. They were rearranged procedurally using attached position and rotation information. Now it represents model with skeletal transformation hierarchy in unity3D.
+- Animation is represented with Unity3D animation curve.
+- Includes Character Controller with animation state machine and physics. 
 
-Frequently asked qustions about TR2 Level Viewer
 
 
-Q. How can I browse a tr2 level file?
+<h3>Frequently asked qustions about TR2 Level Viewer</h3>
+
+
+<b>Q. How can I browse a tr2 level file?</b>
 
 Ans.  File browser currently can not change drive. So, place your level  files in same drive where this project or application is located.  For example,
 If this project is located in “C:/Some folder/ Any Folder2/ “  then  you should place your file any whereIn drive C:
 For android phone or tab, files should be placed in internal memory card (sdcard). 
 
-Q. Browser shows files with tr2 extension. But I cannot select it.
+<b>Q. Browser shows files with tr2 extension. But I cannot select it.</b>
 
 Ans.  Browser can recognize files with *.TR2 extension by default. Try changing *.tr2 extension into upper case *.TR2 extension.
 
-Q. What are the basic controls?
+<b>Q. What are the basic controls?</b>
 
 Ans.  You can use keyboard + mouse to perform various actions. Basics are followings-
 On PC:
@@ -36,11 +46,11 @@ Following controls are available:
 Note: Optionally custom key can also be setup with KeyMapper prefab in unity.
 
 
-Q. How can I configure global parameters of the project?
+<b>Q. How can I configure global parameters of the project?</b>
 
 Ans. You can configure global parameter in Settings.cs script. 
 
-Q. How can I attach custom behavior to movable tr2 object?
+<b>Q. How can I attach custom behavior to movable tr2 object?<b>
 
 Ans. You can attach custom behavior to movable tr2 object through AI prefab in unity. Place AI prefab in scene.
 AI prefab has component AICallBackHandler. You can attach your custom behavior script there in OnAttachingBehaviourToObject call back.
@@ -56,7 +66,7 @@ Player		: Unity game object that represents Lara.
 
 
 
-Q. How can I control animation state with my custom behavior script?
+<b>Q. How can I control animation state with my custom behavior script?</b>
 
 First set ShowObjectID to true in Settings.cs. This will print TR2 object ID in 3D text.  
 Alternatively you can look up this ID in Unity3D Editor’s Hierarchy panel. Search for game object starting 
@@ -68,12 +78,13 @@ test of animations of a tr2 object.
 Game Object ‘AI’ in level scene has a component AICallBackHandler  which handles a request with ObjectID argument. 
 Check this Object ID . If this ID matches your selected TR2 object ID, then you can process it.
 
-Q. What unity layers are used for objects?
+<b>Q. What unity layers are used for objects?</b>
+
     Layers are defined in MaskedLayer.cs and GlobalLayer .cs.Following layers are used
    	Switch = 8       Defines layers of switch objects
 	Player = 9       Defines unity layer of Lara
 	Default = 0
-Q. What features can I play around?
+<b>Q. What features can I play around?</b>
     Possible areas where you can develop are:
 - Sound System
 - Day Night System
@@ -85,7 +96,7 @@ Q. What features can I play around?
 - KeyMapper
 
 
-Q. Can I generate entire level in edit mode?
+<b>Q. Can I generate entire level in edit mode?</b>
 
 Ans. Yes you can.  From Menu TR2 Editor -> Create Level. Be sure to create new scene in that case. Otherwise you 
 will mix-up objects already exist in scene with newly generated objects : ) There is a unit test scene in this project 
@@ -98,10 +109,10 @@ Required prefabs should be placed in scene for minimum level funtionality:
 - Mouse (Prefav Mouse)
 
 
-Q. Is it possible to load level file from http server?
+<b>Q. Is it possible to load level file from http server?</b>
   Ans. Yes it is possible. You can play around Browser.cs .  It uses WWW class to fetch level file data bytes from specified server url. 
 
-Q.How to contact the authour?
+<b>Q.How to contact the authour?</b>
 
 Here is my mail address suruzkento@gmail.com, you can contact me to asked some thing I missed here, to share your ideas, or to simply say “Hi” :) 
 
