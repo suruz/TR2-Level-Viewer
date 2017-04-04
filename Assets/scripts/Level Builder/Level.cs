@@ -141,8 +141,13 @@ public class Level
 		}
 		else
 		{
+			#if UNITY_5_3_OR_NEWER
+			MeshCollider cldr  = go.AddComponent<MeshCollider>();
+			//cldr.isTrigger = true;
+			#else
 			MeshCollider cldr  = go.AddComponent<MeshCollider>();
 			cldr.isTrigger = true;
+			#endif
 		}
 
 		/*Rigidbody rb = go.AddComponent<Rigidbody>();
@@ -478,8 +483,13 @@ public class Level
 			RaycastHit hit = new RaycastHit();
 			Transform roomtransform = null;
 			Transform Lara = m_Player.transform;
-			
-			int mask = Physics.kDefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
+
+			#if UNITY_5_3_OR_NEWER
+				int mask = Physics.DefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
+			#else
+				int mask = Physics.kDefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
+			#endif
+
 			if(Physics.Raycast(Lara.position + Vector3.up * 50, -Vector3.up, out hit,14096,mask ))
 			{
 				roomtransform = hit.transform; Debug.Log("SetRoomForPlayer");
