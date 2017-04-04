@@ -152,7 +152,13 @@ public class Player : ObjectExt {
 		//TODO: Detect Room Change with Raycasting Room
 		//FIXED:Heighten raycast origin to handle floor collision through raycast. m_Transform.position + Vector3.up
 		RaycastHit hit = new RaycastHit();
+
+		#if UNITY_5_3_OR_NEWER
+		int mask = Physics.DefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
+		#else
 		int mask = Physics.kDefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
+		#endif
+
 		if(Physics.Raycast(m_Transform.position + Vector3.up * 10, -Vector3.up, out hit,14096,mask ))
 		{
 			//room changed?
@@ -274,7 +280,12 @@ public class Player : ObjectExt {
 			return;
 		}
 	
+		#if UNITY_5_3_OR_NEWER
+		int mask = Physics.DefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
+		#else
 		int mask = Physics.kDefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
+		#endif
+
 		RaycastHit hit = new RaycastHit();
 
 		Transform t = m_Transform.FindChild("objPart:0");
@@ -330,7 +341,13 @@ public class Player : ObjectExt {
 		if(m_AnimStatePlayer != null)
 		{
 			RaycastHit hit2 = new RaycastHit();
+
+			#if UNITY_5_3_OR_NEWER
+			int mask = Physics.DefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
+			#else
 			int mask = Physics.kDefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
+			#endif
+
 			bool collision = Physics.Raycast(transform.position + Vector3.up * 400, dir, out hit2,150,mask );
 			
 			if(collision)
@@ -465,7 +482,13 @@ public class Player : ObjectExt {
 		if(m_AnimStatePlayer != null)
 		{
 			RaycastHit hit2 = new RaycastHit();
+
+			#if UNITY_5_3_OR_NEWER
+			int mask = Physics.DefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
+			#else
 			int mask = Physics.kDefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
+			#endif
+
 			Transform t = m_Transform.FindChild("objPart:0");
 			bool collision = Physics.Raycast(t.position, dir, out hit2,150,mask );
 
