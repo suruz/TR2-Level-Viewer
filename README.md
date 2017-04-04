@@ -68,6 +68,7 @@ Player		: Unity game object that represents Lara.
 
 <b>Q. How can I control animation state with my custom behavior script?</b>
 
+
 First set ShowObjectID to true in Settings.cs. This will print TR2 object ID in 3D text.  
 Alternatively you can look up this ID in Unity3D Editor’s Hierarchy panel. Search for game object starting 
 ‘Object X‘ where X means ID.
@@ -79,13 +80,13 @@ Game Object ‘AI’ in level scene has a component AICallBackHandler  which han
 Check this Object ID . If this ID matches your selected TR2 object ID, then you can process it.
 
 <b>Q. What unity layers are used for objects?</b>
-
     Layers are defined in MaskedLayer.cs and GlobalLayer .cs.Following layers are used
-   	Switch = 8       Defines layers of switch objects
-	Player = 9       Defines unity layer of Lara
-	Default = 0
+   	- Switch = 8       Defines layers of switch objects
+	- Player = 9       Defines unity layer of Lara
+	- Default = 0
+	
 <b>Q. What features can I play around?</b>
-    Possible areas where you can develop are:
+  Possible areas where you can develop are:
 - Sound System
 - Day Night System
 - Health Monitoring System
@@ -110,6 +111,7 @@ Required prefabs should be placed in scene for minimum level funtionality:
 
 
 <b>Q. Is it possible to load level file from http server?</b>
+
   Ans. Yes it is possible. You can play around Browser.cs .  It uses WWW class to fetch level file data bytes from specified server url. 
 
 <b>Q.How to contact the authour?</b>
