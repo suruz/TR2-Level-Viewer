@@ -378,6 +378,11 @@ public class Animator
 			#elif UNITY_5_0
 			clips[ci].clip.legacy = true;
 			#endif
+
+			#if UNITY_5_3_OR_NEWER
+			clips[ci].clip.legacy = true;
+			#endif
+
 			tr2movable.UnityAnimation.AddClip(clips[ci].clip, "" + ci);
 			tr2movable.AnimClips.Add(clips[ci]);
 		}
