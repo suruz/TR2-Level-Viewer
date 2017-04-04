@@ -313,6 +313,30 @@ public class Animator
 			}
 			
 			AnimationClip animClip = new AnimationClip();
+
+			#if  UNITY_4_0 
+			animClip.legacy = true;
+			#elif  UNITY_4_0_1 	
+			animClip.legacy = true;
+			#elif UNITY_4_1 	
+			animClip.legacy = true;
+			#elif UNITY_4_2 	
+			animClip.legacy = true;
+			#elif UNITY_4_3 	
+			animClip.legacy = true;
+			#elif  UNITY_4_5 	
+			animClip.legacy = true;
+			#elif UNITY_4_6 	
+			animClip.legacy = true;
+			#elif UNITY_5_0
+			animClip.legacy = true;
+			#endif
+
+			#if UNITY_5_3_OR_NEWER
+			animClip.legacy = true;
+			#endif
+
+
 			for(int transformId = 0; transformId < ntransform; transformId++)
 			{
 				System.String relCurvePath = CalculateCurveRelativePath(transformtree[transformId]);
@@ -360,29 +384,6 @@ public class Animator
 		//add these clips to Tr2Moveable tr2movable.UnityAnimation
 		for(int ci = 0; ci < clips.Count; ci++)
 		{
-			
-			#if  UNITY_4_0 
-			clips[ci].clip.legacy = true;
-			#elif  UNITY_4_0_1 	
-			clips[ci].clip.legacy = true;
-			#elif UNITY_4_1 	
-			clips[ci].clip.legacy = true;
-			#elif UNITY_4_2 	
-			clips[ci].clip.legacy = true;
-			#elif UNITY_4_3 	
-			clips[ci].clip.legacy = true;
-			#elif  UNITY_4_5 	
-			clips[ci].clip.legacy = true;
-			#elif UNITY_4_6 	
-			clips[ci].clip.legacy = true;
-			#elif UNITY_5_0
-			clips[ci].clip.legacy = true;
-			#endif
-
-			#if UNITY_5_3_OR_NEWER
-			clips[ci].clip.legacy = true;
-			#endif
-
 			tr2movable.UnityAnimation.AddClip(clips[ci].clip, "" + ci);
 			tr2movable.AnimClips.Add(clips[ci]);
 		}
