@@ -50,7 +50,7 @@ Note: Optionally custom key can also be setup with KeyMapper prefab in unity.
 
 Ans. You can configure global parameter in Settings.cs script. 
 
-<b>Q. How can I attach custom behavior to movable tr2 object?<b>
+<b>Q. How can I attach custom behavior to movable tr2 object?</b>
 
 Ans. You can attach custom behavior to movable tr2 object through AI prefab in unity. Place AI prefab in scene.
 AI prefab has component AICallBackHandler. You can attach your custom behavior script there in OnAttachingBehaviourToObject call back.
