@@ -173,8 +173,8 @@ public class MeshBuilder  {
 			nonSharedUV2s[uvIdx].x+=0.001f;
 			nonSharedUV2s[uvIdx].y+=0.001f;
 		}
-
-		Mesh mesh  = new Mesh();
+        for (int i = 0; i < nonSharedVertices.Length; i++) { nonSharedVertices[i] = nonSharedVertices[i] * Settings.SceneScaling; }
+        Mesh mesh  = new Mesh();
 		mesh.Clear();
 		mesh.vertices = nonSharedVertices;
 		mesh.uv = nonSharedUVs;
@@ -349,8 +349,8 @@ public class MeshBuilder  {
 			nonSharedTris[strideTriIdx+vertOrUVIdx2] = strideVertIdx+vertOrUVIdx2;
 			
 		}
-		
-		Mesh mesh  = new Mesh();
+        for (int i = 0; i < nonSharedVertices.Length; i++) { nonSharedVertices[i] = nonSharedVertices[i] * Settings.SceneScaling; }
+        Mesh mesh  = new Mesh();
 		mesh.Clear();
 		mesh.vertices = nonSharedVertices;
 		
@@ -486,12 +486,12 @@ public class MeshBuilder  {
 		retval = new GameObject(name);
 		MeshFilter mf = retval.AddComponent<MeshFilter>();
 		Mesh m = mf.mesh;
-		m.vertices = new Vector3[]{ new Vector3(0,0,0), new Vector3(1,1,1), new Vector3(0,0,0), new Vector3(1,0,1) };
-		m.triangles =new int[]{0,1,2};
+		m.vertices = new Vector3[]{ new Vector3(0,0,0) , new Vector3(1,1,1), new Vector3(0,0,0), new Vector3(1,0,1) };
+        for (int i = 0; i < m.vertices.Length; i++) { m.vertices[i] = m.vertices[i] * Settings.SceneScaling; }
+        m.triangles =new int[]{0,1,2};
 		BoxCollider collider = retval.AddComponent<BoxCollider>();
 		collider.isTrigger = true;
 		retval.layer = UnityLayer.Player;
 		return retval;
 	}
-	
 }
