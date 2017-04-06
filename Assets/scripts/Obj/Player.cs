@@ -12,10 +12,10 @@ public class Player : ObjectExt {
 
 	protected float m_DistancedCrossed = 0;
 	protected float m_Health = 100;
-	protected float m_Height = 775.0f;
-	protected float m_JumpHeight = 736;//870.0f;
-	protected float m_JumpHeight2 = 761;//870.0f;
-	protected float m_EdgeGrabHeight = 736.0f;
+	protected float m_Height = 775.0f * Settings.SceneScaling;
+	protected float m_JumpHeight = 736 * Settings.SceneScaling;//870.0f;
+	protected float m_JumpHeight2 = 761 * Settings.SceneScaling;//870.0f;
+	protected float m_EdgeGrabHeight = 736.0f * Settings.SceneScaling;
 
 	Physic3D physics = null;
 	bool m_bJumping = false;
@@ -26,7 +26,7 @@ public class Player : ObjectExt {
 
 	bool m_bFreeFall = false;
 	float m_FreeFallStartTime = 0.0f;
-	float m_FreeFallStartHeight = 256;
+	float m_FreeFallStartHeight = 256 * Settings.SceneScaling;
 	float m_GroundHeight = 0.0f;
 	//float m_OnAirHeight = 0.0f;
 	float m_PullUpHeight = 0.0f;
@@ -56,7 +56,7 @@ public class Player : ObjectExt {
 		Mouse.m_OnMouseMove += OnMouseMove;
 
 		physics = new Physic3D(transform.position); 
-		physics.g = 5000;
+		physics.g = 5000 * Settings.SceneScaling;
 		//prevy = thistransform.position.y;
 		LaraStatePlayer.OnJump += JumpHandler;
 		LaraStatePlayer.OnJumping += JumpingHandler;
@@ -72,7 +72,7 @@ public class Player : ObjectExt {
 
 	void SetInitialPosition(Vector3 pos, Vector3 dir)
 	{
-		pos += dir * 128;
+		pos += dir * 128 * Settings.SceneScaling;
 		m_FreePosition = pos;
 		m_PrevPlayPos = pos;
 		m_GroundHeight = pos.y;
@@ -85,9 +85,9 @@ public class Player : ObjectExt {
 	// Update is called once per frame
 	void Update () 
 	{
-		if((m_PrevPlayPos - m_Transform.position).sqrMagnitude > 2500)
+		if((m_PrevPlayPos - m_Transform.position).sqrMagnitude > (2500 * Settings.SceneScaling))
 		{
-			m_DistancedCrossed += (m_Transform.position - m_PrevPlayPos).magnitude /1024.0f;
+			m_DistancedCrossed += (m_Transform.position - m_PrevPlayPos).magnitude /(1024.0f * Settings.SceneScaling);
 			OnGUIUpdate(new Rect(0,Screen.height - 25,Screen.width,100), "" + m_DistancedCrossed.ToString("f2"));
 			m_Health -= m_DistancedCrossed * 0.00005f;
 			OnGUIPlayerHealth(new Rect(0, 25,Screen.width,100), "" + m_Health.ToString("f2"));
@@ -159,7 +159,7 @@ public class Player : ObjectExt {
 		int mask = Physics.kDefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
 		#endif
 
-		if(Physics.Raycast(m_Transform.position + Vector3.up * 10, -Vector3.up, out hit,14096,mask ))
+		if(Physics.Raycast(m_Transform.position + Vector3.up * 10 * Settings.SceneScaling, -Vector3.up, out hit,14096 * Settings.SceneScaling, mask ))
 		{
 			//room changed?
 			if(hit.transform!=null &&  hit.transform != m_Room.transform)
@@ -200,7 +200,7 @@ public class Player : ObjectExt {
 		
 		bool hasGrabableEdge = false;
 		Transform t = m_Transform.FindChild("objPart:0");
-		List<Edge> horizontal_edeges = m_Room.RayCast(t.position, transform.forward, 200);
+		List<Edge> horizontal_edeges = m_Room.RayCast(t.position, transform.forward, 200 * Settings.SceneScaling);
 	
 		if(horizontal_edeges.Count > 0)
 		{
@@ -219,13 +219,13 @@ public class Player : ObjectExt {
 				float pullupheight = ep0.y - transform.position.y;
 				m_PullUpHeight = pullupheight;
 			
-				if( pullupheight > this.m_Height  && pullupheight < this.m_Height + 1024)
+				if( pullupheight > this.m_Height  && pullupheight < this.m_Height + (1024 * Settings.SceneScaling))
 				{
 					JumpTarget = Vector3.up * (pullupheight - m_JumpHeight);
 					PullUpTarget = transform.position + Vector3.up * (pullupheight - m_JumpHeight);
 					retval =  KeyMapper.Jump;
 				}
-				else if( pullupheight > (this.m_Height * 2.0f)  && pullupheight < ((this.m_Height * 2.0f)  + 1024))
+				else if( pullupheight > (this.m_Height * 2.0f)  && pullupheight < ((this.m_Height * 2.0f)  + (1024 * Settings.SceneScaling)))
 				{
 					JumpTarget = Vector3.up * (pullupheight - m_JumpHeight);
 					PullUpTarget = transform.position + Vector3.up * (pullupheight - m_JumpHeight);
@@ -233,7 +233,7 @@ public class Player : ObjectExt {
 				}
 				else if(ep0.y < (transform.position.y + this.m_Height))
 				{
-					if(((transform.position.y + this.m_Height) - ep0.y) < 100)
+					if(((transform.position.y + this.m_Height) - ep0.y) < (100 * Settings.SceneScaling))
 					{
 						JumpTarget = Vector3.zero;
 						PullUpTarget = transform.position;
@@ -289,7 +289,7 @@ public class Player : ObjectExt {
 		RaycastHit hit = new RaycastHit();
 
 		Transform t = m_Transform.FindChild("objPart:0");
-		Vector3 origin = t.position + Vector3.up * 0 - Vector3.forward * 50;
+		Vector3 origin = t.position + Vector3.up * 0 - Vector3.forward * 50 * Settings.SceneScaling;
 
 		if(Physics.Raycast(origin, -Vector3.up, out hit,14096,mask ))
 		{
@@ -348,7 +348,7 @@ public class Player : ObjectExt {
 			int mask = Physics.kDefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
 			#endif
 
-			bool collision = Physics.Raycast(transform.position + Vector3.up * 400, dir, out hit2,150,mask );
+			bool collision = Physics.Raycast(transform.position + Vector3.up * 400 * Settings.SceneScaling, dir, out hit2,150 * Settings.SceneScaling, mask );
 			
 			if(collision)
 			{
@@ -393,7 +393,7 @@ public class Player : ObjectExt {
 			//check for hip displacement from ground
 			float diff = (transform.position - PullUpTarget).magnitude;
 			Debug.Log("Pullig UP" + diff);
-			if(diff < 1f )
+			if(diff < (1f * Settings.SceneScaling))
 			{
 				OnReachPullUpTarget();
 			}
@@ -409,7 +409,7 @@ public class Player : ObjectExt {
 	{
 		Transform t = m_Transform.FindChild("objPart:0");
 		float diff = t.position.y - m_Transform.position.y;
-		if(diff > 1140) //ful standing position
+		if(diff > (1100 * Settings.SceneScaling)) //ful standing position
 		{
 			m_bPullingUp = false;
 			m_bStandingUp = false;
@@ -445,7 +445,7 @@ public class Player : ObjectExt {
 		float diff = t.position.y - m_Transform.position.y;
 		Debug.Log("OnWalkingUp:" + diff);
 
-		if(diff > 935) //ful standing position
+		if(diff > (935 * Settings.SceneScaling)) //ful standing position
 		{
 			m_bWalkingUp = false;
 			if(m_AnimStatePlayer != null)
@@ -478,19 +478,19 @@ public class Player : ObjectExt {
 
 	void MovementHandler(Vector3 dir, float speed)
 	{
-		transform.position = transform.position + dir * speed;
+		transform.position = transform.position + dir * speed * Settings.SceneScaling;
 		if(m_AnimStatePlayer != null)
 		{
 			RaycastHit hit2 = new RaycastHit();
 
 			#if UNITY_5_3_OR_NEWER
-			int mask = Physics.kDefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
+			int mask = Physics.DefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
 			#else
 			int mask = Physics.kDefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
 			#endif
 
 			Transform t = m_Transform.FindChild("objPart:0");
-			bool collision = Physics.Raycast(t.position, dir, out hit2,150,mask );
+			bool collision = Physics.Raycast(t.position, dir, out hit2,150 * Settings.SceneScaling, mask );
 
 			if(collision)
 			{
@@ -516,7 +516,7 @@ public class Player : ObjectExt {
 			{
 				Vector3 normal = Vector3.up;
 				Transform t = m_Transform.FindChild("objPart:0");
-				bool hit = m_Room.HitTest(t.position, m_Transform.forward,ref normal, 200);
+				bool hit = m_Room.HitTest(t.position, m_Transform.forward,ref normal, 200 * Settings.SceneScaling);
 				if(hit)
 				{
 					Debug.Log("Wall Hit Test:" + hit);
@@ -554,7 +554,7 @@ public class Player : ObjectExt {
 		mouse_dy = dy;
 	}
 
-	/*function OnCollisionEnter(collision : Collision) {
+    /*function OnCollisionEnter(collision : Collision) {
 		// Debug-draw all contact points and normals
 		for (var contact : ContactPoint in collision.contacts)
 			Debug.DrawRay(contact.point, contact.normal, Color.white);
@@ -568,5 +568,5 @@ public class Player : ObjectExt {
 	function OnTriggerEnter (other : Collider) {
 		Destroy(other.gameObject);
 	}*/
-
+    float m_maxHorizontalDisplacement = 2500 * Settings.SceneScaling ;
 }
