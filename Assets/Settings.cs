@@ -34,5 +34,5 @@ public class Settings  {
 													//This is default Tomb Raider 2 file extension
 													//that file browser will look up.
 	public static bool LoadDemoLevel = false;
-	
+    public static float SceneScaling = 0.0009765625f; //Scaling support for GI and Physics in Unity 5 and higher
 }
