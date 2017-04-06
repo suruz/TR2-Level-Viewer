@@ -28,7 +28,7 @@ public class ThirdPersonCam : MonoBehaviour {
 	{
 		Camera camera = GetComponent<Camera>();
 		fieldofview = camera.fieldOfView;
-		Mouse.m_OnMouseMove += OnMouseMove;
+		Mouse.m_OnMouseMove += OnMouseMove; camera.near *= Settings.SceneScaling;
 	}
 	
 	void OnMouseMove(float dx, float dy)
@@ -57,7 +57,7 @@ public class ThirdPersonCam : MonoBehaviour {
 					
 	if(!binit)
 	{
-		transform.position = target.position + (target.position - transform.position).normalized * 2048;
+		transform.position = target.position + (target.position - transform.position).normalized * 2048 * Settings.SceneScaling;
 		anim = target.GetComponent<LaraStatePlayer>();
 		binit = true;
 	}
@@ -82,13 +82,13 @@ public class ThirdPersonCam : MonoBehaviour {
 	}
 		
 	RaycastHit hit = new RaycastHit();
-	if(Physics.Raycast(target.position, -forward, out hit,1500))
+	if(Physics.Raycast(target.position, -forward, out hit,1500 * Settings.SceneScaling))
 	{
 		distance = hit.distance;
 	}
 	else
 	{
-		distance = 1500;
+		distance = 1500 * Settings.SceneScaling;
 	}
 		
 		
@@ -100,7 +100,7 @@ public class ThirdPersonCam : MonoBehaviour {
 			
 			transform.forward = Vector3.Lerp(transform.forward , target.forward,Time.deltaTime * 5.0f);
 			Vector3 pos = target.position - forward * distance;
-			transform.position = Vector3.Lerp(transform.position,new Vector3(pos.x,pos.y + 700, pos.z),Time.deltaTime * 2.0f);
+			transform.position = Vector3.Lerp(transform.position,new Vector3(pos.x,pos.y + 700 *Settings.SceneScaling, pos.z),Time.deltaTime * 2.0f);
 
 		
 			//Debug.Log(camrot);
@@ -111,7 +111,7 @@ public class ThirdPersonCam : MonoBehaviour {
 			mouse_dy = 0;
 			transform.forward = Vector3.Lerp(transform.forward , target.forward + Vector3.up * lookup,Time.deltaTime * 5.0f) ;
 			Vector3 pos = target.position - forward * distance;
-			transform.position = Vector3.Lerp(transform.position,new Vector3(pos.x,pos.y + 700, pos.z),Time.deltaTime * 2.0f);
+			transform.position = Vector3.Lerp(transform.position,new Vector3(pos.x,pos.y + 700 * Settings.SceneScaling, pos.z),Time.deltaTime * 2.0f);
 
 	}
 	}
