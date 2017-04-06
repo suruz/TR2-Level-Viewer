@@ -226,9 +226,9 @@ public class Animator
 					
 					if (transformId == 0)
 					{
-						float ItemAnimX = (short)keyframeinfo.data[frameoffset + 6];
-						float ItemAnimY = (short)keyframeinfo.data[frameoffset + 7];
-						float ItemAnimZ = (short)keyframeinfo.data[frameoffset + 8];
+						float ItemAnimX = (short)keyframeinfo.data[frameoffset + 6] * Settings.SceneScaling;
+						float ItemAnimY = (short)keyframeinfo.data[frameoffset + 7] * Settings.SceneScaling;
+						float ItemAnimZ = (short)keyframeinfo.data[frameoffset + 8] * Settings.SceneScaling;
 						
 						if(numkeyframe == 1) //addition key after last key
 						{
