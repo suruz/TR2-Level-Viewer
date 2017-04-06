@@ -89,7 +89,7 @@ public class Level
 				Parser.Tr2Room tr2room = leveldata.Rooms[i];  
 				Mesh roommesh = MeshBuilder.CreateRoomMesh(tr2room, m_leveldata);
 				Vector3 position = new Vector3(m_leveldata.Rooms[i].info.x,0,m_leveldata.Rooms[i].info.z);
-				GameObject go = CreateRoom(roommesh, position, i);
+				GameObject go = CreateRoom(roommesh, position * Settings.SceneScaling, i);
 				go.transform.parent = m_LevelRoot.transform;
 				m_RoomExs[i] = go.AddComponent<RoomEx>();
 				//build room object
@@ -107,98 +107,111 @@ public class Level
 	
 		}
 	}
-	
-	//TODO: Determine Unity Pro / Free version and use Transparent/Cutout/Diffuse if pro otherwise
-	//use Diffuse in material
-	
-	GameObject CreateRoom(Mesh mesh, Vector3 position, int roomidx)
-	{
-		GameObject go = new GameObject("room" + roomidx);
-		Renderer renderer = go.AddComponent<MeshRenderer>();
-		MeshFilter mf = go.AddComponent<MeshFilter>();
-		mf.mesh = mesh;
 
-		go.transform.position = position;
-		go.transform.rotation = Quaternion.identity;
-		if(Settings.PlatformUnityPro)
-		{
-			#if UNITY_5_3_OR_NEWER
+    //TODO: Determine Unity Pro / Free version and use Transparent/Cutout/Diffuse if pro otherwise
+    //use Diffuse in material
+
+    GameObject CreateRoom(Mesh mesh, Vector3 position, int roomidx)
+    {
+        GameObject go = new GameObject("room" + roomidx);
+        Renderer renderer = go.AddComponent<MeshRenderer>();
+        MeshFilter mf = go.AddComponent<MeshFilter>();
+        mf.mesh = mesh;
+
+        go.transform.position = position;
+        go.transform.rotation = Quaternion.identity;
+        if (Settings.PlatformUnityPro)
+        {
+#if UNITY_5_3_OR_NEWER
 			renderer.material = Resources.Load("room_material", typeof(Material)) as Material;
-			#else
-			renderer.material = new Material(Shader.Find("Transparent/Cutout/Diffuse"));
-			#endif
-		}
-		else
-		{
-			#if UNITY_5_3_OR_NEWER
+#else
+            renderer.material = new Material(Shader.Find("Transparent/Cutout/Diffuse"));
+#endif
+        }
+        else
+        {
+#if UNITY_5_3_OR_NEWER
 			renderer.material = Resources.Load("room_material", typeof(Material)) as Material;
-			#else
-			renderer.material = new Material(Shader.Find("Diffuse"));
-			#endif
+#else
+            renderer.material = new Material(Shader.Find("Diffuse"));
+#endif
 
-		}
-		renderer.material.mainTexture =  m_LevelTextureTile;
-		renderer.material.color = new Color(1f,1f,1f,1.0f);
-		renderer.castShadows = !Settings.EnableIndoorShadow;
-		//renderer.material.SetTexture("_BumpMap", Bumptex);*/
+        }
+        renderer.material.mainTexture = m_LevelTextureTile;
+        renderer.material.color = new Color(1f, 1f, 1f, 1.0f);
 
-		//check for inertia tensor calculation!
-		if(mesh.bounds.extents.y == 0 || mesh.bounds.extents.x == 0 || mesh.bounds.extents.z == 0)
-		{
-			BoxCollider cldr = go.AddComponent<BoxCollider>();
-			cldr.isTrigger = true;
-		}
-		else
-		{
-			#if UNITY_5_3_OR_NEWER
+#if UNITY_5_3_OR_NEWER
+        if (!Settings.EnableIndoorShadow)
+        {
+            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+        }
+        else
+        {
+            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        }
+#else
+         renderer.castShadows = !Settings.EnableIndoorShadow;
+#endif
+
+        //renderer.material.SetTexture("_BumpMap", Bumptex);*/
+
+        //check for inertia tensor calculation!
+        if (mesh.bounds.extents.y == 0 || mesh.bounds.extents.x == 0 || mesh.bounds.extents.z == 0)
+        {
+            BoxCollider cldr = go.AddComponent<BoxCollider>();
+            cldr.isTrigger = true;
+        }
+        else
+        {
+#if UNITY_5_3_OR_NEWER
 			MeshCollider cldr  = go.AddComponent<MeshCollider>();
 			//cldr.isTrigger = true;
-			#else
-			MeshCollider cldr  = go.AddComponent<MeshCollider>();
-			cldr.isTrigger = true;
-			#endif
-		}
+#else
+            MeshCollider cldr = go.AddComponent<MeshCollider>();
+            cldr.isTrigger = true;
+#endif
+        }
 
-		/*Rigidbody rb = go.AddComponent<Rigidbody>();
+        /*Rigidbody rb = go.AddComponent<Rigidbody>();
 		rb.isKinematic = true;
 		rb.useGravity = false;*/
-		
-		//go.AddComponent<RoomCollision>();
-		return go;
-	}
 
-	GameObject CreateObject(Mesh mesh, Vector3 position, Quaternion rotation, string name)
-	{
-		GameObject go = new GameObject(name);
-		Renderer renderer = go.AddComponent<MeshRenderer>();
-		MeshFilter mf = go.AddComponent<MeshFilter>();
-		mf.mesh = mesh;
-		
-		go.transform.position = position;
-		go.transform.rotation = rotation;
-		if(Settings.PlatformUnityPro)
-		{
-			#if UNITY_5_3_OR_NEWER
-			renderer.material = Resources.Load("room_material", typeof(Material)) as Material;
-			#else
-			renderer.material = new Material(Shader.Find("Transparent/Cutout/Diffuse"));
-			#endif
-		}
-		else
-		{
-			#if UNITY_5_3_OR_NEWER
-			renderer.material = Resources.Load("room_material", typeof(Material)) as Material;
-			#else
-			renderer.material = new Material(Shader.Find("Diffuse"));
-			#endif
-		}
-		
-		renderer.material.mainTexture =  m_LevelTextureTile;
-		renderer.material.color = new Color(1f,1f,1f,1.0f);
-		return go;
-	}
+        //go.AddComponent<RoomCollision>();
+        return go;
+    }
 
-	GameObject CreateObjectWithID(int idx, Vector3 position, Quaternion rotation, string name )
+    GameObject CreateObject(Mesh mesh, Vector3 position, Quaternion rotation, string name)
+    {
+        GameObject go = new GameObject(name);
+        Renderer renderer = go.AddComponent<MeshRenderer>();
+        MeshFilter mf = go.AddComponent<MeshFilter>();
+        mf.mesh = mesh;
+
+        go.transform.position = position;
+        go.transform.rotation = rotation;
+        if (Settings.PlatformUnityPro)
+        {
+#if UNITY_5_3_OR_NEWER
+			renderer.material = Resources.Load("room_material", typeof(Material)) as Material;
+#else
+            renderer.material = new Material(Shader.Find("Transparent/Cutout/Diffuse"));
+#endif
+        }
+        else
+        {
+#if UNITY_5_3_OR_NEWER
+			renderer.material = Resources.Load("room_material", typeof(Material)) as Material;
+#else
+            renderer.material = new Material(Shader.Find("Diffuse"));
+#endif
+        }
+
+        renderer.material.mainTexture = m_LevelTextureTile;
+        renderer.material.color = new Color(1f, 1f, 1f, 1.0f);
+        return go;
+    }
+
+    GameObject CreateObjectWithID(int idx, Vector3 position, Quaternion rotation, string name )
 	{
 		Parser.Tr2Mesh tr2mesh = m_leveldata.Meshes[idx];
 		Mesh objmesh = MeshBuilder.CreateObjectMesh(tr2mesh,m_leveldata);
@@ -238,9 +251,14 @@ public class Level
 			tr2staticmesh.UnityObject = CreateObjectWithID(itemIdx,Vector3.zero, Quaternion.identity, "__staticBase" + k );
 			tr2staticmesh.UnityObject.transform.parent = m_LevelRoot.transform;
 			tr2staticmesh.UnityObject.AddComponent<MeshCollider>();
-			tr2staticmesh.UnityObject.SetActiveRecursively(false);
-			
-			objects.Add(tr2staticmesh);
+
+#if UNITY_5_3_OR_NEWER
+            tr2staticmesh.UnityObject.SetActive(false);
+#else
+            tr2staticmesh.UnityObject.SetActiveRecursively(false);
+#endif
+
+            objects.Add(tr2staticmesh);
 		}
 		return objects;
 	}
@@ -340,15 +358,20 @@ public class Level
 					}
 					
 					transformtree[i].parent = Parent;
-					transformtree[i].localPosition = meshPos;;
+					transformtree[i].localPosition = meshPos * Settings.SceneScaling;
 					//transformtree[i].localRotation = relRot;
 					
 				}
 			}
-			objRoot.SetActiveRecursively(false);
-		}
 
-		return objects;
+#if UNITY_5_3_OR_NEWER
+            objRoot.SetActive(false);
+#else
+            objRoot.SetActiveRecursively(false);
+#endif
+        }
+
+        return objects;
 	}
 
 
@@ -375,11 +398,17 @@ public class Level
 					rot.z = 0;
 					int itemIdx = (int)m_leveldata.StaticMeshes[k].StartingMesh;
 					
-					GameObject go = (GameObject)GameObject.Instantiate(m_StaticPrefabs[k].UnityObject,meshPos,Quaternion.Euler(rot) );
+					GameObject go = (GameObject)GameObject.Instantiate(m_StaticPrefabs[k].UnityObject,meshPos * Settings.SceneScaling,Quaternion.Euler(rot) );
 					go.name = "room" + roomidx + "__staticBase" + k + "__meshBase"+itemIdx;
 					go.transform.parent = m_LevelRoot.transform;
-					go.SetActiveRecursively(true);
-					objects.Add(go);
+				
+#if UNITY_5_3_OR_NEWER
+                    go.SetActive(true);
+#else
+                    go.SetActiveRecursively(true);
+#endif
+
+                    objects.Add(go);
 				}
 			}
 		}
@@ -426,7 +455,7 @@ public class Level
 				GameObject movableItem = (GameObject) GameObject.Instantiate(m_DynamicPrefabs[i].UnityObject);
 				movableItem.name = "Object";
 				movableItem.transform.parent = m_LevelRoot.transform;
-				movableItem.transform.position = new Vector3(m_leveldata.Items[j].x ,-m_leveldata.Items[j].y,m_leveldata.Items[j].z );
+				movableItem.transform.position = new Vector3(m_leveldata.Items[j].x ,-m_leveldata.Items[j].y,m_leveldata.Items[j].z ) * Settings.SceneScaling;
 				float rot = ((m_leveldata.Items[j].Angle >> 14) & 0x03) * 90;
 				movableItem.transform.rotation = Quaternion.Euler(0,rot,0);
 				m_leveldata.Items[j].UnityObject = movableItem;
@@ -442,68 +471,78 @@ public class Level
 		
 		return objects;
 	}
-	
-	void InitialiseInstance(Parser.Tr2Item tr2item)
-	{
-		GameObject go = tr2item.UnityObject;
-		go.name +=" " + tr2item.ObjectID;
-		if (tr2item.ObjectID == 0) {
-			//playable character found!
-			m_Player = go;
-			m_Player.layer = UnityLayer.Player;
-			m_PrevPlayPos = m_Player.transform.position;
-			m_Player.transform.parent = null;
 
-			if (m_leveldata.Camera != null) {
-				m_leveldata.Camera.target = m_Player.transform;
-			}
-			LaraStatePlayer stateplayer = m_Player.AddComponent<LaraStatePlayer> ();
-			stateplayer.tranimations = m_DynamicPrefabs [0].AnimClips;
-			m_Player.name = "Lara";
+    void InitialiseInstance(Parser.Tr2Item tr2item)
+    {
+        GameObject go = tr2item.UnityObject;
+        go.name += " " + tr2item.ObjectID;
+        if (tr2item.ObjectID == 0)
+        {
+            //playable character found!
+            m_Player = go;
+            m_Player.layer = UnityLayer.Player;
+            m_PrevPlayPos = m_Player.transform.position;
+            m_Player.transform.parent = null;
 
-			GameObject FlashLight = new GameObject ("Fire Torch");
-			FlashLight.AddComponent <FlashLightStatePlayer> ();
-			Light lt = FlashLight.AddComponent<Light> ();
-			lt.type = LightType.Spot;
-			lt.range = 10000;
-			lt.spotAngle = 70;
-			lt.intensity = 1;
+            if (m_leveldata.Camera != null)
+            {
+                m_leveldata.Camera.target = m_Player.transform;
+            }
+            LaraStatePlayer stateplayer = m_Player.AddComponent<LaraStatePlayer>();
+            stateplayer.tranimations = m_DynamicPrefabs[0].AnimClips;
+            m_Player.name = "Lara";
 
-			FlashLight.transform.parent = m_Player.transform.FindChild ("objPart:0");//.Find("objPart:7").Find("objPart:14");
-			FlashLight.transform.position = FlashLight.transform.parent.position;
-			FlashLight.transform.forward = FlashLight.transform.parent.forward;
-			lt.enabled = false;
-		
-			Player player = go.AddComponent<Player> ();
-			player.m_Tr2Item = tr2item;
-			HealthMonitor healthmon = go.AddComponent<HealthMonitor> ();
-			PlayerCollisionHandler playercollider = go.AddComponent<PlayerCollisionHandler> ();
+            GameObject FlashLight = new GameObject("Fire Torch");
+            FlashLight.AddComponent<FlashLightStatePlayer>();
+            Light lt = FlashLight.AddComponent<Light>();
+            lt.type = LightType.Spot;
+            lt.range = 10000;
+            lt.spotAngle = 70;
+            lt.intensity = 1;
 
-			//Initialise Current Active Room for player
-			player.m_Room = SetRoomForPlayer ();
-			go.SetActiveRecursively (true);
-		}
+            FlashLight.transform.parent = m_Player.transform.FindChild("objPart:0");//.Find("objPart:7").Find("objPart:14");
+            FlashLight.transform.position = FlashLight.transform.parent.position;
+            FlashLight.transform.forward = FlashLight.transform.parent.forward;
+            lt.enabled = false;
 
-		//check if we have any custom behabiour  script for object
-		else if (!(Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.LinuxEditor || Application.platform == RuntimePlatform.OSXEditor))
-		{	
+            Player player = go.AddComponent<Player>();
+            player.m_Tr2Item = tr2item;
+            HealthMonitor healthmon = go.AddComponent<HealthMonitor>();
+            PlayerCollisionHandler playercollider = go.AddComponent<PlayerCollisionHandler>();
 
-			if (m_OnAttachBehabiourScript != null && !m_OnAttachBehabiourScript (tr2item.UnityObject, tr2item.ObjectID, m_Player, tr2item)) 
-			{
-				go.AddComponent<DefaultStatePlayer> (); // user did not attached any custom behabiour. so use default one
-			}
+            //Initialise Current Active Room for player
+            player.m_Room = SetRoomForPlayer();
+#if UNITY_5_3_OR_NEWER
+            m_Player.SetActive(true);
+#else
+            m_Player.SetActiveRecursively(true);
+#endif
 
-		} 
+        }
 
-		#if UNITY_5_3_OR_NEWER
-		go.SetActiveRecursively(true);
-		#elif
-		go.SetActiveRecursively (true);
-		#endif
-			
-	}
-	
-	RoomEx SetRoomForPlayer()
+        //check if we have any custom behabiour  script for object
+        // else if (!(Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.LinuxEditor || Application.platform == RuntimePlatform.OSXEditor))
+        //{
+
+        if (m_OnAttachBehabiourScript != null && !m_OnAttachBehabiourScript(tr2item.UnityObject, tr2item.ObjectID, m_Player, tr2item))
+        {
+                go.AddComponent<DefaultStatePlayer>(); // user did not attached any custom behabiour. so use default one
+
+#if UNITY_5_3_OR_NEWER
+            go.SetActive(true);
+#else
+            go.SetActiveRecursively(true);
+#endif
+
+        }
+
+        //}
+
+
+
+    }
+
+    RoomEx SetRoomForPlayer()
 	{
 		if(m_RoomExs.Length > 0 && m_Player!=null )
 		{
@@ -511,13 +550,12 @@ public class Level
 			Transform roomtransform = null;
 			Transform Lara = m_Player.transform;
 
-			#if UNITY_5_3_OR_NEWER
-				int mask = Physics.DefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
-			#else
-				int mask = Physics.kDefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
-			#endif
-
-			if(Physics.Raycast(Lara.position + Vector3.up * 50, -Vector3.up, out hit,14096,mask ))
+#if UNITY_5_3_OR_NEWER
+			int mask = Physics.DefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
+#else
+            int mask = Physics.kDefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
+#endif
+            if (Physics.Raycast(Lara.position + Vector3.up * 50, -Vector3.up, out hit,14096,mask ))
 			{
 				roomtransform = hit.transform; Debug.Log("SetRoomForPlayer");
 			}
@@ -662,8 +700,8 @@ public class Level
 									Vector3 sector_world_position = new Vector3(room_world_position.x + (sectorx * 1024), 0, room_world_position.z + (sectorz * 1024));
 								
 									GameObject diezone = MeshBuilder.CreateZone("Die Zone");
-									diezone.transform.position = sector_world_position;
-									diezone.transform.localScale = new Vector3(1024, 1024, 1024);
+									diezone.transform.position = sector_world_position * Settings.SceneScaling;
+									diezone.transform.localScale = new Vector3(1024, 1024, 1024) * Settings.SceneScaling;
 								   // diezone.transform.parent = m_RoomExs[r].transform;
 								
 								break;
@@ -673,8 +711,8 @@ public class Level
 									sector_world_position = new Vector3(room_world_position.x + (sectorx * 1024), 0, room_world_position.z + (sectorz * 1024));
 								
 									GameObject climbzone = MeshBuilder.CreateZone("Climb Zone");
-									climbzone.transform.position = sector_world_position;
-									climbzone.transform.localScale = new Vector3(1024, 1024, 1024);
+									climbzone.transform.position = sector_world_position * Settings.SceneScaling;
+									climbzone.transform.localScale = new Vector3(1024, 1024, 1024) * Settings.SceneScaling;
 								    //climbzone.transform.parent = m_RoomExs[r].transform;
 									
 								break;
