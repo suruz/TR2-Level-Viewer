@@ -43,11 +43,11 @@ public class SharkGoldenStatePlayer : MonoBehaviour {
 			
 			float dist = (m_FollowTransform.position - m_StartPos).magnitude;
 			
-			if(dist > 1024 && dist < 1024)
+			if(dist > (1024 * Settings.SceneScaling) && dist < (1024 * Settings.SceneScaling))
 			{
 				m_TargetPos = m_FollowTransform.position;
 				m_CurrentKeyState = Run;
-				if((transform.position - m_TargetPos).magnitude < 1024)
+				if((transform.position - m_TargetPos).magnitude < (1024 * Settings.SceneScaling))
 				{
 					m_CurrentKeyState = Attack;
 				}
@@ -57,7 +57,7 @@ public class SharkGoldenStatePlayer : MonoBehaviour {
 				transform.forward = (m_TargetPos - transform.position).normalized;
 				transform.position = Vector3.Lerp(transform.position ,m_TargetPos,Time.deltaTime);
 			}
-			else if((transform.position - m_StartPos).magnitude < 1024)
+			else if((transform.position - m_StartPos).magnitude < (1024 * Settings.SceneScaling))
 			{
 				m_CurrentKeyState = Idle;
 			}
@@ -67,7 +67,7 @@ public class SharkGoldenStatePlayer : MonoBehaviour {
 				m_CurrentKeyState = Walk;
 				
 				transform.forward = (m_TargetPos - transform.position).normalized;
-				transform.position = Vector3.Lerp(transform.position ,m_TargetPos,Time.deltaTime * 0.25f);
+				transform.position = Vector3.Lerp(transform.position ,m_TargetPos,Time.deltaTime * 0.25f * Settings.SceneScaling);
 			}
 			
 		}

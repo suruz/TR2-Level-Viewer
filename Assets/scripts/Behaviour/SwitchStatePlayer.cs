@@ -29,10 +29,10 @@ public class SwitchStatePlayer : MonoBehaviour {
 		m_Animation.wrapMode = WrapMode.Once;
 		m_Animation.Play(""+ m_CurrentKeyState);
 
-		BoxCollider collider = gameObject.AddComponent<BoxCollider>();
-		collider.size = new Vector3(1024, 1024, 512);
-		collider.center =  new Vector3(0, 512, 256);
-		collider.isTrigger = true;
+	
+        //removed collider creation from this behabiour script
+
+
 		gameObject.layer = UnityLayer.Switch;
 
 		m_GUIFont = (Font)Resources.Load("Font/courbd - gui", typeof(Font));

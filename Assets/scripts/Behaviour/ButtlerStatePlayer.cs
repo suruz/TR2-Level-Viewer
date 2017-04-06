@@ -43,10 +43,10 @@ public class ButtlerStatePlayer : MonoBehaviour {
 			m_TargetPos = m_FollowTransform.position;
 			transform.forward = (m_TargetPos - transform.position).normalized;
 			float dist = (m_FollowTransform.position - transform.position).magnitude;
-			if(dist > 2048 )
+			if(dist > (2048 * Settings.SceneScaling) )
 			{
 				m_CurrentKeyState = Walk;
-				transform.position = Vector3.Lerp(transform.position ,m_TargetPos,Time.deltaTime * 0.05f);
+				transform.position = Vector3.Lerp(transform.position ,m_TargetPos,Time.deltaTime * 0.05f * Settings.SceneScaling);
 			}
 			else
 			{

@@ -45,11 +45,11 @@ public class DogStatePlayer : MonoBehaviour {
 			Vector3 follow = (m_FollowTransform.position - m_StartPos);
 			float dist = follow.magnitude;
 			
-			if(dist > 1024 && dist < 6000)
+			if(dist > (1024 * Settings.SceneScaling) && dist < (6000 * Settings.SceneScaling))
 			{
-				m_TargetPos = m_FollowTransform.position - follow.normalized * 512;
+				m_TargetPos = m_FollowTransform.position - follow.normalized * 512 * Settings.SceneScaling;
 				m_CurrentKeyState = Run;
-				if((transform.position - m_TargetPos).magnitude < 256)
+				if((transform.position - m_TargetPos).magnitude < (256 * Settings.SceneScaling))
 				{
 					m_CurrentKeyState = Attack;
 				}
@@ -61,7 +61,7 @@ public class DogStatePlayer : MonoBehaviour {
 				transform.forward = fwrd;
 				transform.position = Vector3.Lerp(transform.position ,m_TargetPos,Time.deltaTime);
 			}
-			else if((transform.position - m_StartPos).magnitude < 256)
+			else if((transform.position - m_StartPos).magnitude < ( 256 * Settings.SceneScaling))
 			{
 				m_CurrentKeyState = Idle;
 			}
@@ -73,7 +73,7 @@ public class DogStatePlayer : MonoBehaviour {
 				Vector3 fwrd = (m_TargetPos - transform.position).normalized;
 				fwrd.y = 0;
 				transform.forward = fwrd;
-				transform.position = Vector3.Lerp(transform.position ,m_TargetPos,Time.deltaTime * 0.25f);
+				transform.position = Vector3.Lerp(transform.position ,m_TargetPos,Time.deltaTime * 0.25f * Settings.SceneScaling);
 			}
 			
 		}
