@@ -3,110 +3,110 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 
-public class Level  
+public class Level
 {
-	static RoomEx[] m_RoomExs = null;
-	static GameObject m_LevelRoot = null;
-	static Texture2D m_LevelTextureTile = null;
-	static public Parser.Tr2Level m_leveldata = null;
-	static public string m_LevelName;
+    static RoomEx[] m_RoomExs = null;
+    static GameObject m_LevelRoot = null;
+    static Texture2D m_LevelTextureTile = null;
+    static public Parser.Tr2Level m_leveldata = null;
+    static public string m_LevelName;
 
-	//resources
-	static List<Tr2Moveable> m_DynamicPrefabs = null;
-	static List <Parser.Tr2StaticMesh> m_StaticPrefabs = null;
+    //resources
+    static List<Tr2Moveable> m_DynamicPrefabs = null;
+    static List<Parser.Tr2StaticMesh> m_StaticPrefabs = null;
 
-	//Actors
-	static List <Actor> m_Actors = new List<Actor>();
-	public static GameObject m_Player = null;
-	//instances
-	static List<Parser.Tr2Item> m_MovableInstances = null;
+    //Actors
+    static List<Actor> m_Actors = new List<Actor>();
+    public static GameObject m_Player = null;
+    //instances
+    static List<Parser.Tr2Item> m_MovableInstances = null;
 
-	//Process room/sector data
-	//Transform m_CurrentActiveRoom = null;
-	RoomEx m_CurrentActiveRoom = null;
+    //Process room/sector data
+    //Transform m_CurrentActiveRoom = null;
+    RoomEx m_CurrentActiveRoom = null;
 
-	Vector3 m_PrevPlayPos = Vector3.zero;
-	Vector3 m_CurrentPlayPos = Vector3.zero;
-	public float m_DistancedCrossed = 0;
-	
-	public  delegate bool AttachBehaviourScript(GameObject AI, int ObjectID, GameObject player, Parser.Tr2Item tr2item);
-	public static AttachBehaviourScript m_OnAttachBehabiourScript = AICallBackHandler.OnAttachingBehaviourToObject;
-	
-	public Level(Parser.Tr2Level leveldata)
-	{
-		m_leveldata = leveldata;
-		m_LevelRoot = new GameObject ("Level " + m_LevelName);
-		//m_LevelRoot.AddComponent(typeof (MeshFilter));
-		//m_LevelRoot.AddComponent(typeof (MeshRenderer));
+    Vector3 m_PrevPlayPos = Vector3.zero;
+    Vector3 m_CurrentPlayPos = Vector3.zero;
+    public float m_DistancedCrossed = 0;
 
-		if(m_leveldata!=null && m_leveldata.NumRooms > 0)
-		{
-			m_LevelTextureTile = TextureUV.GenerateTextureTile (m_leveldata);
-			m_RoomExs = new RoomEx[m_leveldata.NumRooms];
+    public delegate bool AttachBehaviourScript(GameObject AI, int ObjectID, GameObject player, Parser.Tr2Item tr2item);
+    public static AttachBehaviourScript m_OnAttachBehabiourScript = AICallBackHandler.OnAttachingBehaviourToObject;
 
-			m_DynamicPrefabs = BuildDynamicPrefabObjects();
-			m_StaticPrefabs = BuildStaticPrefabObjects();
+    public Level(Parser.Tr2Level leveldata)
+    {
+        m_leveldata = leveldata;
+        m_LevelRoot = new GameObject("Level " + m_LevelName);
+        //m_LevelRoot.AddComponent(typeof (MeshFilter));
+        //m_LevelRoot.AddComponent(typeof (MeshRenderer));
 
-			//determine animation clip size for each movable object
-			for(int i = 0; i < m_DynamicPrefabs.Count - 1; i++)
-			{
-				int startoffset0 = m_DynamicPrefabs[i].Animation;
-				int startoffset1 = m_DynamicPrefabs[i + 1].Animation;
-				m_DynamicPrefabs[i].NumClips = startoffset1 - startoffset0; 
-			}
-			if(m_DynamicPrefabs.Count > 0)
-			{
-				int startoffset0 = m_DynamicPrefabs[m_DynamicPrefabs.Count - 1].Animation;
-				m_DynamicPrefabs[m_DynamicPrefabs.Count - 1].NumClips = (int) m_leveldata.NumAnimations - 1 - startoffset0;
-			}
+        if (m_leveldata != null && m_leveldata.NumRooms > 0)
+        {
+            m_LevelTextureTile = TextureUV.GenerateTextureTile(m_leveldata);
+            m_RoomExs = new RoomEx[m_leveldata.NumRooms];
 
-			//attach animation and their state change
-			for(int i = 0; i < m_DynamicPrefabs.Count; i++)
-			{
-				List<TRAnimationClip> clips = Animator.AttachAnimation(m_DynamicPrefabs[i], m_leveldata);
-				AnimationStateMapper.BuildMap(clips, m_DynamicPrefabs[i].UnityAnimation, m_leveldata);
-			}
+            m_DynamicPrefabs = BuildDynamicPrefabObjects();
+            m_StaticPrefabs = BuildStaticPrefabObjects();
 
-			//attach 3DText Box to movable objects  to mark their ID
-			if(Settings.ShowObjectID)
-			{
-				for(int i = 0; i < m_DynamicPrefabs.Count; i++)
-				{
-					if(m_leveldata.Text3DPrefav!=null)
-					{
-						TextMesh text3d = (TextMesh)GameObject.Instantiate(m_leveldata.Text3DPrefav);
-						text3d.transform.position = m_DynamicPrefabs[i].UnityObject.transform.position + Vector3.up * 1000;
-						text3d.transform.parent =   m_DynamicPrefabs[i].UnityObject.transform;
-						text3d.characterSize = 100;
-						text3d.text = "" + m_DynamicPrefabs[i].ObjectID;
-					}
-				}
-			}
+            //determine animation clip size for each movable object
+            for (int i = 0; i < m_DynamicPrefabs.Count - 1; i++)
+            {
+                int startoffset0 = m_DynamicPrefabs[i].Animation;
+                int startoffset1 = m_DynamicPrefabs[i + 1].Animation;
+                m_DynamicPrefabs[i].NumClips = startoffset1 - startoffset0;
+            }
+            if (m_DynamicPrefabs.Count > 0)
+            {
+                int startoffset0 = m_DynamicPrefabs[m_DynamicPrefabs.Count - 1].Animation;
+                m_DynamicPrefabs[m_DynamicPrefabs.Count - 1].NumClips = (int)m_leveldata.NumAnimations - 1 - startoffset0;
+            }
 
-			//build rooms
-			for(int i = 0 ; i < m_leveldata.NumRooms; i++)
-			{
-				Parser.Tr2Room tr2room = leveldata.Rooms[i];  
-				Mesh roommesh = MeshBuilder.CreateRoomMesh(tr2room, m_leveldata);
-				Vector3 position = new Vector3(m_leveldata.Rooms[i].info.x,0,m_leveldata.Rooms[i].info.z);
-				GameObject go = CreateRoom(roommesh, position * Settings.SceneScaling, i);
-				go.transform.parent = m_LevelRoot.transform;
-				m_RoomExs[i] = go.AddComponent<RoomEx>();
-				//build room object
-				List <GameObject> objects = InstantiateStaticObjects(tr2room, i);  
-				m_RoomExs[i].InitRoom(tr2room, objects);
-			}
+            //attach animation and their state change
+            for (int i = 0; i < m_DynamicPrefabs.Count; i++)
+            {
+                List<TRAnimationClip> clips = Animator.AttachAnimation(m_DynamicPrefabs[i], m_leveldata);
+                AnimationStateMapper.BuildMap(clips, m_DynamicPrefabs[i].UnityAnimation, m_leveldata);
+            }
 
-			m_MovableInstances =  InstantiateDynamicObjects();
-			SetupTrigers();
-			//attach components to m_MovableInstances
-			for(int i = 0; i < m_MovableInstances.Count; i++)
-			{
-				InitialiseInstance(m_MovableInstances[i]);
-			}
-	
-		}
-	}
+            //attach 3DText Box to movable objects  to mark their ID
+            if (Settings.ShowObjectID)
+            {
+                for (int i = 0; i < m_DynamicPrefabs.Count; i++)
+                {
+                    if (m_leveldata.Text3DPrefav != null)
+                    {
+                        TextMesh text3d = (TextMesh)GameObject.Instantiate(m_leveldata.Text3DPrefav);
+                        text3d.transform.position = m_DynamicPrefabs[i].UnityObject.transform.position + Vector3.up * 1000 * Settings.SceneScaling;
+                        text3d.transform.parent = m_DynamicPrefabs[i].UnityObject.transform;
+                        text3d.characterSize = 100 * Settings.SceneScaling;
+                        text3d.text = "" + m_DynamicPrefabs[i].ObjectID;
+                    }
+                }
+            }
+
+            //build rooms
+            for (int i = 0; i < m_leveldata.NumRooms; i++)
+            {
+                Parser.Tr2Room tr2room = leveldata.Rooms[i];
+                Mesh roommesh = MeshBuilder.CreateRoomMesh(tr2room, m_leveldata);
+                Vector3 position = new Vector3(m_leveldata.Rooms[i].info.x, 0, m_leveldata.Rooms[i].info.z);
+                GameObject go = CreateRoom(roommesh, position * Settings.SceneScaling, i);
+                go.transform.parent = m_LevelRoot.transform;
+                m_RoomExs[i] = go.AddComponent<RoomEx>();
+                //build room object
+                List<GameObject> objects = InstantiateStaticObjects(tr2room, i);
+                m_RoomExs[i].InitRoom(tr2room, objects);
+            }
+
+            m_MovableInstances = InstantiateDynamicObjects();
+            SetupTrigers();
+            //attach components to m_MovableInstances
+            for (int i = 0; i < m_MovableInstances.Count; i++)
+            {
+                InitialiseInstance(m_MovableInstances[i]);
+            }
+
+        }
+    }
 
     //TODO: Determine Unity Pro / Free version and use Transparent/Cutout/Diffuse if pro otherwise
     //use Diffuse in material
@@ -123,36 +123,22 @@ public class Level
         if (Settings.PlatformUnityPro)
         {
 #if UNITY_5_3_OR_NEWER
-			renderer.material = Resources.Load("room_material", typeof(Material)) as Material;
+            renderer.material = Resources.Load("room_material", typeof(Material)) as Material;
 #else
-            renderer.material = new Material(Shader.Find("Transparent/Cutout/Diffuse"));
+			renderer.material = new Material(Shader.Find("Transparent/Cutout/Diffuse"));
 #endif
         }
         else
         {
 #if UNITY_5_3_OR_NEWER
-			renderer.material = Resources.Load("room_material", typeof(Material)) as Material;
+            renderer.material = Resources.Load("room_material", typeof(Material)) as Material;
 #else
-            renderer.material = new Material(Shader.Find("Diffuse"));
+			renderer.material = new Material(Shader.Find("Diffuse"));
 #endif
-
         }
         renderer.material.mainTexture = m_LevelTextureTile;
         renderer.material.color = new Color(1f, 1f, 1f, 1.0f);
-
-#if UNITY_5_3_OR_NEWER
-        if (!Settings.EnableIndoorShadow)
-        {
-            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
-        }
-        else
-        {
-            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        }
-#else
-         renderer.castShadows = !Settings.EnableIndoorShadow;
-#endif
-
+        renderer.castShadows = !Settings.EnableIndoorShadow;
         //renderer.material.SetTexture("_BumpMap", Bumptex);*/
 
         //check for inertia tensor calculation!
@@ -164,10 +150,11 @@ public class Level
         else
         {
 #if UNITY_5_3_OR_NEWER
-			MeshCollider cldr  = go.AddComponent<MeshCollider>();
-			//cldr.isTrigger = true;
-#else
             MeshCollider cldr = go.AddComponent<MeshCollider>();
+            //room mesh tends to be concave, MeshCollider can not be used as trigger for this kind of mesh in unity 5.3 or higher
+            cldr.isTrigger = false;
+#else
+             MeshCollider cldr = go.AddComponent<MeshCollider>();
             cldr.isTrigger = true;
 #endif
         }
@@ -192,18 +179,19 @@ public class Level
         if (Settings.PlatformUnityPro)
         {
 #if UNITY_5_3_OR_NEWER
-			renderer.material = Resources.Load("room_material", typeof(Material)) as Material;
+            renderer.material = Resources.Load("room_material", typeof(Material)) as Material;
 #else
-            renderer.material = new Material(Shader.Find("Transparent/Cutout/Diffuse"));
+			renderer.material = new Material(Shader.Find("Transparent/Cutout/Diffuse"));
 #endif
         }
         else
         {
 #if UNITY_5_3_OR_NEWER
-			renderer.material = Resources.Load("room_material", typeof(Material)) as Material;
+            renderer.material = Resources.Load("room_material", typeof(Material)) as Material;
 #else
-            renderer.material = new Material(Shader.Find("Diffuse"));
+			renderer.material = new Material(Shader.Find("Diffuse"));
 #endif
+
         }
 
         renderer.material.mainTexture = m_LevelTextureTile;
@@ -211,266 +199,250 @@ public class Level
         return go;
     }
 
-    GameObject CreateObjectWithID(int idx, Vector3 position, Quaternion rotation, string name )
-	{
-		Parser.Tr2Mesh tr2mesh = m_leveldata.Meshes[idx];
-		Mesh objmesh = MeshBuilder.CreateObjectMesh(tr2mesh,m_leveldata);
-		return CreateObject(objmesh,position,rotation,name);
-	}
+    GameObject CreateObjectWithID(int idx, Vector3 position, Quaternion rotation, string name)
+    {
+        Parser.Tr2Mesh tr2mesh = m_leveldata.Meshes[idx];
+        Mesh objmesh = MeshBuilder.CreateObjectMesh(tr2mesh, m_leveldata);
+        return CreateObject(objmesh, position, rotation, name);
+    }
 
-	GameObject[] CreateMultiPartObject(Tr2Moveable tr2movable)
-	{
-		GameObject[] parts = new GameObject[tr2movable.NumMeshes];
-		// run through all the meshes init transforms
-		for (int i = 0; i < tr2movable.NumMeshes; i++) 
-		{
-			int itemMeshIdx =	(int)(tr2movable.StartingMesh + i); // mesh id in tr2  mesh table
-			if(itemMeshIdx > m_leveldata.NumMeshes-1)
-			{
-				itemMeshIdx = (int)(m_leveldata.NumMeshes-1);
-			}
-			
-			parts[i] = CreateObjectWithID(itemMeshIdx, Vector3.zero, Quaternion.identity, "objPart:" + itemMeshIdx);
-			parts[i].transform.parent = null;
-			
-		}
-		
-		return parts;
-	}
-	
-	List<Parser.Tr2StaticMesh>  BuildStaticPrefabObjects()
-	{
-		List<Parser.Tr2StaticMesh> objects = new List<Parser.Tr2StaticMesh>();
-		
-		for (int k = 0; k < (int)m_leveldata.NumStaticMeshes; k++) 
-		{
-			Parser.Tr2StaticMesh tr2staticmesh = m_leveldata.StaticMeshes[k];
-			int itemIdx = (int)tr2staticmesh.StartingMesh;
-			
-			//m_leveldata.StaticMeshes[k]
-			tr2staticmesh.UnityObject = CreateObjectWithID(itemIdx,Vector3.zero, Quaternion.identity, "__staticBase" + k );
-			tr2staticmesh.UnityObject.transform.parent = m_LevelRoot.transform;
-			tr2staticmesh.UnityObject.AddComponent<MeshCollider>();
+    GameObject[] CreateMultiPartObject(Tr2Moveable tr2movable)
+    {
+        GameObject[] parts = new GameObject[tr2movable.NumMeshes];
+        // run through all the meshes init transforms
+        for (int i = 0; i < tr2movable.NumMeshes; i++)
+        {
+            int itemMeshIdx = (int)(tr2movable.StartingMesh + i); // mesh id in tr2  mesh table
+            if (itemMeshIdx > m_leveldata.NumMeshes - 1)
+            {
+                itemMeshIdx = (int)(m_leveldata.NumMeshes - 1);
+            }
 
-#if UNITY_5_3_OR_NEWER
-            tr2staticmesh.UnityObject.SetActive(false);
-#else
-            tr2staticmesh.UnityObject.SetActiveRecursively(false);
-#endif
+            parts[i] = CreateObjectWithID(itemMeshIdx, Vector3.zero, Quaternion.identity, "objPart:" + itemMeshIdx);
+            parts[i].transform.parent = null;
+
+        }
+
+        return parts;
+    }
+
+    List<Parser.Tr2StaticMesh> BuildStaticPrefabObjects()
+    {
+        List<Parser.Tr2StaticMesh> objects = new List<Parser.Tr2StaticMesh>();
+
+        for (int k = 0; k < (int)m_leveldata.NumStaticMeshes; k++)
+        {
+            Parser.Tr2StaticMesh tr2staticmesh = m_leveldata.StaticMeshes[k];
+            int itemIdx = (int)tr2staticmesh.StartingMesh;
+
+            //m_leveldata.StaticMeshes[k]
+            tr2staticmesh.UnityObject = CreateObjectWithID(itemIdx, Vector3.zero, Quaternion.identity, "__staticBase" + k);
+            tr2staticmesh.UnityObject.transform.parent = m_LevelRoot.transform;
+            tr2staticmesh.UnityObject.AddComponent<MeshCollider>();
+            AICondition.SetActive(tr2staticmesh.UnityObject,false);
 
             objects.Add(tr2staticmesh);
-		}
-		return objects;
-	}
+        }
+        return objects;
+    }
 
-	List<Tr2Moveable>  BuildDynamicPrefabObjects()
-	{
-		List<Tr2Moveable> objects = new List<Tr2Moveable>();
+    List<Tr2Moveable> BuildDynamicPrefabObjects()
+    {
+        List<Tr2Moveable> objects = new List<Tr2Moveable>();
 
-		for(int MovableObjectIdx = 0; MovableObjectIdx < m_leveldata.Moveables.Length;  MovableObjectIdx++)
-		{
-			Tr2Moveable tr2movable =  m_leveldata.Moveables[MovableObjectIdx];
-			int startclipid = tr2movable.Animation; 
-			if(startclipid > m_leveldata.Animations.Length) continue;
+        for (int MovableObjectIdx = 0; MovableObjectIdx < m_leveldata.Moveables.Length; MovableObjectIdx++)
+        {
+            Tr2Moveable tr2movable = m_leveldata.Moveables[MovableObjectIdx];
+            int startclipid = tr2movable.Animation;
+            if (startclipid > m_leveldata.Animations.Length) continue;
 
-			GameObject[] parts = CreateMultiPartObject(tr2movable);
-			Transform[] transformtree = new Transform[parts.Length];
-			for(int i = 0; i < parts.Length; i++)
-			{
-				transformtree[i] = parts[i].transform;
-				if(tr2movable.ObjectID != 0)
-				{
-					MeshCollider mf = parts[i].AddComponent<MeshCollider>();
-				}
-			}
+            GameObject[] parts = CreateMultiPartObject(tr2movable);
+            Transform[] transformtree = new Transform[parts.Length];
+            for (int i = 0; i < parts.Length; i++)
+            {
+                transformtree[i] = parts[i].transform;
+                if (tr2movable.ObjectID != 0)
+                {
+                    MeshCollider mf = parts[i].AddComponent<MeshCollider>();
+                }
+            }
 
-			//creat a place holder gameObject and make it root transform ;
-			tr2movable.UnityObject = new GameObject ("prefab type:" + MovableObjectIdx);
-			GameObject objRoot = tr2movable.UnityObject;
-			objRoot.transform.parent = m_LevelRoot.transform;
-			objRoot.transform.Translate(Vector3.zero);
-			objRoot.transform.Rotate(Vector3.zero);
+            //creat a place holder gameObject and make it root transform ;
+            tr2movable.UnityObject = new GameObject("prefab type:" + MovableObjectIdx);
+            GameObject objRoot = tr2movable.UnityObject;
+            objRoot.transform.parent = m_LevelRoot.transform;
+            objRoot.transform.Translate(Vector3.zero);
+            objRoot.transform.Rotate(Vector3.zero);
 
-			//add unity animation components
-			tr2movable.UnityAnimation = objRoot.AddComponent<Animation>();
-			tr2movable.UnityAnimation.wrapMode = WrapMode.Loop;
-			tr2movable.TransformsTree = transformtree;
-			tr2movable.AnimationStartOffset = startclipid;
-			tr2movable.AnimClips = new List<TRAnimationClip>();
-			objects.Add(tr2movable);
+            //add unity animation components
+            tr2movable.UnityAnimation = objRoot.AddComponent<Animation>();
+            tr2movable.UnityAnimation.wrapMode = WrapMode.Loop;
+            tr2movable.TransformsTree = transformtree;
+            tr2movable.AnimationStartOffset = startclipid;
+            tr2movable.AnimClips = new List<TRAnimationClip>();
+            objects.Add(tr2movable);
 
-			//build mesh tree with stack
-			ComputionModel.StackInit();
+            //build mesh tree with stack
+            ComputionModel.StackInit();
 
-			//setup parent transform
-			Transform Parent = transformtree[0];
-			Parent.Translate(Vector3.zero); 
-			Parent.Rotate(Vector3.zero);
-			Parent.parent = objRoot.transform;
+            //setup parent transform
+            Transform Parent = transformtree[0];
+            Parent.Translate(Vector3.zero);
+            Parent.Rotate(Vector3.zero);
+            Parent.parent = objRoot.transform;
 
-			int animRootId = 0;
-			for (int i = 0; i < tr2movable.NumMeshes; i++) 
-			{
-				if (i != 0)   // first mesh - position to world coordinates, set rotation
-				{
-					Vector3 meshPos = Vector3.zero;
+            int animRootId = 0;
+            for (int i = 0; i < tr2movable.NumMeshes; i++)
+            {
+                if (i != 0)   // first mesh - position to world coordinates, set rotation
+                {
+                    Vector3 meshPos = Vector3.zero;
 
-					// tr2movable.MeshTree is a byte offset into MeshTrees[],
-					// so we have to do a little converting here...
-					
-					int offsetMeshTree = (int) tr2movable.MeshTree;
-					int Idx = (i-1)*4 + offsetMeshTree;
-					meshPos.x = (float)m_leveldata.MeshTrees[Idx  + 1]; 
-					meshPos.y =-(float)m_leveldata.MeshTrees[Idx  + 2];
-					meshPos.z = (float)m_leveldata.MeshTrees[Idx  + 3];
-					
-					int flagVal1 = (int)(( m_leveldata.MeshTrees[Idx  + 0]) & 0x01);
-					int flagVal2 = (int)((m_leveldata.MeshTrees[Idx  + 0]) & 0x02);
-					
-					if(flagVal1 > 0 && flagVal2 > 0)
-					{
-						//print("poping - pushing ");
-						animRootId = ComputionModel.Pop();
-						Parent =transformtree[animRootId];
-						animRootId = ComputionModel.Push(animRootId);
-					}
-					else
-					{
-						if (flagVal1 > 0)  // pop last saved anchor
-						{
-							//print("poping "+i);
-							animRootId = ComputionModel.Pop();
-							Parent =transformtree[animRootId];
-						}
-						else
-						{
-							
-							Parent = transformtree[i-1];
-						}
-						
-						if (flagVal2 > 0)  // push new anchor save
-						{
-							
-							//print("pushing "+i);
-							animRootId = ComputionModel.Push(i-1);
-							//prevParent = transformtree[animRootId];
-						}
-					}
-					
-					transformtree[i].parent = Parent;
-					transformtree[i].localPosition = meshPos * Settings.SceneScaling;
-					//transformtree[i].localRotation = relRot;
-					
-				}
-			}
+                    // tr2movable.MeshTree is a byte offset into MeshTrees[],
+                    // so we have to do a little converting here...
 
-#if UNITY_5_3_OR_NEWER
-            objRoot.SetActive(false);
-#else
-            objRoot.SetActiveRecursively(false);
-#endif
+                    int offsetMeshTree = (int)tr2movable.MeshTree;
+                    int Idx = (i - 1) * 4 + offsetMeshTree;
+                    meshPos.x = (float)m_leveldata.MeshTrees[Idx + 1];
+                    meshPos.y = -(float)m_leveldata.MeshTrees[Idx + 2];
+                    meshPos.z = (float)m_leveldata.MeshTrees[Idx + 3];
+
+                    int flagVal1 = (int)((m_leveldata.MeshTrees[Idx + 0]) & 0x01);
+                    int flagVal2 = (int)((m_leveldata.MeshTrees[Idx + 0]) & 0x02);
+
+                    if (flagVal1 > 0 && flagVal2 > 0)
+                    {
+                        //print("poping - pushing ");
+                        animRootId = ComputionModel.Pop();
+                        Parent = transformtree[animRootId];
+                        animRootId = ComputionModel.Push(animRootId);
+                    }
+                    else
+                    {
+                        if (flagVal1 > 0)  // pop last saved anchor
+                        {
+                            //print("poping "+i);
+                            animRootId = ComputionModel.Pop();
+                            Parent = transformtree[animRootId];
+                        }
+                        else
+                        {
+
+                            Parent = transformtree[i - 1];
+                        }
+
+                        if (flagVal2 > 0)  // push new anchor save
+                        {
+
+                            //print("pushing "+i);
+                            animRootId = ComputionModel.Push(i - 1);
+                            //prevParent = transformtree[animRootId];
+                        }
+                    }
+
+                    transformtree[i].parent = Parent;
+                    transformtree[i].localPosition = meshPos * Settings.SceneScaling;
+                    //transformtree[i].localRotation = relRot;
+
+                }
+            }
+            AICondition.SetActive(objRoot,false);
         }
 
         return objects;
-	}
+    }
 
 
-	List <GameObject> InstantiateStaticObjects(Parser.Tr2Room tr2room, int roomidx)
-	{
-		List <GameObject> objects = new List <GameObject>();
-		
-		for(int staticMeshCount = 0;  staticMeshCount < tr2room.NumStaticMeshes; staticMeshCount++)
-		{
-			for (int k = 0; k < m_StaticPrefabs.Count; k++) 
-			{
-				//room static meshes are instantce of Level mesh asset
-				//choose only the meshe from whole level that belongs to this room
-				if (tr2room.StaticMeshes[staticMeshCount].ObjectID == m_leveldata.StaticMeshes[k].ObjectID)
-				{
-					Vector3 meshPos;
-					meshPos.x = tr2room.StaticMeshes[staticMeshCount].x; 
-					meshPos.y= -tr2room.StaticMeshes[staticMeshCount].y;
-					meshPos.z = tr2room.StaticMeshes[staticMeshCount].z;
-					
-					Vector3 rot;
-					rot.x = 0;
-					rot.y = ((tr2room.StaticMeshes[staticMeshCount].Rotation >> 14) & 0x03) * 90; 
-					rot.z = 0;
-					int itemIdx = (int)m_leveldata.StaticMeshes[k].StartingMesh;
-					
-					GameObject go = (GameObject)GameObject.Instantiate(m_StaticPrefabs[k].UnityObject,meshPos * Settings.SceneScaling,Quaternion.Euler(rot) );
-					go.name = "room" + roomidx + "__staticBase" + k + "__meshBase"+itemIdx;
-					go.transform.parent = m_LevelRoot.transform;
-				
-#if UNITY_5_3_OR_NEWER
-                    go.SetActive(true);
-#else
-                    go.SetActiveRecursively(true);
-#endif
+    List<GameObject> InstantiateStaticObjects(Parser.Tr2Room tr2room, int roomidx)
+    {
+        List<GameObject> objects = new List<GameObject>();
 
+        for (int staticMeshCount = 0; staticMeshCount < tr2room.NumStaticMeshes; staticMeshCount++)
+        {
+            for (int k = 0; k < m_StaticPrefabs.Count; k++)
+            {
+                //room static meshes are instantce of Level mesh asset
+                //choose only the meshe from whole level that belongs to this room
+                if (tr2room.StaticMeshes[staticMeshCount].ObjectID == m_leveldata.StaticMeshes[k].ObjectID)
+                {
+                    Vector3 meshPos;
+                    meshPos.x = tr2room.StaticMeshes[staticMeshCount].x;
+                    meshPos.y = -tr2room.StaticMeshes[staticMeshCount].y;
+                    meshPos.z = tr2room.StaticMeshes[staticMeshCount].z;
+
+                    Vector3 rot;
+                    rot.x = 0;
+                    rot.y = ((tr2room.StaticMeshes[staticMeshCount].Rotation >> 14) & 0x03) * 90;
+                    rot.z = 0;
+                    int itemIdx = (int)m_leveldata.StaticMeshes[k].StartingMesh;
+
+                    GameObject go = (GameObject)GameObject.Instantiate(m_StaticPrefabs[k].UnityObject, meshPos * Settings.SceneScaling, Quaternion.Euler(rot));
+                    go.name = "room" + roomidx + "__staticBase" + k + "__meshBase" + itemIdx;
+                    go.transform.parent = m_LevelRoot.transform;
+                    AICondition.SetActive(go,true);
                     objects.Add(go);
-				}
-			}
-		}
-		return objects;
-	}
+                }
+            }
+        }
+        return objects;
+    }
 
-	List <Parser.Tr2Item>  InstantiateDynamicObjects()
-	{
-		List <Parser.Tr2Item> objects = new List <Parser.Tr2Item>();
-		
-		for (int j = m_leveldata.NumItems - 1; j >= 0; j--) 
-		{
-			uint objId = (uint)m_leveldata.Items[j].ObjectID;
-			//determine if item pointing to a sprite object going through all sprites
-			int i = 0; // "Could be a Sprite" flag (0 == "could be a sprite")
-			
-			if (m_leveldata.EngineVersion == Parser.TR2VersionType.TombRaider_1) 
-			{
-				if(m_leveldata.Items[j].Intensity1 == -1) // it's a mesh, not a sprite
-				{
-					i = (int)m_leveldata.NumSpriteSequences;   // skip the sprite search "for" loop that follows
-				}
-			}
-			
-			// for othercases where m_leveldata.Items[j].Intensity1 != -1
-			// search the SpriteSequence list (if we didn't already decide that it's a mesh) 
-			
-			for ( ; i < (int)m_leveldata.NumSpriteSequences; ++i) 
-			{
-				if (m_leveldata.SpriteSequences[i].ObjectID == objId) break; //search till we find one sprite
-			}
-			
-			if (i == (int)m_leveldata.NumSpriteSequences) //search exhusted? not in SpriteSequences[] (or we know it's not a sprite)
-			{  
-				// search the Moveable list
-				for (i = 0; i < m_DynamicPrefabs.Count; ++i)
-				{
-					if (m_DynamicPrefabs[i].ObjectID == objId) 
-					{
-						break;
-					}
-				}
-				
-				GameObject movableItem = (GameObject) GameObject.Instantiate(m_DynamicPrefabs[i].UnityObject);
-				movableItem.name = "Object";
-				movableItem.transform.parent = m_LevelRoot.transform;
-				movableItem.transform.position = new Vector3(m_leveldata.Items[j].x ,-m_leveldata.Items[j].y,m_leveldata.Items[j].z ) * Settings.SceneScaling;
-				float rot = ((m_leveldata.Items[j].Angle >> 14) & 0x03) * 90;
-				movableItem.transform.rotation = Quaternion.Euler(0,rot,0);
-				m_leveldata.Items[j].UnityObject = movableItem;
-				m_leveldata.Items[j].ObjectBase = m_DynamicPrefabs[i];
-				objects.Add(m_leveldata.Items[j]);
+    List<Parser.Tr2Item> InstantiateDynamicObjects()
+    {
+        List<Parser.Tr2Item> objects = new List<Parser.Tr2Item>();
 
-				if(m_DynamicPrefabs[i].ObjectID == 0)
-				{
-					m_Player = movableItem;
-				}
-			}
-		}
-		
-		return objects;
-	}
+        for (int j = m_leveldata.NumItems - 1; j >= 0; j--)
+        {
+            uint objId = (uint)m_leveldata.Items[j].ObjectID;
+            //determine if item pointing to a sprite object going through all sprites
+            int i = 0; // "Could be a Sprite" flag (0 == "could be a sprite")
+
+            if (m_leveldata.EngineVersion == Parser.TR2VersionType.TombRaider_1)
+            {
+                if (m_leveldata.Items[j].Intensity1 == -1) // it's a mesh, not a sprite
+                {
+                    i = (int)m_leveldata.NumSpriteSequences;   // skip the sprite search "for" loop that follows
+                }
+            }
+
+            // for othercases where m_leveldata.Items[j].Intensity1 != -1
+            // search the SpriteSequence list (if we didn't already decide that it's a mesh) 
+
+            for (; i < (int)m_leveldata.NumSpriteSequences; ++i)
+            {
+                if (m_leveldata.SpriteSequences[i].ObjectID == objId) break; //search till we find one sprite
+            }
+
+            if (i == (int)m_leveldata.NumSpriteSequences) //search exhusted? not in SpriteSequences[] (or we know it's not a sprite)
+            {
+                // search the Moveable list
+                for (i = 0; i < m_DynamicPrefabs.Count; ++i)
+                {
+                    if (m_DynamicPrefabs[i].ObjectID == objId)
+                    {
+                        break;
+                    }
+                }
+
+                GameObject movableItem = (GameObject)GameObject.Instantiate(m_DynamicPrefabs[i].UnityObject);
+                movableItem.name = "Object";
+                movableItem.transform.parent = m_LevelRoot.transform;
+                movableItem.transform.position = new Vector3(m_leveldata.Items[j].x, -m_leveldata.Items[j].y, m_leveldata.Items[j].z) * Settings.SceneScaling;
+                float rot = ((m_leveldata.Items[j].Angle >> 14) & 0x03) * 90;
+                movableItem.transform.rotation = Quaternion.Euler(0, rot, 0);
+                m_leveldata.Items[j].UnityObject = movableItem;
+                m_leveldata.Items[j].ObjectBase = m_DynamicPrefabs[i];
+                objects.Add(m_leveldata.Items[j]);
+
+                if (m_DynamicPrefabs[i].ObjectID == 0)
+                {
+                    m_Player = movableItem;
+                }
+            }
+        }
+
+        return objects;
+    }
 
     void InitialiseInstance(Parser.Tr2Item tr2item)
     {
@@ -512,74 +484,54 @@ public class Level
 
             //Initialise Current Active Room for player
             player.m_Room = SetRoomForPlayer();
-#if UNITY_5_3_OR_NEWER
-            m_Player.SetActive(true);
-#else
-            m_Player.SetActiveRecursively(true);
-#endif
-
+            AICondition.SetActive(m_Player, true);
         }
-
         //check if we have any custom behabiour  script for object
-        // else if (!(Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.LinuxEditor || Application.platform == RuntimePlatform.OSXEditor))
-        //{
-
-        if (m_OnAttachBehabiourScript != null && !m_OnAttachBehabiourScript(tr2item.UnityObject, tr2item.ObjectID, m_Player, tr2item))
+        else if (m_OnAttachBehabiourScript != null && !m_OnAttachBehabiourScript(tr2item.UnityObject, tr2item.ObjectID, m_Player, tr2item))
         {
-                go.AddComponent<DefaultStatePlayer>(); // user did not attached any custom behabiour. so use default one
-
-#if UNITY_5_3_OR_NEWER
-            go.SetActive(true);
-#else
-            go.SetActiveRecursively(true);
-#endif
-
+            go.AddComponent<DefaultStatePlayer>(); // user did not attached any custom behabiour. so use default one
         }
-
-        //}
-
-
 
     }
 
     RoomEx SetRoomForPlayer()
-	{
-		if(m_RoomExs.Length > 0 && m_Player!=null )
-		{
-			RaycastHit hit = new RaycastHit();
-			Transform roomtransform = null;
-			Transform Lara = m_Player.transform;
+    {
+        if (m_RoomExs.Length > 0 && m_Player != null)
+        {
+            RaycastHit hit = new RaycastHit();
+            Transform roomtransform = null;
+            Transform Lara = m_Player.transform;
 
 #if UNITY_5_3_OR_NEWER
-			int mask = Physics.DefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
+            int mask = Physics.DefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
 #else
-            int mask = Physics.kDefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
+		    int mask = Physics.kDefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
 #endif
-            if (Physics.Raycast(Lara.position + Vector3.up * 50, -Vector3.up, out hit,14096,mask ))
-			{
-				roomtransform = hit.transform; Debug.Log("SetRoomForPlayer");
-			}
-			else
-			{
-				Debug.Log("failed SetRoomForPlayer!");
-			}
-			
-			for(int r = 0; r < m_RoomExs.Length; r++)
-			{
-				if(m_RoomExs[r].m_Transform == roomtransform)
-				{
-					m_CurrentActiveRoom = m_RoomExs[r];
-					break;
-				}
-			}
-		}
+            if (Physics.Raycast(Lara.position + Vector3.up * 50, -Vector3.up, out hit, 14096, mask))
+            {
+                roomtransform = hit.transform; Debug.Log("SetRoomForPlayer");
+            }
+            else
+            {
+                Debug.Log("failed SetRoomForPlayer!");
+            }
 
-		return m_CurrentActiveRoom;
-	}
+            for (int r = 0; r < m_RoomExs.Length; r++)
+            {
+                if (m_RoomExs[r].m_Transform == roomtransform)
+                {
+                    m_CurrentActiveRoom = m_RoomExs[r];
+                    break;
+                }
+            }
+        }
 
-	public void Update()
-	{
-		/*if(m_RoomExs.Length > 0 && m_Player!=null )
+        return m_CurrentActiveRoom;
+    }
+
+    public void Update()
+    {
+        /*if(m_RoomExs.Length > 0 && m_Player!=null )
 		{
 			RaycastHit hit = new RaycastHit();
 			Transform roomtransform = null;
@@ -597,136 +549,147 @@ public class Level
 				m_CurrentActiveRoom = m_RoomExs[r].m_Transform;
 			}
 		}*/
-		
-		//Debug.Log("Room length:" + m_leveldata.Rooms.Length);
-		//if(m_CurrentActiveRoom!=null)
-		//{
-			//m_CurrentActiveRoom.DebugRoomSurface();
-		//}
-	}
+
+        //Debug.Log("Room length:" + m_leveldata.Rooms.Length);
+        //if(m_CurrentActiveRoom!=null)
+        //{
+        //m_CurrentActiveRoom.DebugRoomSurface();
+        //}
+    }
 
 
-	void SetupTrigers()
-	{
-		if(m_leveldata.Rooms.Length > 0 && m_Player!=null )
-		{
-			Transform Lara = m_Player.transform;
+    void SetupTrigers()
+    {
+        if (m_leveldata.Rooms.Length > 0 && m_Player != null)
+        {
+            Transform Lara = m_Player.transform;
 
-			for(int r = 0; r < m_leveldata.Rooms.Length; r++)
-			{
-				Vector3 room_world_position = m_RoomExs[r].transform.position;
-				
-				//IN TR2 sector is scaned vertically (depth first order)
-				
-				int width = m_leveldata.Rooms[r].NumXsectors;
-				int depth = m_leveldata.Rooms[r].NumZsectors;
-				
-				
-				int numsector = width * depth;
-				int sectorid = 0;
-				
-				
-				for(int sectorz = 0; sectorz < depth; sectorz++)
-				{
-					for (int sectorx = 0; sectorx < width; sectorx++)
-					{
-						sectorid = sectorx * depth + sectorz;
-						Parser.Tr2RoomSector[] sector = m_leveldata.Rooms[r].SectorList;
-						int fdid = sector[sectorid].FDindex;
-						ushort fd = m_leveldata.FloorData[fdid];
-						
-				
-						//determine if floor data is a single function
-						//Function:         bits 0..7 (0x00FF)
-						//Sub Function:    	bits 8..14 (0x7F00)
-						//EndData:          bit 15 (0x8000) 
-		
-						//Debug.Log(sectorid  +"-> Floor Data indx :" + sector[sectorid].FDindex);
-									
-						int triger_item_index = - 1;
-						int target_item_index = - 1;
-					
-						if((fd & 0x00FF) == 0x4) // sector acts as triger
-						{
-							int subfunc = (int)((fd & 0x7F00) >> 8);	    	  
-							if(subfunc == 2) // sector includes a triger item ( for example switch
-							{
-								int activation_mask = (int)((m_leveldata.FloorData[fdid + 1] &  0x3e00) >> 9);
-								//Debug.Log("activation_mask " + activation_mask);
-								ushort fdlist0 = m_leveldata.FloorData[fdid + 2];
-								int triger_funtion = (int)((fdlist0 & 0x3C00) >> 10);
-								//Debug.Log("triger_funtion" + triger_funtion);
-								if(triger_funtion == 0) //FDfunction 0x00: Activate or deactivate item
-								{
-									triger_item_index =  (int)(fdlist0 & 0x03FF); 	//FDfunction Operand (bits 0..9): Item index 
-									//Debug.Log("Switch ID " + m_leveldata.Items[triger_item_index].ObjectID);
-									m_leveldata.Items[triger_item_index].UnityObject.name = "Switch";
-								}
-							
-								//get trigger target
-								fdlist0 = m_leveldata.FloorData[fdid + 3];
-								triger_funtion = (int)((fdlist0 & 0x3C00) >> 10);
-								if(triger_funtion == 0) 
-								{
-									target_item_index =  (int)(fdlist0 & 0x03FF); 
-									//Debug.Log("Target ID " + m_leveldata.Items[target_item_index].ObjectID);
-									m_leveldata.Items[target_item_index].UnityObject.name = "Target";
-									m_leveldata.Items[triger_item_index].ActivateObject = m_leveldata.Items[target_item_index].UnityObject;
-									m_leveldata.Items[triger_item_index].UnityObject.name += "[T" + m_leveldata.Items[target_item_index].ObjectID + "]";
-								}
-				
-							}
-							else if(subfunc == 0)
-							{
-								ushort fdlist0 = m_leveldata.FloorData[fdid + 2];
-								int triger_funtion = (int)((fdlist0 & 0x3C00) >> 10);
-								//Debug.Log("triger_funtion" + triger_funtion);
-							
-								if(triger_funtion == 0) //FDfunction 0x00: Activate or deactivate item
-								{
-									triger_item_index =  (int)(fdlist0 & 0x03FF); 	//FDfunction Operand (bits 0..9): Item index 
-									//Debug.Log("Enemy ID " + triger_item_index);
-								}
-							}
-						
-						}
-					
-						if((int)(fd & 0x8000) == 0x8000)
-						{
-						
-							switch(fd & 0x00FF)
-							{
-								case 0x5: Debug.Log("Die");
-									Vector3 sector_world_position = new Vector3(room_world_position.x + (sectorx * 1024), 0, room_world_position.z + (sectorz * 1024));
-								
-									GameObject diezone = MeshBuilder.CreateZone("Die Zone");
-									diezone.transform.position = sector_world_position * Settings.SceneScaling;
-									diezone.transform.localScale = new Vector3(1024, 1024, 1024) * Settings.SceneScaling;
-								   // diezone.transform.parent = m_RoomExs[r].transform;
-								
-								break;
-								
-								case 0x6: Debug.Log("Climb");
-								// m_leveldata.Rooms[r].info.
-									sector_world_position = new Vector3(room_world_position.x + (sectorx * 1024), 0, room_world_position.z + (sectorz * 1024));
-								
-									GameObject climbzone = MeshBuilder.CreateZone("Climb Zone");
-									climbzone.transform.position = sector_world_position * Settings.SceneScaling;
-									climbzone.transform.localScale = new Vector3(1024, 1024, 1024) * Settings.SceneScaling;
-								    //climbzone.transform.parent = m_RoomExs[r].transform;
-									
-								break;
-							}
-						}
-				
-					}
+            for (int r = 0; r < m_leveldata.Rooms.Length; r++)
+            {
+                Vector3 room_world_position = m_RoomExs[r].transform.position;
 
-				}
-				
-			}
-			
-		}
-	}
+                //IN TR2 sector is scaned vertically (depth first order)
 
-	
+                int width = m_leveldata.Rooms[r].NumXsectors;
+                int depth = m_leveldata.Rooms[r].NumZsectors;
+
+
+                int numsector = width * depth;
+                int sectorid = 0;
+
+
+                for (int sectorz = 0; sectorz < depth; sectorz++)
+                {
+                    for (int sectorx = 0; sectorx < width; sectorx++)
+                    {
+                        sectorid = sectorx * depth + sectorz;
+                        Parser.Tr2RoomSector[] sector = m_leveldata.Rooms[r].SectorList;
+                        int fdid = sector[sectorid].FDindex;
+                        ushort fd = m_leveldata.FloorData[fdid];
+
+
+                        //determine if floor data is a single function
+                        //Function:         bits 0..7 (0x00FF)
+                        //Sub Function:    	bits 8..14 (0x7F00)
+                        //EndData:          bit 15 (0x8000) 
+
+                        //Debug.Log(sectorid  +"-> Floor Data indx :" + sector[sectorid].FDindex);
+
+                        int triger_item_index = -1;
+                        int target_item_index = -1;
+
+                        if ((fd & 0x00FF) == 0x4) // sector acts as triger
+                        {
+                            int subfunc = (int)((fd & 0x7F00) >> 8);
+                            if (subfunc == 2) // sector includes a triger item ( for example switch
+                            {
+                                int activation_mask = (int)((m_leveldata.FloorData[fdid + 1] & 0x3e00) >> 9);
+                                //Debug.Log("activation_mask " + activation_mask);
+                                ushort fdlist0 = m_leveldata.FloorData[fdid + 2];
+                                int triger_funtion = (int)((fdlist0 & 0x3C00) >> 10);
+                                //Debug.Log("triger_funtion" + triger_funtion);
+                                if (triger_funtion == 0) //FDfunction 0x00: Activate or deactivate item
+                                {
+                                    triger_item_index = (int)(fdlist0 & 0x03FF);    //FDfunction Operand (bits 0..9): Item index 
+                                                                                    //Debug.Log("Switch ID " + m_leveldata.Items[triger_item_index].ObjectID);
+                                    m_leveldata.Items[triger_item_index].UnityObject.name = "Switch";
+                                }
+
+                                //get trigger target
+                                fdlist0 = m_leveldata.FloorData[fdid + 3];
+                                triger_funtion = (int)((fdlist0 & 0x3C00) >> 10);
+                                if (triger_funtion == 0)
+                                {
+                                    target_item_index = (int)(fdlist0 & 0x03FF);
+                                    //Debug.Log("Target ID " + m_leveldata.Items[target_item_index].ObjectID);
+                                    m_leveldata.Items[target_item_index].UnityObject.name = "Target";
+                                    m_leveldata.Items[triger_item_index].ActivateObject = m_leveldata.Items[target_item_index].UnityObject;
+                                    m_leveldata.Items[triger_item_index].UnityObject.name += "[T" + m_leveldata.Items[target_item_index].ObjectID + "]";
+                                    AddTrigger(m_leveldata.Items[triger_item_index].UnityObject);
+                                }
+                                
+                            }
+                            else if (subfunc == 0)
+                            {
+                                ushort fdlist0 = m_leveldata.FloorData[fdid + 2];
+                                int triger_funtion = (int)((fdlist0 & 0x3C00) >> 10);
+                                //Debug.Log("triger_funtion" + triger_funtion);
+
+                                if (triger_funtion == 0) //FDfunction 0x00: Activate or deactivate item
+                                {
+                                    triger_item_index = (int)(fdlist0 & 0x03FF);    //FDfunction Operand (bits 0..9): Item index 
+                                                                                    //Debug.Log("Enemy ID " + triger_item_index);
+                                }
+                            }
+
+                        }
+
+                        if ((int)(fd & 0x8000) == 0x8000)
+                        {
+
+                            switch (fd & 0x00FF)
+                            {
+                                case 0x5:
+                                    Debug.Log("Die");
+                                    Vector3 sector_world_position = room_world_position + new Vector3( (sectorx * 1024), (sectorz * 1024)) * Settings.SceneScaling;
+
+                                    GameObject diezone = MeshBuilder.CreateZone("Die Zone");
+                                    diezone.transform.position = sector_world_position;
+                                    diezone.transform.localScale = new Vector3(1024, 1024, 1024) * Settings.SceneScaling;
+                                    // diezone.transform.parent = m_RoomExs[r].transform;
+
+                                    break;
+
+                                case 0x6:
+                                    Debug.Log("Climb");
+                                    // m_leveldata.Rooms[r].info.
+                                    sector_world_position = room_world_position + new Vector3((sectorx * 1024), 0, (sectorz * 1024)) * Settings.SceneScaling;
+
+                                    GameObject climbzone = MeshBuilder.CreateZone("Climb Zone");
+                                    climbzone.transform.position = sector_world_position;
+                                    climbzone.transform.localScale = new Vector3(1024, 1024, 1024) * Settings.SceneScaling;
+                                    //climbzone.transform.parent = m_RoomExs[r].transform;
+
+                                    break;
+                            }
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+    }
+
+    static public Collider AddTrigger(GameObject go)
+    {
+        BoxCollider collider = go.AddComponent<BoxCollider>();
+        collider.size = new Vector3(1024, 1024, 512) * Settings.SceneScaling;
+        collider.center = new Vector3(0, 512, 256) * Settings.SceneScaling;
+        collider.isTrigger = true;
+        return collider;
+    }
+
 }
