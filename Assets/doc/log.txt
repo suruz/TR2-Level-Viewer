@@ -356,5 +356,22 @@ Fixed error concave room mesh can not be used as trigger for unity version 5.3 o
 
 Fixed: remove behabiour scripts for movable object while creating level in Editor
 Fixed error while interacting uninitialised script and game object
-Fixed stand alone unity player's runtime exception due to legacy material use in level.cs for unity version 5.3 or higher
+Fixed stand alone unity player's runtime exception due to legacy material use in level.cs for unity version 5.3 or higher.
+
+4/5/2017
+
+Upgrade for Unity 5.3 and new GI system
+
+Scaled down rooms , objects and animation to simulate real world measurement.
+Added a scaling factor Settings.SceneScaling in Settins.cs 
+
+Effected classes are 
+- Player.cs
+- Level.cs
+- Animator.cs
+
+Negative Effect of this scalling down,
+Original floor data for room gets invalid due to improper dimension.
+
+
 
