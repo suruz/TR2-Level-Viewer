@@ -685,7 +685,11 @@ public class Level
 
     static public Collider AddTrigger(GameObject go)
     {
-        BoxCollider collider = go.AddComponent<BoxCollider>();
+        BoxCollider collider = go.GetComponent<BoxCollider>();
+        if(collider==null)
+        {
+            go.AddComponent<BoxCollider>();
+        }
         collider.size = new Vector3(1024, 1024, 512) * Settings.SceneScaling;
         collider.center = new Vector3(0, 512, 256) * Settings.SceneScaling;
         collider.isTrigger = true;
