@@ -375,3 +375,7 @@ Original floor data for room gets invalid due to improper dimension.
 
 
 
+4/7/2017
+Check Collider component before adding new component in trigger
+Door cam missing main camera refference if main camera is disabled
+main camera near clip distance should be in range >= .01 to avoid error
