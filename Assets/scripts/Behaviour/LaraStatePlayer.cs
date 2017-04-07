@@ -605,14 +605,14 @@ public class LaraStatePlayer: MonoBehaviour {
 			{
 				rootanim.wrapMode = WrapMode.Once;
 			}
-			current_action.time = Time.time;
+ 			current_action.time = Time.time;
 			OnAir = state.OnAir;
 			
 			if(OnAir)
 			{
 				Vector3 jumpdir = thistransform.rotation * state.movedir;
 				//Notify Jump Physics Handler
-				if(OnJump != null) OnJump (thistransform.position, jumpdir * 2048, transform.rotation, (state.movedir.x + state.movedir.z));
+				if(OnJump != null) OnJump (thistransform.position, jumpdir * 2048 * Settings.SceneScaling , transform.rotation, (state.movedir.x + state.movedir.z));
 			}
 		}
 	}
