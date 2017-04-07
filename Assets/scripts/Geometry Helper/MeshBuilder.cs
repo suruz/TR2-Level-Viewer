@@ -484,13 +484,15 @@ public class MeshBuilder  {
 	{
 		GameObject retval = null;
 		retval = new GameObject(name);
-		MeshFilter mf = retval.AddComponent<MeshFilter>();
-		Mesh m = mf.mesh;
-		m.vertices = new Vector3[]{ new Vector3(0,0,0) , new Vector3(1,1,1), new Vector3(0,0,0), new Vector3(1,0,1) };
-        for (int i = 0; i < m.vertices.Length; i++) { m.vertices[i] = m.vertices[i] * Settings.SceneScaling; }
-        m.triangles =new int[]{0,1,2};
+
+
+
+
+
 		BoxCollider collider = retval.AddComponent<BoxCollider>();
-		collider.isTrigger = true;
+        	collider.center = new Vector3(0.5f * 1024 , 0, 0.5f * 1024) * Settings.SceneScaling;
+        	collider.size = new Vector3(1024, 1024, 1024) * Settings.SceneScaling;
+        	collider.isTrigger = true;
 		retval.layer = UnityLayer.Player;
 		return retval;
 	}
