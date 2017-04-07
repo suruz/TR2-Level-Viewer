@@ -1,6 +1,7 @@
 
 
 
+
 <b>Features: </b>
 - It parses Tomb Raider 2 level data like models, animation, textures. Then it renders them back in unity3D.
 - It uses data driven shader model instead of fixed function render pipeline. 
@@ -9,6 +10,8 @@
 - In original file models were not defined in complete mesh. Model parts are stored separately. They were rearranged procedurally using attached position and rotation information. Now it represents model with skeletal transformation hierarchy in unity3D.
 - Animation is represented with Unity3D animation curve.
 - Includes Character Controller with animation state machine and physics. 
+
+- Zones and Triggers are marked using Unity Box Collider for convinient collision detection.
 
 
 
@@ -113,6 +116,12 @@ Required prefabs should be placed in scene for minimum level funtionality:
 <b>Q. Is it possible to load level file from http server?</b>
 
   Ans. Yes it is possible. You can play around Browser.cs .  It uses WWW class to fetch level file data bytes from specified server url. 
+
+
+<b> Known Issues </b>
+
+Project was developed in Unity 3.5.If project import fails because of meta missing in Unity 5 or higher just cancel import and try to reimport.
+
 
 <b>Q.How to contact the authour?</b>
 
