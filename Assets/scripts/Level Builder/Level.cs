@@ -122,7 +122,7 @@ public class Level
         go.transform.rotation = Quaternion.identity;
         if (Settings.PlatformUnityPro)
         {
-#if UNITY_5_3_OR_NEWER
+#if (UNITY_5_3_OR_NEWER || UNITY_5_3)
             renderer.material = Resources.Load("room_material", typeof(Material)) as Material;
 #else
 			renderer.material = new Material(Shader.Find("Transparent/Cutout/Diffuse"));
@@ -130,7 +130,7 @@ public class Level
         }
         else
         {
-#if UNITY_5_3_OR_NEWER
+#if (UNITY_5_3_OR_NEWER || UNITY_5_3)
             renderer.material = Resources.Load("room_material", typeof(Material)) as Material;
 #else
 			renderer.material = new Material(Shader.Find("Diffuse"));
@@ -149,7 +149,7 @@ public class Level
         }
         else
         {
-#if UNITY_5_3_OR_NEWER
+#if (UNITY_5_3_OR_NEWER || UNITY_5_3)
             MeshCollider cldr = go.AddComponent<MeshCollider>();
             //room mesh tends to be concave, MeshCollider can not be used as trigger for this kind of mesh in unity 5.3 or higher
             cldr.isTrigger = false;
@@ -178,7 +178,7 @@ public class Level
         go.transform.rotation = rotation;
         if (Settings.PlatformUnityPro)
         {
-#if UNITY_5_3_OR_NEWER
+#if (UNITY_5_3_OR_NEWER || UNITY_5_3)
             renderer.material = Resources.Load("room_material", typeof(Material)) as Material;
 #else
 			renderer.material = new Material(Shader.Find("Transparent/Cutout/Diffuse"));
@@ -186,7 +186,7 @@ public class Level
         }
         else
         {
-#if UNITY_5_3_OR_NEWER
+#if (UNITY_5_3_OR_NEWER || UNITY_5_3)
             renderer.material = Resources.Load("room_material", typeof(Material)) as Material;
 #else
 			renderer.material = new Material(Shader.Find("Diffuse"));
@@ -502,7 +502,7 @@ public class Level
             Transform roomtransform = null;
             Transform Lara = m_Player.transform;
 
-#if UNITY_5_3_OR_NEWER
+#if (UNITY_5_3_OR_NEWER || UNITY_5_3)
             int mask = Physics.DefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
 #else
 		    int mask = Physics.kDefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
