@@ -331,7 +331,7 @@ public class Animator
 #elif UNITY_5_0
 			animClip.legacy = true;
 #endif
-#if UNITY_5_3_OR_NEWER
+#if (UNITY_5_3_OR_NEWER || UNITY_5_3)
             animClip.legacy = true;
 #endif
 
@@ -382,10 +382,10 @@ public class Animator
         //add these clips to Tr2Moveable tr2movable.UnityAnimation
         for (int ci = 0; ci < clips.Count; ci++)
         {
-
             tr2movable.UnityAnimation.AddClip(clips[ci].clip, "" + ci);
-            tr2movable.AnimClips.Add(clips[ci]);
         }
+		 tr2movable.AnimClips = clips;
+		
         return clips;
     }
 
