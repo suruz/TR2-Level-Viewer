@@ -382,3 +382,12 @@ main camera near clip distance should be in range >= .01 to avoid error
 
 Zone and Triggers are marked using Unity Box Collider
 Fixed Jump speed scale OnJump event in LaraStatePlayer.cs
+
+4/10/2017
+
+Test Real Time GI on level Lara's home. light entrance with with alpha blocks GI.
+Planing to developer a cutter to detect such entrance and cut mesh to aproximate portal
+
+TODO:
+Image based material detection and apply custom material and shader.
+Color correction and alpha keying in TextureUV.GenerateTextureTile()
