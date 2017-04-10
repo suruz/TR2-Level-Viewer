@@ -1,11 +1,11 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.IO;
 
 public class TextureUV  {
 
 	static Rect[] uvRects = null;
-	static float cmult = 0.00392156862745098f;
+	static float cmult = 0.03225806451612903225806451612903f;
 
 	public static float AdjustTextureCoordinateX(byte pixel, sbyte offset, ushort texTileIdx)
 	{   		
@@ -104,12 +104,17 @@ public class TextureUV  {
 				{
 					cols[c16_index].a = 0.0f;
 				}
-				
-				cols[c16_index].b = ((ucolor & 0x1f) * 8) * cmult;
-				cols[c16_index].g = (((ucolor >> 5) & 0x1f) * 8) * cmult;
-				cols[c16_index].r = (((ucolor >> 10) & 0x1f) * 8) * cmult;
-			}			
-		}
+				//fix color conversion with range 0 - 31
+				cols[c16_index].b = (ucolor & 0x1f)  * cmult;
+				cols[c16_index].g = ((ucolor >> 5) & 0x1f) * cmult;
+				cols[c16_index].r = ((ucolor >> 10) & 0x1f) * cmult;
+                Vector3 alpha_vec = new Vector3(cols[c16_index].r, cols[c16_index].g, cols[c16_index].b);
+                //if(alpha_vec.magnitude <= 0.097)
+                //{
+                    //cols[c16_index].a = 0.0f;
+                //}
+            }
+        }
 
 		//pack tiles
 		float uvlength = 1.0f/16.0f;
