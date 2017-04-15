@@ -42,7 +42,7 @@ public class DayNightSystem : MonoBehaviour {
 		light.intensity = 0.4f;
 		if(!Settings.EnableIndoorShadow)
 		{
-			light.shadows = LightShadows.None;
+			//light.shadows = LightShadows.None;  // shadow should be controlled by shadow caster 
 		}
 		QualitySettings.shadowDistance = 40000 * Settings.SceneScaling;
 		
