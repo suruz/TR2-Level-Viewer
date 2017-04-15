@@ -123,7 +123,11 @@ public class Level
         if (Settings.PlatformUnityPro)
         {
 #if (UNITY_5_3_OR_NEWER || UNITY_5_3)
-            renderer.material = Resources.Load("room_material", typeof(Material)) as Material;
+            //renderer.material = Resources.Load("room_material", typeof(Material)) as Material;
+			//renderer.material.SetFloat("_Mode", 1);
+			//renderer.material.SetFloat("_Cutoff", 0.5);
+			renderer.material = new Material(Shader.Find("Legacy Shaders/Transparent/Cutout/Diffuse"));
+			
 #else
 			renderer.material = new Material(Shader.Find("Transparent/Cutout/Diffuse"));
 #endif
@@ -179,7 +183,11 @@ public class Level
         if (Settings.PlatformUnityPro)
         {
 #if (UNITY_5_3_OR_NEWER || UNITY_5_3)
-            renderer.material = Resources.Load("room_material", typeof(Material)) as Material;
+            //renderer.material = Resources.Load("room_material", typeof(Material)) as Material;
+			//renderer.material.SetFloat("_Mode", 1);
+			//renderer.material.SetFloat("_Cutoff", 0.5);
+			renderer.material = new Material(Shader.Find("Legacy Shaders/Transparent/Cutout/Diffuse"));
+			
 #else
 			renderer.material = new Material(Shader.Find("Transparent/Cutout/Diffuse"));
 #endif
