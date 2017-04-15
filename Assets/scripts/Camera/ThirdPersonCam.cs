@@ -28,7 +28,8 @@ public class ThirdPersonCam : MonoBehaviour {
 	{
 		Camera camera = GetComponent<Camera>();
 		fieldofview = camera.fieldOfView;
-		Mouse.m_OnMouseMove += OnMouseMove; camera.near *= Settings.SceneScaling;
+		Mouse.m_OnMouseMove += OnMouseMove; 
+		camera.near *= 10.24f * Settings.SceneScaling;
 	}
 	
 	void OnMouseMove(float dx, float dy)

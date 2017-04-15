@@ -5,7 +5,7 @@
 	<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
 	<ProductVersion>10.0.20506</ProductVersion>
 	<SchemaVersion>2.0</SchemaVersion>
-	<ProjectGuid>{66EC5DF2-4772-4F7B-22FC-4868B2006714}</ProjectGuid>
+	<ProjectGuid>{D21BB5A1-E675-583E-BF2D-7DA7AEAEE689}</ProjectGuid>
 	<OutputType>Library</OutputType>
 	<AppDesignerFolder>Properties</AppDesignerFolder>
 	<RootNamespace></RootNamespace>
@@ -37,10 +37,10 @@
     <Reference Include="System.XML" />
 	<Reference Include="System.Core" />
 	<Reference Include="UnityEngine">
-	  <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine.dll</HintPath>
+	  <HintPath>D:/Unity Dev Tools/Unity/Editor/Data/Managed/UnityEngine.dll</HintPath>
 	</Reference>
 	<Reference Include="UnityEditor">
-	  <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEditor.dll</HintPath>
+	  <HintPath>D:/Unity Dev Tools/Unity/Editor/Data/Managed/UnityEditor.dll</HintPath>
 	</Reference>
   </ItemGroup>
   <ItemGroup>
@@ -49,6 +49,7 @@
      <Compile Include="Assets\scripts\Animation Helper\AnimationStateMapper.cs" />
      <Compile Include="Assets\scripts\Animation Helper\Animator.cs" />
      <Compile Include="Assets\scripts\Behaviour\AICallBackHandler.cs" />
+     <Compile Include="Assets\scripts\Behaviour\AICondition.cs" />
      <Compile Include="Assets\scripts\Behaviour\BoulderStatePlayer.cs" />
      <Compile Include="Assets\scripts\Behaviour\ButtlerStatePlayer.cs" />
      <Compile Include="Assets\scripts\Behaviour\CrowStatePlayer.cs" />
@@ -100,13 +101,13 @@
      <Compile Include="Assets\scripts\Utility\TextureUV.cs" />
      <Compile Include="Assets\scripts\Utility\Zip.cs" />
      <None Include="Assets\scripts\Behaviour\TigerStatePlayer.cs.txt" />
-     <None Include="Assets\Level Texture\read me.txt" />
-     <None Include="Assets\doc\ClassMap.txt" />
      <None Include="Assets\sfx\extra\sfx.txt" />
-     <None Include="Assets\Resources\Demo Level.txt" />
      <None Include="Assets\doc\log.txt" />
-     <None Include="Assets\doc\read me.txt" />
+     <None Include="Assets\Resources\Demo Level.txt" />
      <None Include="Assets\shader\Lightmapped_Diffuse.shader" />
+     <None Include="Assets\doc\ClassMap.txt" />
+     <None Include="Assets\Level Texture\read me.txt" />
+     <None Include="Assets\doc\read me.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
