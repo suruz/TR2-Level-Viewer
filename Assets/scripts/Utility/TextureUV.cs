@@ -5,7 +5,7 @@ using System.IO;
 public class TextureUV  {
 
 	static Rect[] uvRects = null;
-	static float cmult = 0.03225806451612903225806451612903f;
+	static float cmult = 0.032258064516129f;
 
 	public static float AdjustTextureCoordinateX(byte pixel, sbyte offset, ushort texTileIdx)
 	{   		
@@ -108,7 +108,7 @@ public class TextureUV  {
 				cols[c16_index].b = (ucolor & 0x1f)  * cmult;
 				cols[c16_index].g = ((ucolor >> 5) & 0x1f) * cmult;
 				cols[c16_index].r = ((ucolor >> 10) & 0x1f) * cmult;
-                Vector3 alpha_vec = new Vector3(cols[c16_index].r, cols[c16_index].g, cols[c16_index].b);
+                //Vector3 alpha_vec = new Vector3(cols[c16_index].r, cols[c16_index].g, cols[c16_index].b);
                 //if(alpha_vec.magnitude <= 0.097)
                 //{
                     //cols[c16_index].a = 0.0f;
