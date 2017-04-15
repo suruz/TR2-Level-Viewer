@@ -364,7 +364,7 @@ Upgrade for Unity 5.3 and new GI system
 
 Scaled down rooms , objects and animation to simulate real world measurement.
 Added a scaling factor Settings.SceneScaling in Settins.cs 
-
+scaled level for real world size, fixed zone and trigger. Added legacy material support.
 Effected classes are 
 - Player.cs
 - Level.cs
@@ -391,3 +391,6 @@ Planing to developer a cutter to detect such entrance and cut mesh to aproximate
 TODO:
 Image based material detection and apply custom material and shader.
 Color correction and alpha keying in TextureUV.GenerateTextureTile()
+
+4/15/2017
+
