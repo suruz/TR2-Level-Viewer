@@ -44,7 +44,7 @@ public class DayNightSystem : MonoBehaviour {
 		{
 			light.shadows = LightShadows.None;
 		}
-		QualitySettings.shadowDistance = 40000;
+		QualitySettings.shadowDistance = 40000 * Settings.SceneScaling;
 		
 		//_AmbientLightColor = RenderSettings.ambientLight;
 		DayNightSettings();
