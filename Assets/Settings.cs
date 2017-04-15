@@ -10,7 +10,7 @@ public class Settings  {
 	public static bool ForceOpenAllDoors = false;    //Force open all doors in level
 	public static bool ForceDisableAllBoulder = false;  //Force disable all boulder in level
 	
-	public static bool EnableIndoorShadow = true; 	//If enabled indoor objects will cast shadow
+	public static bool EnableIndoorShadow = false; 	//If enabled indoor objects will cast shadow
 	public static bool PlatformUnityPro = true;   	//If enabled Unity Pro features will be used,
 													//texture transparancy will be eabled.
 													//Otherwise Unity Free features will be used.
