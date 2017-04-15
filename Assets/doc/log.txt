@@ -393,4 +393,7 @@ Image based material detection and apply custom material and shader.
 Color correction and alpha keying in TextureUV.GenerateTextureTile()
 
 4/15/2017
+Fixed metadata conflict in unity version 3.5 and 5.3 or higher
+by deleting and updating library. git commit was needed.
 
+fixed shadow casting and scaled shadow distance in DayNightSystem.
