@@ -52,6 +52,17 @@ public class TRAnimationClip
         statechanges = new List<TRAnimStateChange>();
         //
     }
+    //Get time of key frame time
+	public float GetAnimationFrameTime(int frame)
+	{
+		float retval = 0;
+		if (clip != null) 
+		{
+			retval = frame * clip.frameRate;
+		}
+
+		return retval;
+	}
 }
 
 public class Animator
