@@ -113,6 +113,8 @@ public class Level
 
     GameObject CreateRoom(Mesh mesh, Vector3 position, int roomidx)
     {
+		MeshModifier.CullAlphaFace(ref mesh, m_LevelTextureTile);
+		
         GameObject go = new GameObject("room" + roomidx);
         Renderer renderer = go.AddComponent<MeshRenderer>();
         MeshFilter mf = go.AddComponent<MeshFilter>();
