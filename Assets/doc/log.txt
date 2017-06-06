@@ -397,3 +397,10 @@ Fixed metadata conflict in unity version 3.5 and 5.3 or higher
 by deleting and updating library. git commit was needed.
 
 fixed shadow casting and scaled shadow distance in DayNightSystem.
+
+4/30/ 2017
+
+Check if current room is null, before adjusting /setting Lara's room in  void PositionChanged(Vector3 position)
+
+
+
