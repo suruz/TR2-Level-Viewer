@@ -340,6 +340,7 @@ if(!m_bFreeFall && !m_bJumping)
 	}
 }
 
+
 2/25/2015
 Is there any way to set Time.fixedTime from script? Otherwise  random fixed time setting in projec t   can effect animation keyframe timing.
 
@@ -401,6 +402,6 @@ fixed shadow casting and scaled shadow distance in DayNightSystem.
 4/30/ 2017
 
 Check if current room is null, before adjusting /setting Lara's room in  void PositionChanged(Vector3 position)
-
-
+Added MeshModifier.CullAlphaFace() to remove door/window faces with alpha texture. This will help 
+Unity GI to mark transparent objects.
 
