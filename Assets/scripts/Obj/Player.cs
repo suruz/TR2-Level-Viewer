@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -162,14 +162,28 @@ public class Player : ObjectExt
         if (Physics.Raycast(m_Transform.position + Vector3.up * 10 * Settings.SceneScaling, -Vector3.up, out hit, 14096 * Settings.SceneScaling, mask))
         {
             //room changed?
-            if (hit.transform != null && hit.transform != m_Room.transform)
+            if (hit.transform != null )
             {
-                RoomEx room = hit.transform.GetComponent<RoomEx>();
-                if (room != null) //All hit objects need not to be a room
-                {
-                    m_Room = room;
-                    Debug.Log("m_Room" + m_Room.name);
-                }
+				//there may be lara's current room == null,  first check for this
+				if(m_Room!=null && hit.transform != m_Room.transform)
+				{
+                	RoomEx room = hit.transform.GetComponent<RoomEx>();
+                	if (room != null) //All hit objects need not to be a room
+                	{
+                    	m_Room = room;
+                    	Debug.Log("m_Room" + m_Room.name);
+                	}
+				}
+				else
+				{
+					RoomEx room = hit.transform.GetComponent<RoomEx>();
+                	if (room != null) //All hit objects need not to be a room
+                	{
+                    	m_Room = room;
+                    	Debug.Log("m_Room" + m_Room.name);
+                	}
+					
+				}
             }
         }
         FreeFallHandler();
