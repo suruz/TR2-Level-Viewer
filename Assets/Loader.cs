@@ -9,8 +9,8 @@ using System.IO;
 public class Loader :MonoBehaviour {
 	
 	static TextAsset m_DemoData;
-	public ThirdPersonCam m_Camera = null;
-	public TextMesh m_Text3D = null;
+	//public ThirdPersonCam m_Camera = null;
+	//public TextMesh m_Text3D = null;
 	static Level m_Level = null;
 	public static byte[] m_RawFileData = null;
 	WWW m_www = null;
@@ -60,8 +60,8 @@ public class Loader :MonoBehaviour {
 		Parser.Tr2Level leveldata = LoadLevelFromFile(Settings.LevelFileLocalPath);
 		if(leveldata!= null)
 		{
-			leveldata.Camera = m_Camera;
-			leveldata.Text3DPrefav = m_Text3D;
+			//leveldata.Camera = m_Camera;
+			//leveldata.Text3DPrefav = m_Text3D;
 			m_Level = new Level(leveldata);
 		}
 		else
@@ -109,8 +109,8 @@ public class Loader :MonoBehaviour {
 		Parser.Tr2Level leveldata = Parser.Parse(data);
 		if(leveldata!= null)
 		{
-			leveldata.Camera = m_Camera;
-			leveldata.Text3DPrefav = m_Text3D;
+			//leveldata.Camera = m_Camera;
+			//leveldata.Text3DPrefav = m_Text3D;
 			m_Level = new Level(leveldata);
 		}
 	}
