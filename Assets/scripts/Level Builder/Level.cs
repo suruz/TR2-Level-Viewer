@@ -31,7 +31,7 @@ public class Level
 
     public delegate bool AttachBehaviourScript(GameObject AI, int ObjectID, GameObject player, Parser.Tr2Item tr2item);
     public static AttachBehaviourScript m_OnAttachBehabiourScript = AICallBackHandler.OnAttachingBehaviourToObject;
-
+    public static Material m_SharedMaterial;
     public Level(Parser.Tr2Level leveldata)
     {
         m_leveldata = leveldata;
@@ -42,6 +42,11 @@ public class Level
         if (m_leveldata != null && m_leveldata.NumRooms > 0)
         {
             m_LevelTextureTile = TextureUV.GenerateTextureTile(m_leveldata);
+            //Trying to set assigned render material property, marks shared material as instance.
+            //So change property of shared material before assign it to renderer.
+            m_SharedMaterial.mainTexture = m_LevelTextureTile;
+            m_SharedMaterial.color = new Color(1f, 1f, 1f, 1.0f);
+
             m_RoomExs = new RoomEx[m_leveldata.NumRooms];
 
             m_DynamicPrefabs = BuildDynamicPrefabObjects();
@@ -122,28 +127,10 @@ public class Level
 
         go.transform.position = position;
         go.transform.rotation = Quaternion.identity;
-        if (Settings.PlatformUnityPro)
-        {
-#if (UNITY_5_3_OR_NEWER || UNITY_5_3)
-            //renderer.material = Resources.Load("room_material", typeof(Material)) as Material;
-			//renderer.material.SetFloat("_Mode", 1);
-			//renderer.material.SetFloat("_Cutoff", 0.5);
-			renderer.material = new Material(Shader.Find("Legacy Shaders/Transparent/Cutout/Diffuse"));
-			
-#else
-			renderer.material = new Material(Shader.Find("Transparent/Cutout/Diffuse"));
-#endif
-        }
-        else
-        {
-#if (UNITY_5_3_OR_NEWER || UNITY_5_3)
-            renderer.material = Resources.Load("room_material", typeof(Material)) as Material;
-#else
-			renderer.material = new Material(Shader.Find("Diffuse"));
-#endif
-        }
-        renderer.material.mainTexture = m_LevelTextureTile;
-        renderer.material.color = new Color(1f, 1f, 1f, 1.0f);
+        renderer.sharedMaterial = m_SharedMaterial;
+
+        //renderer.material.mainTexture = m_LevelTextureTile;
+        //renderer.material.color = new Color(1f, 1f, 1f, 1.0f);
         renderer.castShadows = !Settings.EnableIndoorShadow;
         //renderer.material.SetTexture("_BumpMap", Bumptex);*/
 
@@ -182,30 +169,10 @@ public class Level
 
         go.transform.position = position;
         go.transform.rotation = rotation;
-        if (Settings.PlatformUnityPro)
-        {
-#if (UNITY_5_3_OR_NEWER || UNITY_5_3)
-            //renderer.material = Resources.Load("room_material", typeof(Material)) as Material;
-			//renderer.material.SetFloat("_Mode", 1);
-			//renderer.material.SetFloat("_Cutoff", 0.5);
-			renderer.material = new Material(Shader.Find("Legacy Shaders/Transparent/Cutout/Diffuse"));
-			
-#else
-			renderer.material = new Material(Shader.Find("Transparent/Cutout/Diffuse"));
-#endif
-        }
-        else
-        {
-#if (UNITY_5_3_OR_NEWER || UNITY_5_3)
-            renderer.material = Resources.Load("room_material", typeof(Material)) as Material;
-#else
-			renderer.material = new Material(Shader.Find("Diffuse"));
-#endif
+        renderer.sharedMaterial = m_SharedMaterial;
 
-        }
-
-        renderer.material.mainTexture = m_LevelTextureTile;
-        renderer.material.color = new Color(1f, 1f, 1f, 1.0f);
+        //renderer.material.mainTexture = m_LevelTextureTile;
+       // renderer.material.color = new Color(1f, 1f, 1f, 1.0f);
         return go;
     }
 
