@@ -9,6 +9,7 @@ public class MeshModifier  {
 	
 	static public void CullAlphaFace(ref Mesh mesh, Texture2D texture)
 	{
+        return;
 		int[] triangles = mesh.triangles;
 		Vector2[] uvs = mesh.uv;
 		int face_count = triangles.Length / 3;
