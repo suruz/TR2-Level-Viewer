@@ -416,4 +416,9 @@ Supply room material while contructing level.
 Error ocurred after try to set global material of level. because  mean while level is created
 
 
+Why a render material truned into instance material?
+
+Trying to set assigned rendermaterial property marks shared material as instance.
+So change property of shared material before assign it to renderer
+
 
