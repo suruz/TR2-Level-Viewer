@@ -405,3 +405,15 @@ Check if current room is null, before adjusting /setting Lara's room in  void Po
 Added MeshModifier.CullAlphaFace() to remove door/window faces with alpha texture. This will help 
 Unity GI to mark transparent objects.
 
+8/5/2017
+Checking WEB GL Build....
+
+using MeshModifier.CullAlphaFace taking too much vertex/uv memmory allocation.
+This is happening due to copying vertex/uv data of whole mesh for each alpha_face
+
+Optimize room material for batch processing...
+Supply room material while contructing level.
+Error ocurred after try to set global material of level. because  mean while level is created
+
+
+
