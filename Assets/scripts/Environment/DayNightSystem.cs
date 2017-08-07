@@ -10,11 +10,11 @@ public class DayNightSystem : MonoBehaviour {
 	public Material SkyMat;
 	Transform _Transform;
 	float OrbitRadius = 0;
-	float Rotz = 0;
+	float Rotz = 60.0f;
 	float _LightIntensity = Settings.DayLightIntensity;
-
+	float _StartTime = 0;
 	bool _IsDay = true;
-	bool _PrevState = true;
+	bool _PrevState = false;
 
 	public AudioClip _DayTimeAudio;
 	public AudioClip _NightTimeAudio;
@@ -26,7 +26,7 @@ public class DayNightSystem : MonoBehaviour {
 	public static event DayNightHandlerDelegate OnDayNightUpdate;
 	public static event GUIDayTimeUpdateDelegate OnDayTimeUpdate;
 	Light light; //builtin property light has been deprecated since unity5.
-
+	public AnimationCurve _IntensitySampler;
 	// Use this for initialization
 	void Start () 
 	{
@@ -34,41 +34,42 @@ public class DayNightSystem : MonoBehaviour {
 		OrbitRadius = (_Transform.position - LightTarget.position).magnitude;
 		LightTarget.position = new Vector3(LightTarget.position.x, LightTarget.position.y,_Transform.position.z );
 		Vector3 pos = LightTarget.InverseTransformPoint(_Transform.position);
-		Rotz = Mathf.Atan2(pos.y, pos.x) * 180.0f/ Mathf.PI;
-
+		Rotz = 60.0f;//Mathf.Atan2(pos.y, pos.x) * 180.0f/ Mathf.PI;
+		_StartTime = Time.time;
 		_AudioSource = GetComponent<AudioSource>();
 		_AudioSource.loop = true;
 		light = GetComponent<Light>();
-		light.intensity = 0.4f;
+		light.intensity = _LightIntensity;
 		if(!Settings.EnableIndoorShadow)
 		{
 			//light.shadows = LightShadows.None;  // shadow should be controlled by shadow caster 
 		}
 		QualitySettings.shadowDistance = 40000 * Settings.SceneScaling;
 		
-		//_AmbientLightColor = RenderSettings.ambientLight;
+		_AmbientLightColor = RenderSettings.ambientLight;
 		DayNightSettings();
 	}
 	
 	// Update is called once per frame
 	void Update () {
 
-		float sunanglef = Rotz + Time.time * 0.6f;
-		int sunangle = (int)sunanglef % 360;
+		float sunanglef = Rotz + (Time.time - _StartTime) * 0.6f;
+		//int sunangle = (int)sunanglef % 360;
 
 		Quaternion rot =  Quaternion.Euler(0,0,sunanglef);
 		Vector3 dir = rot * Vector3.right;
-		Vector3 pos = LightTarget.position + dir * OrbitRadius;
-		_Transform.position = pos;
+		//Vector3 pos = LightTarget.position + dir * OrbitRadius;
+		//_Transform.position = pos;
 		//_Transform.rotation = rot;
 		_Transform.forward = -dir;
 		
-		light.intensity = _LightIntensity + Vector3.Dot(Vector3.right, _Transform.forward) * 0.5f;
+		 _LightIntensity = Vector3.Dot(-Vector3.up, _Transform.forward);
+		//light.intensity = _LightIntensity * 1.26f;
 
 		//Debug.Log(sunangle);
-		if(OnDayTimeUpdate !=null) OnDayTimeUpdate((sunangle * 24.0f / 360.0f));
+		if(OnDayTimeUpdate !=null) OnDayTimeUpdate((sunanglef * 24.0f / 360.0f));
 
-		if(sunangle > 180 )
+		if(sunanglef > 180 )
 		{
 			_IsDay = false;
 
@@ -82,6 +83,20 @@ public class DayNightSystem : MonoBehaviour {
 		{
 			DayNightSettings();
 			_PrevState = _IsDay;
+		}
+		
+		
+		
+		if(_IsDay)
+		{
+			float intensity = _IntensitySampler.Evaluate(_LightIntensity);
+			//light.intensity = intensity * 1.2f;
+			if(intensity > 0.75f)
+			{
+				intensity = 0.75f;
+			}
+			RenderSettings.ambientLight =  Color.white * intensity * 0.9f;
+			
 		}
 
 		//Debug.DrawLine(LightTarget.position,_Transform.position );
@@ -99,7 +114,7 @@ public class DayNightSystem : MonoBehaviour {
 		if(_IsDay)
 		{
 			_AudioSource.clip = _DayTimeAudio;
-			RenderSettings.ambientLight = _AmbientLightColor;
+			//RenderSettings.ambientLight =  Color.white * light.intensity * 0.75f;
 			RenderSettings.skybox = SkyMat;
 		}
 		else
