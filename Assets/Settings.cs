@@ -18,14 +18,14 @@ public class Settings  {
 	
 	public static float DayNightTimeSpeed = 1.0f;   //Must be >=0
 													//When 0 Day Night changes will not happen
-	public static float DayLightIntensity = 0.2f;  	//Controls amount of day light
+	public static float DayLightIntensity = 1f;  	//Controls amount of day light
 	
 	public static bool LoadLevelFileFromUrl = false; //If enabled system will load level from url
 													 //specified by LevelFileUrl. Url could be either
 													 //file: url or http:
 													 //otherwise system will load level from
 													 //LevelFileLocalPath
-	public static string LevelFileUrl = "http://example.com/mylevel.TR2"; 
+	public static string LevelFileUrl = "http://tickleheadstudios.com/demo/unity/tr2webgl/assault.tr2"; 
 	public static string LevelFileLocalPath = "Custom Demo Files/HILTOP.TR2";  
 													//LevelFileLocalPath is default file path 
 													//that system tries lo load if
