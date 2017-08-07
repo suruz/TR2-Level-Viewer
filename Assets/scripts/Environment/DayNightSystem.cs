@@ -26,7 +26,7 @@ public class DayNightSystem : MonoBehaviour {
 	public static event DayNightHandlerDelegate OnDayNightUpdate;
 	public static event GUIDayTimeUpdateDelegate OnDayTimeUpdate;
 	Light light; //builtin property light has been deprecated since unity5.
-	public AnimationCurve _IntensitySampler;
+	public AnimationCurve _IntensitySampler = AnimationCurve.Linear(0,0,1,1);
 	// Use this for initialization
 	void Start () 
 	{
