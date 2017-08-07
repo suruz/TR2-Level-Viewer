@@ -11,6 +11,7 @@ public class Loader :MonoBehaviour {
 	static TextAsset m_DemoData;
 	//public ThirdPersonCam m_Camera = null;
 	//public TextMesh m_Text3D = null;
+    public Material m_SharedMaterial;
 	static Level m_Level = null;
 	public static byte[] m_RawFileData = null;
 	WWW m_www = null;
@@ -60,10 +61,23 @@ public class Loader :MonoBehaviour {
 		Parser.Tr2Level leveldata = LoadLevelFromFile(Settings.LevelFileLocalPath);
 		if(leveldata!= null)
 		{
-			//leveldata.Camera = m_Camera;
-			//leveldata.Text3DPrefav = m_Text3D;
-			m_Level = new Level(leveldata);
-		}
+            //leveldata.Camera = m_Camera;
+            //leveldata.Text3DPrefav = m_Text3D;
+            if (m_SharedMaterial != null)
+            {
+                Level.m_SharedMaterial = m_SharedMaterial;
+                m_Level = new Level(leveldata);
+            }
+            else
+            {
+#if UNITY_EDITOR
+                EditorUtility.DisplayDialog("Error", "m_SharedMaterial is not set in GameObject:" + this.name, "OK");
+#else
+                Debug.LogError("m_SharedMaterial is not set in GameObject" + this.name);
+#endif
+            }
+
+        }
 		else
 		{
 			//Selected file is not tr2 type! 
@@ -109,10 +123,26 @@ public class Loader :MonoBehaviour {
 		Parser.Tr2Level leveldata = Parser.Parse(data);
 		if(leveldata!= null)
 		{
-			//leveldata.Camera = m_Camera;
-			//leveldata.Text3DPrefav = m_Text3D;
-			m_Level = new Level(leveldata);
-		}
+            //leveldata.Camera = m_Camera;
+            //leveldata.Text3DPrefav = m_Text3D;
+            if (m_SharedMaterial != null)
+            {
+                Level.m_SharedMaterial = m_SharedMaterial;
+                m_Level = new Level(leveldata);
+            }
+            else
+            {
+         
+#if UNITY_EDITOR
+                EditorUtility.DisplayDialog("Error", "m_SharedMaterial is not set in GameObject: " + this.name, "OK");
+             
+#else
+                Debug.LogError("m_SharedMaterial is not set in GameObject" + this.name);
+#endif
+
+            }
+
+        }
 	}
 
 	// Update is called once per frame
