@@ -12,7 +12,7 @@ public class ButtlerStatePlayer : MonoBehaviour {
 	
 	int Walk = 0;
 	int Jump = 0;
-	int Idle = 0;
+	int Idle = 2;
 	int Run = 0;
 	int Attack = 0;
 	
@@ -43,10 +43,10 @@ public class ButtlerStatePlayer : MonoBehaviour {
 			m_TargetPos = m_FollowTransform.position;
 			transform.forward = (m_TargetPos - transform.position).normalized;
 			float dist = (m_FollowTransform.position - transform.position).magnitude;
-			if(dist > (2048 * Settings.SceneScaling) )
+			if(dist > (1024 * Settings.SceneScaling) )
 			{
 				m_CurrentKeyState = Walk;
-				transform.position = Vector3.Lerp(transform.position ,m_TargetPos,Time.deltaTime * 0.05f * Settings.SceneScaling);
+				transform.position = Vector3.Lerp(transform.position ,m_TargetPos,Time.deltaTime * 0.15f);
 			}
 			else
 			{
