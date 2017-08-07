@@ -23,27 +23,37 @@ public class Mouse : MonoBehaviour {
 	// Update is called once per frame
 	public void Update () 
 	{
-		// Get the mouse delta. This is not in the range -1...1
-		//var h = horizontalSpeed * Input.GetAxis ("Mouse X");
-		//var v = verticalSpeed * Input.GetAxis ("Mouse Y");
-		
-		if(Input.GetMouseButtonDown(0) || initmouse)
-		{
-			mousepos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
-			prevmousepos = mousepos;
-			initmouse = false;
-		}
-		else if (Input.GetMouseButton(0))
-		{
-			mousepos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
-		}
-		
-		if(prevmousepos != mousepos)
-		{
-			if(m_OnMouseMove!=null) m_OnMouseMove(mousepos.x - prevmousepos.x, mousepos.y - prevmousepos.y);
-		}
+     
+        if ((Application.platform == RuntimePlatform.Android) || (Application.platform == RuntimePlatform.IPhonePlayer))
+        {
+            if (Input.GetMouseButtonDown(0) || initmouse)
+            {
+                mousepos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+                prevmousepos = mousepos;
+                initmouse = false;
+            }
+            else if (Input.GetMouseButton(0))
+            {
+                mousepos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+            }
 
-	}
+
+
+            if (prevmousepos != mousepos)
+            {
+                if (m_OnMouseMove != null) m_OnMouseMove(mousepos.x - prevmousepos.x, mousepos.y - prevmousepos.y);
+            }
+        }
+        else
+        {
+            // Get the mouse delta. This is not in the range -1...1
+            float x = Input.GetAxis ("Mouse X") * 8;
+            float y = Input.GetAxis ("Mouse Y") * 5;
+            if (m_OnMouseMove != null) m_OnMouseMove(x, y);
+        }
+
+
+    }
 
 	static public float GetAxisX ()
 	{
