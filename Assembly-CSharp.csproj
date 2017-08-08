@@ -106,6 +106,7 @@
      <None Include="Assets\Resources\Demo Level.txt" />
      <None Include="Assets\shader\Lightmapped_Diffuse.shader" />
      <None Include="Assets\doc\ClassMap.txt" />
+     <None Include="Assets\Resources\AlphaTest-Diffuse.shader" />
      <None Include="Assets\Level Texture\read me.txt" />
      <None Include="Assets\doc\read me.txt" />
   </ItemGroup>

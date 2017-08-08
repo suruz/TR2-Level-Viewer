@@ -445,9 +445,9 @@ public class Level
             FlashLight.AddComponent<FlashLightStatePlayer>();
             Light lt = FlashLight.AddComponent<Light>();
             lt.type = LightType.Spot;
-            lt.range = 10000;
+            lt.range = 5;
             lt.spotAngle = 70;
-            lt.intensity = 1;
+            lt.intensity = 5;
 
             FlashLight.transform.parent = m_Player.transform.FindChild("objPart:0");//.Find("objPart:7").Find("objPart:14");
             FlashLight.transform.position = FlashLight.transform.parent.position;

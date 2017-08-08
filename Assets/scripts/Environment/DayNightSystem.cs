@@ -95,7 +95,7 @@ public class DayNightSystem : MonoBehaviour {
 			{
 				intensity = 0.75f;
 			}
-			RenderSettings.ambientLight =  Color.white * intensity * 0.9f;
+			RenderSettings.ambientLight =  Color.white * intensity;
 			
 		}
 

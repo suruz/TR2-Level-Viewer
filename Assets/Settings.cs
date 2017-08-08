@@ -18,7 +18,7 @@ public class Settings  {
 	
 	public static float DayNightTimeSpeed = 1.0f;   //Must be >=0
 													//When 0 Day Night changes will not happen
-	public static float DayLightIntensity = 1f;  	//Controls amount of day light
+	public static float DayLightIntensity = 0.65f;  	//Controls amount of day light
 	
 	public static bool LoadLevelFileFromUrl = false; //If enabled system will load level from url
 													 //specified by LevelFileUrl. Url could be either
