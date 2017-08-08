@@ -421,4 +421,9 @@ Why a render material truned into instance material?
 Trying to set assigned rendermaterial property marks shared material as instance.
 So change property of shared material before assign it to renderer
 
+8/8/2017
+TODO:
+Check room material import error with custom shader in Unity 5 and higher.
+Set material in loader properly
+
 
