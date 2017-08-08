@@ -462,6 +462,25 @@ public class Level
             //Initialise Current Active Room for player
             player.m_Room = SetRoomForPlayer();
             AICondition.SetActive(m_Player, true);
+			
+			//set every game object under player as player
+			Transform[] objs = m_Player.GetComponentsInChildren<Transform>();
+			foreach(Transform t in objs)
+			{
+				t.gameObject.layer = UnityLayer.Player;
+			}
+			
+			//Add Charecter light
+			GameObject LaraLight = new GameObject("Lara Light");
+			Light light = LaraLight.AddComponent<Light>();
+			light.transform.position = m_Player.transform.position;
+			light.type = LightType.Directional;
+			light.transform.forward = Vector3.Reflect(Vector3.one, -Vector3.up);
+			light.transform.parent = m_Player.transform;
+			light.cullingMask = MaskedLayer.Player;
+			light.intensity = 0.3f;
+			
+
         }
         //check if we have any custom behabiour  script for object
         else if (m_OnAttachBehabiourScript != null && !m_OnAttachBehabiourScript(tr2item.UnityObject, tr2item.ObjectID, m_Player, tr2item))
