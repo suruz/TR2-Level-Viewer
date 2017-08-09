@@ -479,7 +479,7 @@ public class Level
 			light.transform.parent = m_Player.transform;
 			light.cullingMask = MaskedLayer.Player;
 			light.intensity = 0.3f;
-			
+			light.gameObject.AddComponent<LaraLightStatePlayer>();
 
         }
         //check if we have any custom behabiour  script for object
