@@ -59,6 +59,7 @@
      <Compile Include="Assets\scripts\Behaviour\EgleStatePlayer.cs" />
      <Compile Include="Assets\scripts\Behaviour\GoonWithRoolerStatePlayer.cs" />
      <Compile Include="Assets\scripts\Behaviour\Inventory Item\FlashLightStatePlayer.cs" />
+     <Compile Include="Assets\scripts\Behaviour\LaraLightStatePlayer.cs" />
      <Compile Include="Assets\scripts\Behaviour\LaraStatePlayer.cs" />
      <Compile Include="Assets\scripts\Behaviour\SharkGoldenStatePlayer.cs" />
      <Compile Include="Assets\scripts\Behaviour\SwitchStatePlayer.cs" />
