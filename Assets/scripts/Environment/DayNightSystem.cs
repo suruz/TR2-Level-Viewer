@@ -11,8 +11,9 @@ public class DayNightSystem : MonoBehaviour {
 	Transform _Transform;
 	float OrbitRadius = 0;
 	float Rotz = 60.0f;
-	float _LightIntensity = Settings.DayLightIntensity;
-	float _StartTime = 0;
+    float _LightIntensity = 1;
+    float _AmbientIntensity = 1;
+    float _StartTime = 0;
 	bool _IsDay = true;
 	bool _PrevState = false;
 
@@ -39,8 +40,15 @@ public class DayNightSystem : MonoBehaviour {
 		_AudioSource = GetComponent<AudioSource>();
 		_AudioSource.loop = true;
 		light = GetComponent<Light>();
-		light.intensity = _LightIntensity;
-		if(!Settings.EnableIndoorShadow)
+
+        _LightIntensity = Settings.DayLightIntensity;
+#if (UNITY_5_3_OR_NEWER || UNITY_5_3)
+        _LightIntensity = 1;
+#endif
+        light.intensity = _LightIntensity;
+
+
+        if (!Settings.EnableIndoorShadow)
 		{
 			//light.shadows = LightShadows.None;  // shadow should be controlled by shadow caster 
 		}
@@ -62,12 +70,10 @@ public class DayNightSystem : MonoBehaviour {
 		//_Transform.position = pos;
 		//_Transform.rotation = rot;
 		_Transform.forward = -dir;
-		
-		 _LightIntensity = Vector3.Dot(-Vector3.up, _Transform.forward);
-		//light.intensity = _LightIntensity * 1.26f;
-
-		//Debug.Log(sunangle);
-		if(OnDayTimeUpdate !=null) OnDayTimeUpdate((sunanglef * 24.0f / 360.0f));
+        _AmbientIntensity = Vector3.Dot(-Vector3.up, _Transform.forward);
+ 
+        //Debug.Log(sunangle);
+        if (OnDayTimeUpdate !=null) OnDayTimeUpdate((sunanglef * 24.0f / 360.0f));
 
 		if(sunanglef > 180 )
 		{
@@ -89,7 +95,7 @@ public class DayNightSystem : MonoBehaviour {
 		
 		if(_IsDay)
 		{
-			float intensity = _IntensitySampler.Evaluate(_LightIntensity);
+			float intensity = _IntensitySampler.Evaluate(_AmbientIntensity);
 			//light.intensity = intensity * 1.2f;
 			if(intensity > 0.75f)
 			{
