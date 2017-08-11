@@ -61,7 +61,7 @@ public class DayNightSystem : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-		float sunanglef = Rotz + (Time.time - _StartTime) * 0.6f;
+		int sunanglef = (int)(Rotz + (Time.time - _StartTime) * 0.6f) % 360;
 		//int sunangle = (int)sunanglef % 360;
 
 		Quaternion rot =  Quaternion.Euler(0,0,sunanglef);
