@@ -22,7 +22,8 @@ public class DayNightSystem : MonoBehaviour {
 	AudioSource _AudioSource;
 
 	Color _AmbientLightColor = new Color(88f/255f, 88f/255f, 88f/255f, 1f);
-	Color _SkyColor =  Color.gray;
+    Color _SunLightColor = new Color(254f / 255f, 249f / 255f, 229f / 255f, 1f);
+    Color _SkyColor =  Color.gray;
 	
 	public static event DayNightHandlerDelegate OnDayNightUpdate;
 	public static event GUIDayTimeUpdateDelegate OnDayTimeUpdate;
@@ -40,13 +41,16 @@ public class DayNightSystem : MonoBehaviour {
 		_AudioSource = GetComponent<AudioSource>();
 		_AudioSource.loop = true;
 		light = GetComponent<Light>();
-
+ 
         _LightIntensity = Settings.DayLightIntensity;
 #if (UNITY_5_3_OR_NEWER || UNITY_5_3)
-        _LightIntensity = 1;
+        _LightIntensity = 1.05f;
 #endif
         light.intensity = _LightIntensity;
-
+        light.color = _SunLightColor;
+        light.shadowStrength = 0.9f;
+        light.shadowNormalBias = 0;
+        light.shadowBias = 0;
 
         if (!Settings.EnableIndoorShadow)
 		{
