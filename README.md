@@ -12,6 +12,9 @@
 - Includes Character Controller with animation state machine and physics. 
 
 - Zones and Triggers are marked using Unity Box Collider for convinient collision detection.
+- Auto detects grabbable platform of any level by analyzing room mesh, no floor data is needed.
+- Properly scaled level, ready for Unity physics and GI lighting system.
+- Included experimental day-night system.
 
 
 
