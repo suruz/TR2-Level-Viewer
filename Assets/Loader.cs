@@ -48,20 +48,16 @@ public class Loader :MonoBehaviour {
 				BinaryWriter bw = new BinaryWriter(fstream);
 				bw.Write(shared_texture.EncodeToPNG());
 				bw.Close();
-				//load shared texture
-				//refresh assets before tryy
-				AssetDatabase.Refresh();
-				TextureImporter teximp = (TextureImporter)TextureImporter.GetAtPath("Assets" + m_SharedTexturePath + Level.m_LevelName + ".png");
 				
+				//load shared texture
+				TextureImporter teximp = (TextureImporter)TextureImporter.GetAtPath("Assets" + m_SharedTexturePath + Level.m_LevelName + ".png");
 				if(teximp == null)
 				{
 					EditorUtility.DisplayDialog("Error", "Assets" + m_SharedTexturePath + Level.m_LevelName + ".png" + " is not found in Assets ", "OK");
 					return;
-
 				}
 				else
 				{
-					
 					#if (UNITY_5_3_OR_NEWER || UNITY_5_3)
 					teximp.alphaSource = TextureImporterAlphaSource.FromInput;
 					teximp.filterMode   = FilterMode.Bilinear;
@@ -72,15 +68,19 @@ public class Loader :MonoBehaviour {
 					teximp.mipmapEnabled = false;
 					teximp.textureCompression = TextureImporterCompression.Uncompressed;
 					#else
-					
 					teximp.filterMode = FilterMode.Bilinear;
             		teximp.grayscaleToAlpha = false;
             		teximp.textureFormat = TextureImporterFormat.ARGB32;
             		teximp.wrapMode = TextureWrapMode.Clamp;
-					
+					teximp.maxTextureSize = 4096;
+					teximp.mipmapEnabled = false;
 					#endif
-            		
+            
 				}
+				
+				//reimport assets to apply changes 
+				AssetDatabase.Refresh();
+				
 					
 				//load shared material
 				Material shared_material = (Material )AssetDatabase.LoadAssetAtPath("Assets" + m_SharedMaterialPath, typeof(Material));
