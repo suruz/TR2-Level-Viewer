@@ -556,6 +556,9 @@ public class Level
 
     void SetupTrigers()
     {
+		GameObject DieZoneContainer = new GameObject("Die Zones");
+		GameObject ClimbZoneContainer = new GameObject("Climb Zones");
+
         if (m_leveldata.Rooms.Length > 0 && m_Player != null)
         {
             Transform Lara = m_Player.transform;
@@ -652,7 +655,7 @@ public class Level
                                     GameObject diezone = MeshBuilder.CreateZone("Die Zone");
                                     diezone.transform.position = sector_world_position;
                                     diezone.transform.localScale = new Vector3(1024, 1024, 1024) * Settings.SceneScaling;
-                                    // diezone.transform.parent = m_RoomExs[r].transform;
+                                    diezone.transform.parent = DieZoneContainer.transform;
 
                                     break;
 
@@ -664,7 +667,7 @@ public class Level
                                     GameObject climbzone = MeshBuilder.CreateZone("Climb Zone");
                                     climbzone.transform.position = sector_world_position;
                                     climbzone.transform.localScale = new Vector3(1024, 1024, 1024) * Settings.SceneScaling;
-                                    //climbzone.transform.parent = m_RoomExs[r].transform;
+                                    climbzone.transform.parent = ClimbZoneContainer.transform;
 
                                     break;
                             }
