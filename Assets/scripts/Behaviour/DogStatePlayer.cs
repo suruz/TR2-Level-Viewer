@@ -73,7 +73,7 @@ public class DogStatePlayer : MonoBehaviour {
 				Vector3 fwrd = (m_TargetPos - transform.position).normalized;
 				fwrd.y = 0;
 				transform.forward = fwrd;
-				transform.position = Vector3.Lerp(transform.position ,m_TargetPos,Time.deltaTime * 0.25f * Settings.SceneScaling);
+				transform.position = Vector3.Lerp(transform.position ,m_TargetPos,Time.deltaTime * 0.25f);
 			}
 			
 		}

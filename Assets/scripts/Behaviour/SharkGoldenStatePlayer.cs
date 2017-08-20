@@ -67,7 +67,7 @@ public class SharkGoldenStatePlayer : MonoBehaviour {
 				m_CurrentKeyState = Walk;
 				
 				transform.forward = (m_TargetPos - transform.position).normalized;
-				transform.position = Vector3.Lerp(transform.position ,m_TargetPos,Time.deltaTime * 0.25f * Settings.SceneScaling);
+				transform.position = Vector3.Lerp(transform.position ,m_TargetPos,Time.deltaTime * 0.25f);
 			}
 			
 		}
