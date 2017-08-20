@@ -81,8 +81,9 @@ public class Loader :MonoBehaviour {
             
 				}
 				
-				//reimport assets to apply changes 
+				//refresh assets to apply changes 
 				AssetDatabase.Refresh();
+				//reimport is need after import setting modification
 				AssetDatabase.ImportAsset("Assets" + m_SharedTexturePath + Level.m_LevelName + ".png");
 					
 				//load shared material
