@@ -462,3 +462,11 @@ if(!Directory.Exists(Application.dataPath + "/Level Texture/"))
 //if(!File.Exists(Application.dataPath + "/Level Texture/" + Level.m_LevelName + ".png"))
 File.WriteAllBytes(Application.dataPath + "/Level Texture/" + Level.m_LevelName + ".png",tex.EncodeToPNG());
 	
+	
+	
+About non standard resource access path in Unity...
+All path in AsseteDataBase starts with "Assets" with proper extension at the end.
+Double slash does not work.
+
+On the other hand,
+All path in Resources.Load API starts relative to "Resources" and extension at the end is not allowed

@@ -62,7 +62,7 @@ public class Loader :MonoBehaviour {
 					teximp.filterMode   = FilterMode.Bilinear;
 					teximp.wrapMode = TextureWrapMode.Clamp;
 					//teximp.sRGBTexture = true; 
-					teximp.textureType = TextureImporterType.Advanced;
+					teximp.textureType = TextureImporterType.Default;
 					teximp.maxTextureSize = 4096;
 					teximp.mipmapEnabled = false;
 					//teximp.textureCompression = TextureImporterFormat.ARGB32;
@@ -81,7 +81,7 @@ public class Loader :MonoBehaviour {
 					return;
 				}
 				
-				shared_material.mainTexture = (Texture) AssetDatabase.LoadAssetAtPath("Assets/" + m_SharedTexturePath + Level.m_LevelName, typeof(Texture));
+				shared_material.mainTexture = (Texture) AssetDatabase.LoadAssetAtPath("Assets" + m_SharedTexturePath + Level.m_LevelName + ".png", typeof(Texture));
 				Level.m_SharedMaterial = shared_material;
 				m_Level = new Level(leveldata);
 			}
