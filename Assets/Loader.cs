@@ -43,8 +43,11 @@ public class Loader :MonoBehaviour {
 					Directory.CreateDirectory(Application.dataPath + m_SharedTexturePath);
 				}
 				//if(!File.Exists(Application.dataPath + "/Level Texture/" + Level.m_LevelName + ".png"))
-				File.WriteAllBytes(Application.dataPath + m_SharedTexturePath + Level.m_LevelName + ".png",shared_texture.EncodeToPNG());
-				
+				//File.WriteAllBytes(Application.dataPath + m_SharedTexturePath + Level.m_LevelName + ".png",shared_texture.EncodeToPNG());
+				FileStream fstream = File.Open(Application.dataPath + m_SharedTexturePath + Level.m_LevelName + ".png",FileMode.OpenOrCreate,FileAccess.ReadWrite);
+				BinaryWriter bw = new BinaryWriter(fstream);
+				bw.Write(shared_texture.EncodeToPNG());
+				bw.Close();
 				//load shared texture
 				//refresh assets before tryy
 				AssetDatabase.Refresh();
@@ -79,10 +82,6 @@ public class Loader :MonoBehaviour {
             		
 				}
 					
-				
-				
-				
-				
 				//load shared material
 				Material shared_material = (Material )AssetDatabase.LoadAssetAtPath("Assets" + m_SharedMaterialPath, typeof(Material));
 				
@@ -172,7 +171,10 @@ public class Loader :MonoBehaviour {
 			}
 			else
 			{
-				m_RawFileData =File.ReadAllBytes(path); 
+				FileStream fstream = File.Open(path,FileMode.Open,FileAccess.ReadWrite);
+				BinaryReader br = new BinaryReader(fstream);
+				m_RawFileData =  br.ReadBytes((int)fstream.Length); //File.ReadAllBytes(path); //fixed file read access violation
+				br.Close();
 			}
 				
 			leveldata = Parser.Parse(m_RawFileData);
