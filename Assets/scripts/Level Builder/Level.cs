@@ -41,10 +41,10 @@ public class Level
 
         if (m_leveldata != null && m_leveldata.NumRooms > 0)
         {
-            m_LevelTextureTile = TextureUV.GenerateTextureTile(m_leveldata);
+            //TextureUV.GenerateTextureTile ismoved to Loader.cs for better responsibility managment 
             //Trying to set assigned render material property, marks shared material as instance.
             //So change property of shared material before assign it to renderer.
-            m_SharedMaterial.mainTexture = m_LevelTextureTile;
+            
             m_SharedMaterial.color = new Color(1f, 1f, 1f, 1.0f);
 
             m_RoomExs = new RoomEx[m_leveldata.NumRooms];
