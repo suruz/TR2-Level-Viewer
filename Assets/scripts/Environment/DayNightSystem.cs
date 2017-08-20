@@ -45,11 +45,11 @@ public class DayNightSystem : MonoBehaviour {
         _LightIntensity = Settings.DayLightIntensity;
 #if (UNITY_5_3_OR_NEWER || UNITY_5_3)
         _LightIntensity = 1.05f;
+		light.shadowNormalBias = 0;
 #endif
         light.intensity = _LightIntensity;
         light.color = _SunLightColor;
         light.shadowStrength = 0.9f;
-        light.shadowNormalBias = 0;
         light.shadowBias = 0;
 
         if (!Settings.EnableIndoorShadow)
