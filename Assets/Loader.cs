@@ -19,14 +19,25 @@ public class Loader :MonoBehaviour {
 	//used in editor only
 	static string m_SharedTexturePath = "/Level Texture/";
 	static string m_SharedMaterialPath = "/Resources/room_material.mat";
-		
+	static string m_LastBrowsedPathForLevel = "";
 	// Use this for initialization
 	
 #if UNITY_EDITOR
 	[MenuItem("TR2 Editor/Create Level")]
 	public static void Create () 
 	{
-		string path = EditorUtility.OpenFilePanel("Open Tomb Raider II Level File (*.TR2)", Application.dataPath, "*.tr2; *.TR2");
+		//procedure to store last browsed path
+		string path = PlayerPrefs.GetString("last_browsed_path", "");
+		if(path == "")
+		{
+			path = EditorUtility.OpenFilePanel("Open Tomb Raider II Level File (*.TR2)", Application.dataPath, "*.tr2; *.TR2");
+		}
+		else
+		{
+			path = EditorUtility.OpenFilePanel("Open Tomb Raider II Level File (*.TR2)", path, "*.tr2; *.TR2");
+		}
+		PlayerPrefs.SetString("last_browsed_path", Path.GetDirectoryName(path));
+		
 		if(path != null)
 		{
 			Settings.LevelFileLocalPath = path;
