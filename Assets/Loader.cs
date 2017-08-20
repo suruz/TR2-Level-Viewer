@@ -50,7 +50,10 @@ public class Loader :MonoBehaviour {
 				bw.Close();
 				
 				//load shared texture
-				TextureImporter teximp = (TextureImporter)TextureImporter.GetAtPath("Assets" + m_SharedTexturePath + Level.m_LevelName + ".png");
+				//Refresh assete database for newly created texture
+				AssetDatabase.Refresh();
+
+				TextureImporter teximp = TextureImporter.GetAtPath("Assets" + m_SharedTexturePath + Level.m_LevelName + ".png") as TextureImporter;
 				if(teximp == null)
 				{
 					EditorUtility.DisplayDialog("Error", "Assets" + m_SharedTexturePath + Level.m_LevelName + ".png" + " is not found in Assets ", "OK");
@@ -80,7 +83,7 @@ public class Loader :MonoBehaviour {
 				
 				//reimport assets to apply changes 
 				AssetDatabase.Refresh();
-				
+				AssetDatabase.ImportAsset("Assets" + m_SharedTexturePath + Level.m_LevelName + ".png");
 					
 				//load shared material
 				Material shared_material = (Material )AssetDatabase.LoadAssetAtPath("Assets" + m_SharedMaterialPath, typeof(Material));
