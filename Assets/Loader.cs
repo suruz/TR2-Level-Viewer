@@ -15,6 +15,11 @@ public class Loader :MonoBehaviour {
 	static Level m_Level = null;
 	public static byte[] m_RawFileData = null;
 	WWW m_www = null;
+	
+	//used in editor only
+	static string m_SharedTexturePath = "/Level Texture/";
+	static string m_SharedMaterialPath = "/Resources/room_material.mat";
+		
 	// Use this for initialization
 	
 #if UNITY_EDITOR
@@ -30,6 +35,54 @@ public class Loader :MonoBehaviour {
 			{
 				leveldata.Camera = null;
 				leveldata.Text3DPrefav = null;
+				
+				// generate shared texture
+				Texture2D shared_texture = TextureUV.GenerateTextureTile(leveldata);
+				if(!Directory.Exists(Application.dataPath + m_SharedTexturePath))
+				{
+					Directory.CreateDirectory(Application.dataPath + m_SharedTexturePath);
+				}
+				//if(!File.Exists(Application.dataPath + "/Level Texture/" + Level.m_LevelName + ".png"))
+				File.WriteAllBytes(Application.dataPath + m_SharedTexturePath + Level.m_LevelName + ".png",shared_texture.EncodeToPNG());
+				
+				//load shared texture
+				//refresh assets before tryy
+				AssetDatabase.Refresh();
+				TextureImporter teximp = (TextureImporter)TextureImporter.GetAtPath("Assets" + m_SharedTexturePath + Level.m_LevelName + ".png");
+				
+				if(teximp == null)
+				{
+					EditorUtility.DisplayDialog("Error", "Assets" + m_SharedTexturePath + Level.m_LevelName + ".png" + " is not found in Assets ", "OK");
+					return;
+
+				}
+				else
+				{
+					teximp.alphaSource = TextureImporterAlphaSource.FromInput;
+					teximp.filterMode   = FilterMode.Bilinear;
+					teximp.wrapMode = TextureWrapMode.Clamp;
+					//teximp.sRGBTexture = true; 
+					teximp.textureType = TextureImporterType.Advanced;
+					teximp.maxTextureSize = 4096;
+					teximp.mipmapEnabled = false;
+					//teximp.textureCompression = TextureImporterFormat.ARGB32;
+				}
+					
+				
+				
+				
+				
+				//load shared material
+				Material shared_material = (Material )AssetDatabase.LoadAssetAtPath("Assets" + m_SharedMaterialPath, typeof(Material));
+				
+				if(shared_material == null)
+				{
+					EditorUtility.DisplayDialog("Error","Assets" + m_SharedMaterialPath + " is not found in Assets ", "OK");
+					return;
+				}
+				
+				shared_material.mainTexture = (Texture) AssetDatabase.LoadAssetAtPath("Assets/" + m_SharedTexturePath + Level.m_LevelName, typeof(Texture));
+				Level.m_SharedMaterial = shared_material;
 				m_Level = new Level(leveldata);
 			}
 		}
@@ -51,6 +104,7 @@ public class Loader :MonoBehaviour {
 			else                    //download data
 			{
 				Debug.Log("Init load level from url: " + Settings.LevelFileUrl);
+				Level.m_LevelName = Path.GetFileNameWithoutExtension(Settings.LevelFileUrl);
 				m_www = new WWW(Settings.LevelFileUrl);
 			}
 		}
@@ -65,6 +119,7 @@ public class Loader :MonoBehaviour {
             //leveldata.Text3DPrefav = m_Text3D;
             if (m_SharedMaterial != null)
             {
+				m_SharedMaterial.mainTexture = TextureUV.GenerateTextureTile(leveldata);
                 Level.m_SharedMaterial = m_SharedMaterial;
                 m_Level = new Level(leveldata);
             }
@@ -111,6 +166,7 @@ public class Loader :MonoBehaviour {
 				
 			leveldata = Parser.Parse(m_RawFileData);
 			Level.m_LevelName = Path.GetFileNameWithoutExtension(path);
+			Debug.Log("LoadLevelFromFile: " + Level.m_LevelName);
 			#endif
 			
 		}
@@ -127,6 +183,7 @@ public class Loader :MonoBehaviour {
             //leveldata.Text3DPrefav = m_Text3D;
             if (m_SharedMaterial != null)
             {
+				m_SharedMaterial.mainTexture = TextureUV.GenerateTextureTile(leveldata);
                 Level.m_SharedMaterial = m_SharedMaterial;
                 m_Level = new Level(leveldata);
             }
