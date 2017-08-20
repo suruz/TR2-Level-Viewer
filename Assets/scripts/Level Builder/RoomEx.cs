@@ -32,7 +32,13 @@ public class RoomEx: MonoBehaviour  {
 	public void  InitRoom(Parser.Tr2Room room, List<GameObject> objects)
 	{
 		m_leveldata = Level.m_leveldata;
+
+#if UNITY_EDITOR
+		m_Mesh = GetComponent<MeshFilter>().sharedMesh;
+#else
 		m_Mesh = GetComponent<MeshFilter>().mesh;
+#endif 
+		
 		m_Transform = transform;
 		m_StaticObjects = objects;
 		m_Tr2Room = room;
