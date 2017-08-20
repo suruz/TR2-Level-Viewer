@@ -58,6 +58,8 @@ public class Loader :MonoBehaviour {
 				}
 				else
 				{
+					
+					#if (UNITY_5_3_OR_NEWER || UNITY_5_3)
 					teximp.alphaSource = TextureImporterAlphaSource.FromInput;
 					teximp.filterMode   = FilterMode.Bilinear;
 					teximp.wrapMode = TextureWrapMode.Clamp;
@@ -65,7 +67,16 @@ public class Loader :MonoBehaviour {
 					teximp.textureType = TextureImporterType.Default;
 					teximp.maxTextureSize = 4096;
 					teximp.mipmapEnabled = false;
-					//teximp.textureCompression = TextureImporterFormat.ARGB32;
+					teximp.textureCompression = TextureImporterCompression.Uncompressed;
+					#else
+					
+					teximp.filterMode = FilterMode.Bilinear;
+            		teximp.grayscaleToAlpha = false;
+            		teximp.textureFormat = TextureImporterFormat.ARGB32;
+            		teximp.wrapMode = TextureWrapMode.Clamp;
+					
+					#endif
+            		
 				}
 					
 				
