@@ -418,7 +418,7 @@ Error ocurred after try to set global material of level. because  mean while lev
 
 Why a render material truned into instance material?
 
-Trying to set assigned rendermaterial property marks shared material as instance.
+Trying to set assigned render material property marks shared material as instance.
 So change property of shared material before assign it to renderer
 
 8/8/2017
@@ -470,3 +470,36 @@ Double slash does not work.
 
 On the other hand,
 All path in Resources.Load API starts relative to "Resources" and extension at the end is not allowed
+
+8/22/2017
+
+Adding back button support to load new level...
+
+TODO:
+Unregister static event handlers in Player.cs 
+Redefine them as instance event handler....
+
+Change following event defination in LaraStatePlayer
+
+	public  static event OnJumpDelegate OnJump;
+	public  static event OnMovementDelegate OnMovement;
+	public  static event OnJumpingDelegate OnJumping;
+	public  static event OnPrimaryActionDelegate OnPrimaryAction;
+
+Into
+
+	public   event OnJumpDelegate OnJump;
+	public   event OnMovementDelegate OnMovement;
+	public   event OnJumpingDelegate OnJumping;
+	public   event OnPrimaryActionDelegate OnPrimaryAction;
+
+This changes can potentially break existing implementation. but 
+fixes null refferenced handler due to gameobject destruction.
+
+Another way to ressolve the issue without breaking it is,
+releasing handler on destruction of game object and notify
+event generator.
+
+
+Purify Player.cs and make it representative of player model
+by removing resposibilty external to this class
