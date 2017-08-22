@@ -150,10 +150,10 @@ public class Browser : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
 	{
-		// show status of data download
-		if(Loader.m_RawFileData == null)
-		{
-			if(m_www!=null)
+        // show status of data download
+        //if(Loader.m_RawFileData == null)  // force download by disabling existance check of Loader.m_RawFileData
+        //{
+        if (m_www!=null)
 			{
 				m_DownloadProgress = m_www.progress * 100f;
 			}
@@ -173,7 +173,7 @@ public class Browser : MonoBehaviour {
 				m_www = null;
 			}
 			
-		}
+		//}
 	}
 	
 	void LateUpdate()
