@@ -486,6 +486,7 @@ public class Level
         else if (m_OnAttachBehabiourScript != null && !m_OnAttachBehabiourScript(tr2item.UnityObject, tr2item.ObjectID, m_Player, tr2item))
         {
             go.AddComponent<DefaultStatePlayer>(); // user did not attached any custom behabiour. so use default one
+			AICondition.SetActive(go, true); //Added default activation state active
         }
 
     }
