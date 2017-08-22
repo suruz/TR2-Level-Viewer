@@ -580,4 +580,13 @@ public class Player : ObjectExt
 
     float m_maxHorizontalDisplacement = Settings.SceneScaling * Settings.SceneScaling * 2500;
 
+    void OnDestroy()
+    {
+        //release handlers for external events to avoid broken link caused by object destruction
+        LaraStatePlayer.OnJump -= JumpHandler;
+        LaraStatePlayer.OnJumping -= JumpingHandler;
+        LaraStatePlayer.OnMovement -= MovementHandler;
+        LaraStatePlayer.OnPrimaryAction -= PrimaryActionHandler;
+    }
+
 }
