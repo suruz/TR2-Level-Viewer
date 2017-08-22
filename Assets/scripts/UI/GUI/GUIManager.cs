@@ -110,7 +110,7 @@ public class GUIManager : MonoBehaviour {
 		//GUI.Label(m_DisplayRect,m_HtmlFormat + m_DisplayInfo, m_GUIStyle);
 		if(GUI.Button(new Rect(Screen.width - 110,Screen.height - 35, 100, 30), "Back"))
 		{
-            Application.LoadLevel("Browser");  //this will destroy all game object, refferences, event handlers in current scene
+            Application.LoadLevel("Browser"); //this will destroy all game object, refferences, event handlers in current scene
         }
 		
 		
