@@ -500,6 +500,5 @@ Another way to ressolve the issue without breaking it is,
 releasing handler on destruction of game object and notify
 event generator.
 
-
 Purify Player.cs and make it representative of player model
 by removing resposibilty external to this class
