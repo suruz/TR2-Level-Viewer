@@ -315,8 +315,8 @@ public class LaraStatePlayer: MonoBehaviour {
 		prevkeystate = currentkeystate = KeyMapper.Idle;
 		current_action = actions[KeyMapper.Idle];
 		current_state = actions[KeyMapper.Idle].state[0];
-		rootanim.Play("" + current_state.AnimationID);
-		rootanim.wrapMode = WrapMode.Loop;
+		if(current_state.AnimationID < rootanim.GetClipCount()) rootanim.Play("" + current_state.AnimationID); // Check existance of current_state.AnimationID in Animation component
+        rootanim.wrapMode = WrapMode.Loop;
 		current_action.time = Time.time;
 		crossfading = false;
 		busy = false;
@@ -379,7 +379,7 @@ public class LaraStatePlayer: MonoBehaviour {
 		{
 			if(current_action!= null && current_state!=null && current_state.AnimationID != -1 && !collide)
 			{
-				//rootanim.Play("" + current_state.AnimationID);
+                if (current_state.AnimationID >= rootanim.GetClipCount()) return; // Never try to play clip that does not exist in Animation component
 				AnimationState animstate = rootanim["" + current_state.AnimationID];
 				animstate.time = Time.time - current_action.time;
 				//Debug.Log(animstate.speed);

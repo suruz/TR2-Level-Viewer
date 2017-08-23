@@ -1045,7 +1045,7 @@ public class Parser
 			t.posY = System.BitConverter.ToInt16(buffer,2);               
 			t.posX = System.BitConverter.ToInt16(buffer,2);                
 			t.Unknown1 = System.BitConverter.ToInt16(buffer,2);    
-			t.rotX= System.BitConverter.ToInt16(buffer,2);           
+			t.rotX= System.BitConverter.ToInt16(buffer,2);   /*forgot to return it, causing error in some level :)*/     retval = t;   
 		}
 	
 		return retval;
