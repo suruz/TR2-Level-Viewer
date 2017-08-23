@@ -113,14 +113,14 @@ public class Parser
 		static int Tr2LevelSize = 0;
 	//}
 	
-	public struct Tr2Colour // 3 bytes
+	public class Tr2Colour // 3 bytes
 	{  
 		public byte Red;
 		public byte Green;
 		public byte Blue;
 	} 
 	
-	public struct Tr2Colour4 // 4 bytes
+	public class Tr2Colour4 // 4 bytes
 	{  
 		public byte Red;
 		public byte Green;
@@ -128,7 +128,7 @@ public class Parser
 		public byte unused;
 	} 
 	
-	public struct Tr2Vertex // 6 bytes
+	public class Tr2Vertex // 6 bytes
 	{  
 		public short x;
 		public short y;
@@ -143,7 +143,7 @@ public class Parser
      * but ANDing the value with 0xFF seems to produce acceptable results.
      */
 
-	public struct Tr2Face4					// 10 bytes
+	public class Tr2Face4					// 10 bytes
 	{  
 		public ushort Vertices0;			//4vertices
 		public ushort Vertices1;
@@ -160,7 +160,7 @@ public class Parser
      * palette, while (Texture >> 8) is the index into the 16-bit palette.
      */
 	
-	public struct Tr2Face3					// 8 bytes
+	public class Tr2Face3					// 8 bytes
 	{  
 		public ushort Vertices0;			//4vertices
 		public ushort Vertices1;	
@@ -173,7 +173,7 @@ public class Parser
      * whose colour is in the 8-bit palette.
      */
 
-	public struct Tr2Textile8 // 65536 bytes
+	public class Tr2Textile8 // 65536 bytes
 	{   
 		public byte[] Tile;  //256*256
 	} 
@@ -187,7 +187,7 @@ public class Parser
      *    5-bit blue channel
      */
 
-	public struct Tr2Textile16 // 131072 bytes
+	public class Tr2Textile16 // 131072 bytes
 	{  
 		public ushort[] Tile; //256 * 256
 	} 
@@ -201,7 +201,7 @@ public class Parser
      * themselves, y is always 0-relative (not room-relative).
      */
 
-	public struct Tr2RoomInfo 	  // 16 bytes
+	public class Tr2RoomInfo 	  // 16 bytes
 	{  
 		public int x;             // X-offset of room (world coordinates)
 		public int z;             // Z-offset of room (world coordinates)
@@ -217,7 +217,7 @@ public class Parser
      * mesh, texture, and action (if any).
      */
 
-	public struct Tr2RoomPortal 		// 32 bytes
+	public class Tr2RoomPortal 		// 32 bytes
 	{   
 		public ushort AdjoiningRoom;    // which room this "door" leads to 2 bytes
 		public Tr2Vertex Normal;        // which way the "door" faces  6 bytes
@@ -238,7 +238,7 @@ public class Parser
      * cannot be climbed (too tall).
      */
 
-	public struct Tr2RoomSector 			// 8 bytes
+	public class Tr2RoomSector 			// 8 bytes
 	{   
 		public ushort FDindex;
 		public ushort BoxIndex;
@@ -253,7 +253,7 @@ public class Parser
      * Lighting values seem to range from 0..8192.
      */
 	
-	public struct Tr2RoomLight 		// 24 bytes
+	public class Tr2RoomLight 		// 24 bytes
 	{ 
 		public int  x;
 		public int  y;
@@ -268,7 +268,7 @@ public class Parser
      * Room vertex structure.  This defines the vertices within a room.
      */
 
-	public struct Tr2VertexRoom 		 // 12 bytes
+	public class Tr2VertexRoom 		 // 12 bytes
 	{   
 		public Tr2Vertex Vertex; // following 3 entries * 2 byte = 6 bytes
 		public short Lighting1;     // values range from 0 to 32767, 0=total darkness. (TR3)
@@ -285,7 +285,7 @@ public class Parser
      * Sprite structure
      */
 	
-	public struct Tr2RoomSprite 		 // 4 byte
+	public class Tr2RoomSprite 		 // 4 byte
 	{   
 		public short Vertex;             // offset into vertex list
 		public short Texture;            // offset into texture list
@@ -296,7 +296,7 @@ public class Parser
      * Lara can interact with (keyboxes, moveable blocks, moveable doors, etc.)
      */
 	
-	public struct Tr2RoomData 
+	public class Tr2RoomData 
 	{
 		public short           NumVertices;     // number of vertices in the following list
 		public Tr2VertexRoom[] Vertices;       // list of vertices (relative coordinates)
@@ -312,7 +312,7 @@ public class Parser
      * spiderwebs, furniture)
      */
 	
-	public struct Tr2RoomStaticMesh   // 20 bytes
+	public class Tr2RoomStaticMesh   // 20 bytes
 	{  
 		public int  x;                // absolute position in world coordinates
 		public int  y;
@@ -328,7 +328,7 @@ public class Parser
      */
 
 
-	public struct Tr2Room 
+	public class Tr2Room 
 	{
 		public  Tr2RoomInfo info;            				// where the room exists, in world coordinates
 		public uint NumDataWords;            				// number of data words (ushort)
@@ -356,7 +356,7 @@ public class Parser
      */
 
 
-	public struct Tr2Animation               // 32 bytes
+	public class Tr2Animation               // 32 bytes
 	{ 
 		public 	uint 		FrameOffset;     // byte offset into Frames[] (divide by 2 for Frames[i])
 		public  byte  		FrameRate;       // "ticks" per frame
@@ -380,7 +380,7 @@ public class Parser
      * State Change structure
      */
 	
-	public struct Tr2StateChange          // 6 bytes
+	public class Tr2StateChange          // 6 bytes
 	{  
 		public ushort StateID;
 		public ushort NumAnimDispatches;  // number of dispatches (seems to always be 1..5)
@@ -404,7 +404,7 @@ public class Parser
      * AnimCommand structure
      */
 
-	public struct Tr2AnimCommand     // 2 bytes
+	public class Tr2AnimCommand     // 2 bytes
 	{   
 		public short Value;
 	}
@@ -419,7 +419,7 @@ public class Parser
      * The next three ints are X, Y, Z offsets from the last mesh position.
      */
 
-	public struct Tr2MeshTree  // 16 bytes
+	public class Tr2MeshTree  // 16 bytes
 	{   
 		public int Flags;      // 0x0001 = POP, 0x0002 = PUSH
 		public int 	x;
@@ -438,7 +438,7 @@ public class Parser
      * following structre can not be loaded as Explicit.Because [] does not starts in 8 byte allingment 
      */
 
-	public struct Tr2StaticMesh                 // 32 bytes
+	public class Tr2StaticMesh                 // 32 bytes
 	{ 
 		public uint ObjectID;                   // Item Identifier
 		public ushort StartingMesh;             // first mesh
@@ -454,7 +454,7 @@ public class Parser
      * into texture tiles.
      */
 
-	public struct Tr2ObjectTextureVertex     // 4 bytes
+	public class Tr2ObjectTextureVertex     // 4 bytes
 	{  
 		public byte Xcoordinate;
 		public byte Xpixel;
@@ -466,9 +466,9 @@ public class Parser
      */
 	
 	//Error Solved: Could not load type from assembly Version=0.0.0.0, Culture=neutral, PublicKeyToken=null Unity3d 
-	//it's beacuse of public struct or class  with explicit layout with variable length field which is placed in wrong field offset
+	//it's beacuse of public class or class  with explicit layout with variable length field which is placed in wrong field offset
 
-	public struct TrExObjectTexture                 // 38bytes
+	public class TrExObjectTexture                 // 38bytes
 	{    
 		public ushort TransparencyFlags;            // (0: Opaque; 1: Use transparency; 2: Use partial transparency [grayscale intensity :: transparency])
 		public uint Tile;                           // index into textile list
@@ -476,7 +476,7 @@ public class Parser
 	} 
 	
 
-	public struct Tr2ObjectTexture                  // 20 bytes
+	public class Tr2ObjectTexture                  // 20 bytes
 	{    
 		public ushort TransparencyFlags;            // (0: Opaque; 1: Use transparency; 2: Use partial transparency [grayscale intensity :: transparency])
 		public ushort Tile;                         // index into textile list
@@ -488,7 +488,7 @@ public class Parser
      */
 	
 
-	public struct Tr2SpriteTexture         // 16 bytes
+	public class Tr2SpriteTexture         // 16 bytes
 	{ 
 		public ushort Tile;
 		public byte  x;
@@ -506,7 +506,7 @@ public class Parser
      */
 	
 
-	public struct Tr2SpriteSequence          // 8 bytes
+	public class Tr2SpriteSequence          // 8 bytes
 	{  
 		public int ObjectID;                 // Item identifier (same numbering as in tr2_moveable)
 		public short NegativeLength;         // negative of "how many sprites are in this sequence"
@@ -521,7 +521,7 @@ public class Parser
      * per vertex).
      */
 
-	public struct Tr2Mesh {
+	public class Tr2Mesh {
 		public Tr2Vertex Centre;                  // this seems to describe the approximate geometric centre
 		// of the mesh (possibly the centre of gravity?)
 		// (relative coordinates, just like the vertices)
@@ -567,7 +567,7 @@ public class Parser
      *    sets in TR2/3, EXCEPT that the word order is reversed.
      */
 
-	public struct Tr2Frame 
+	public class Tr2Frame 
 	{
 		public Tr2Vertex[] Vector;  //3
 		public int        NumWords;
@@ -601,7 +601,7 @@ public class Parser
      * SoundSource structure
      */
 
-	public struct Tr2SoundSource { //16
+	public class Tr2SoundSource { //16
 		public int  		x;               // position of sound source
 		public int  		y;
 		public int   	z;
@@ -614,7 +614,7 @@ public class Parser
      * Boxes structure
      */
 
-	public struct Tr2BBox                     //8 bytes
+	public class Tr2BBox                     //8 bytes
 	{ 
 		public byte 		Zmin;             // sectors (* 1024 units)
 		public byte      Zmax;
@@ -625,7 +625,7 @@ public class Parser
 	} 
 	
 
-	public struct Tr1BBox   //20 byte
+	public class Tr1BBox   //20 byte
 	{
 		public int Zmin;
 		public int Zmax; 
@@ -640,7 +640,7 @@ public class Parser
      * - really should be simple short[], since it's variable length
      */
 
-	public struct Tr2AnimatedTexture 
+	public class Tr2AnimatedTexture 
 	{
 		public short NumTextureIDs;    // Number of Texture IDs - 1
 		public short[] TextureList;    // list of textures to cycle through
@@ -651,7 +651,7 @@ public class Parser
      */
 	
 
-	public struct Tr2Camera               //16 bytes
+	public class Tr2Camera               //16 bytes
 	{ 
 		public int x;
 		public int y;
@@ -665,7 +665,7 @@ public class Parser
      */
 	
 
-	public struct Tr2SoundDetails         // 8 bytes
+	public class Tr2SoundDetails         // 8 bytes
 	{   
 		public short Sample;
 		public short Volume;
@@ -678,7 +678,7 @@ public class Parser
      * Cutscene Camera structure
      */
 
-	public struct Tr2CinematicFrame         //16 bytes    its 24 bytes in tr4
+	public class Tr2CinematicFrame         //16 bytes    its 24 bytes in tr4
 	{ 
 		public short 	 rotY;             // Rotation about Y axis, +/-32767 ::= +/- 180 degrees
 		public short      rotZ;            // Rotation about Z axis, +/-32767 ::= +/- 180 degrees
@@ -758,7 +758,7 @@ public class Parser
 		public Tr2SoundSource[] SoundSources;              // sounds
 		
 		public int  NumBoxes;                              // Number of Boxes
-		public Tr2BBox[] Boxes;                            // boxes - looks like struct { ushort value[4]; } - value[0..2] might be a vector; value[3] seems to be index into Overlaps[]
+		public Tr2BBox[] Boxes;                            // boxes - looks like class { ushort value[4]; } - value[0..2] might be a vector; value[3] seems to be index into Overlaps[]
 		
 		public int  NumOverlaps;                           // Number of Overlaps
 		public short [] Overlaps;                            // overlaps - looks like ushort; 0x8000 is flag of some sort
@@ -801,257 +801,230 @@ public class Parser
 		public ThirdPersonCam Camera ;
 		public TextMesh Text3DPrefav;
 		//public Light LightPrefav
-	} 
-	
-	//Raw structure data casting is problematice in C#. So break down a structure to it's fields and read them individually. This looks 
-	//ugly but works : )
-	static object Cast2Struct(byte[] buffer, System.Type type)
-	{
-		object retval = null;
-		if(type ==  typeof(Tr2RoomInfo)) 
-		{   
-			Tr2RoomInfo t = new Tr2RoomInfo();
-			t.x = System.BitConverter.ToInt32(buffer,0);
-			t.z = System.BitConverter.ToInt32(buffer,4);
-			t.yBottom = System.BitConverter.ToInt32(buffer,8);
-			t.yTop = System.BitConverter.ToInt32(buffer,8);
-			retval = t;
-		}
-		else if(type==  typeof(Tr2VertexRoom)) 
-		{   
-			Tr2VertexRoom t = new Tr2VertexRoom();
-			t.Vertex.x = System.BitConverter.ToInt16(buffer,0);
-			t.Vertex.y = System.BitConverter.ToInt16(buffer,2);
-			t.Vertex.z = System.BitConverter.ToInt16(buffer,4);
-			t.Lighting1 =  System.BitConverter.ToInt16(buffer,6);    // values range from 0 to 32767, 0=total darkness. (TR3)
-			// I think the values ranged from 0 to 8192 in TR1/2, 0=total brightness
-			t.Attributes =  System.BitConverter.ToUInt16(buffer,8);   // 0x8000 something to do with water surface
-			// 0x4000 under water lighting modulation and movement if viewed from above water surface
-			// 0x2000 water/quicksand surface movement
-			// 0x1fef nothing?
-			// 0x0010 everything?
-			t.Lighting2 =  System.BitConverter.ToInt16(buffer,10);     // seems to be the same as lighting1
-			retval = t;
-		}
-		else if(type ==  typeof(Tr2Vertex)) 
-		{   
-			Tr2Vertex  t = new Tr2Vertex();
-			t.x = System.BitConverter.ToInt16(buffer,0);
-			t.y = System.BitConverter.ToInt16(buffer,2);
-			t.z = System.BitConverter.ToInt16(buffer,4);
-			retval = t;
-		}
-		else if(type ==  typeof(Tr2RoomSector)) 
-		{   
-			Tr2RoomSector  t = new Tr2RoomSector();
-			t.FDindex = System.BitConverter.ToUInt16(buffer,0);
-			t.BoxIndex = System.BitConverter.ToUInt16(buffer,2);
-			t.RoomBelow = buffer[4];       // 255 if none
-			t.Floor =(sbyte) buffer[5];    //char ==2 byte in c# here; chaqnge it to byte
-			t.RoomAbove = buffer[6];       // 255 if none
-			t.Ceiling = (sbyte) buffer[7];
-			retval = t;
-		}
-		else if(type ==  typeof(Tr2RoomLight)) 
-		{   
-			Tr2RoomLight  t = new Tr2RoomLight();
-			t.x =  System.BitConverter.ToInt32(buffer,0);
-			t.y =  System.BitConverter.ToInt32(buffer,4);
-			t.z =  System.BitConverter.ToInt32(buffer,8);
-			t.Intensity1 =  System.BitConverter.ToUInt16(buffer,12);
-			t.Intensity2 =  System.BitConverter.ToUInt16(buffer,14);
-			t.Fade1 = System.BitConverter.ToUInt32(buffer,16);
-			t.Fade2  = System.BitConverter.ToUInt32(buffer,20);
-			retval = t;
-		}
-		else if(type ==  typeof(Tr2RoomStaticMesh)) 
-		{   
-			Tr2RoomStaticMesh  t = new Tr2RoomStaticMesh();
-			t.x =  System.BitConverter.ToInt32(buffer,0);              // absolute position in world coordinates
-			t.y =  System.BitConverter.ToInt32(buffer,4);
-			t.z =  System.BitConverter.ToInt32(buffer,8);
-			t.Rotation =  System.BitConverter.ToUInt16(buffer,12);      // high two bits (0xc000) indicate steps of 90 degrees
-			t.Intensity1 =  System.BitConverter.ToUInt16(buffer,14);
-			t.Intensity2 =  System.BitConverter.ToUInt16(buffer,16);
-			t.ObjectID  =  System.BitConverter.ToUInt16(buffer,18);     // which StaticMesh item to draw
-			retval = t;
-		}
-		else if(type ==  typeof(Tr2RoomSprite)) 
-		{   
-			Tr2RoomSprite  t = new Tr2RoomSprite();
-			t.Vertex = System.BitConverter.ToInt16(buffer,0);     // offset into vertex list
-			t.Texture = System.BitConverter.ToInt16(buffer,2);    // offset into texture list
-			retval = t;
-		}
-		else if(type ==  typeof(Tr2Face4))
-		{   
-			Tr2Face4  t = new Tr2Face4();
-			t.Vertices0 =  System.BitConverter.ToUInt16(buffer,0);
-			t.Vertices1 =  System.BitConverter.ToUInt16(buffer,2);
-			t.Vertices2 =  System.BitConverter.ToUInt16(buffer,4);
-			t.Vertices3 =  System.BitConverter.ToUInt16(buffer,6);
-			t.Texture =  System.BitConverter.ToUInt16(buffer,8);
-			retval = t;
-		}
-		else if(type==  typeof(Tr2Face3))
-		{   
-			Tr2Face3  t = new Tr2Face3();
-			t.Vertices0 =  System.BitConverter.ToUInt16(buffer,0);
-			t.Vertices1 =  System.BitConverter.ToUInt16(buffer,2);
-			t.Vertices2 =  System.BitConverter.ToUInt16(buffer,4);
-			t.Texture =  System.BitConverter.ToUInt16(buffer,6);
-			retval = t;
-		}
-		else if(type ==  typeof(Tr2Animation)) 
-		{   
-			Tr2Animation  t = new Tr2Animation();
-			t.FrameOffset =  System.BitConverter.ToUInt32(buffer,0);     // byte offset into Frames[] (divide by 2 for Frames[i])
-			t.FrameRate =  buffer[4];                                    // "ticks" per frame
-			t.FrameSize = buffer[5];                                      // number of words in Frames[] used by this animation
-			t.StateID =  System.BitConverter.ToInt16(buffer,6);
-			t.Unknown1 =  System.BitConverter.ToInt16(buffer,8);
-			t.Unknown2 =  System.BitConverter.ToInt16(buffer,10);
-			t.Unknown3 =  System.BitConverter.ToInt16(buffer,12);
-			t.Unknown4 =  System.BitConverter.ToInt16(buffer,14);
-			t.FrameStart =  System.BitConverter.ToUInt16(buffer,16);      // first frame in this animation
-			t.FrameEnd =  System.BitConverter.ToUInt16(buffer,18);        // last frame in this animation (numframes = (End - Start) + 1)
-			t.NextAnimation =  System.BitConverter.ToUInt16(buffer,20);
-			t.NextFram =  System.BitConverter.ToUInt16(buffer,22);
-			t.NumStateChanges =  System.BitConverter.ToUInt16(buffer,24);
-			t.StateChangeOffset =  System.BitConverter.ToUInt16(buffer,26);  // offset into StateChanges[]
-			t.NumAnimCommands =  System.BitConverter.ToUInt16(buffer,28);
-			t.AnimCommand =  System.BitConverter.ToUInt16(buffer,30);        // offset into AnimCommands[]
-			retval = t;
-		}
-		else if(type ==  typeof(Tr2StateChange)) 
-		{   
-			Tr2StateChange  t = new Tr2StateChange();
-			t.StateID  =  System.BitConverter.ToUInt16(buffer,0);  ;
-			t.NumAnimDispatches  =  System.BitConverter.ToUInt16(buffer,2);  ;  // number of dispatches (seems to always be 1..5)
-			t.AnimDispatch  =  System.BitConverter.ToUInt16(buffer,4);  ;       // Offset into AnimDispatches[]
-			retval = t;
-		}
-		else if(type ==  typeof(Tr2AnimDispatch)) 
-		{   
-			
-			Tr2AnimDispatch  t = new Tr2AnimDispatch();
-			t.Low =  System.BitConverter.ToInt16(buffer,0);
-			t.High =  System.BitConverter.ToInt16(buffer,2);;
-			t.NextAnimation =  System.BitConverter.ToInt16(buffer,4);;
-			t.NextFrame =  System.BitConverter.ToInt16(buffer,6);;
-			retval = t;
-		}
-		else if(type ==  typeof(Tr2AnimCommand)) 
-		{   
-			Tr2AnimCommand  t = new Tr2AnimCommand();
-			t.Value = System.BitConverter.ToInt16(buffer,0);;
-			retval = t;
-		}
-		else if(type ==  typeof(Tr2Moveable)) 
-		{   
-			Tr2Moveable  t = new Tr2Moveable();
-			t.ObjectID =  System.BitConverter.ToUInt32(buffer,0);        // Item Identifier
-			t.NumMeshes =  System.BitConverter.ToUInt16(buffer,4);       // number of meshes in this object
-			t.StartingMesh =  System.BitConverter.ToUInt16(buffer,6);    // first mesh
-			t.MeshTree =  System.BitConverter.ToUInt32(buffer,8);        // offset into MeshTree[]
-			t.FrameOffset =  System.BitConverter.ToUInt32(buffer,12);    // byte offset into Frames[] (divide by 2 for Frames[i])
-			t.Animation =  System.BitConverter.ToUInt16(buffer,16);      // offset into Animations[]
-			retval = t;
-			
-		}
-		else if(type ==  typeof(Tr2ObjectTextureVertex)) 
-		{   
-			Tr2ObjectTextureVertex t = new Tr2ObjectTextureVertex();
-			t.Xcoordinate = buffer[0];
-			t.Xpixel = buffer[1];
-			t.Ycoordinate = buffer[2];
-			t.Ypixel = buffer[3];
-			retval = t;
-		}
-		else if(type ==  typeof(Tr2SpriteTexture)) 
-		{   
-			Tr2SpriteTexture t = new Tr2SpriteTexture();
-			t.Tile =  System.BitConverter.ToUInt16(buffer,0);
-			t.x = buffer[2];
-			t.y = buffer[3];
-			t.Width =  System.BitConverter.ToUInt16(buffer,4);     // actually, (width * 256) + 255
-			t.Height =  System.BitConverter.ToUInt16(buffer,6);    // actually, (height * 256) + 255
-			t.LeftSide =  System.BitConverter.ToInt16(buffer,8);
-			t.TopSide =  System.BitConverter.ToInt16(buffer,10);
-			t.RightSide =  System.BitConverter.ToInt16(buffer,12);
-			t.Bottomside =  System.BitConverter.ToInt16(buffer,14);
-			retval = t;
-		}
-		else if(type ==  typeof(Tr2SpriteSequence)) 
-		{   
-			Tr2SpriteSequence t = new Tr2SpriteSequence();
-			t.ObjectID =  System.BitConverter.ToInt32(buffer,0);         // Item identifier (same numbering as in tr2_moveable)
-			t.NegativeLength =  System.BitConverter.ToInt16(buffer,4);   // negative of "how many sprites are in this sequence"
-			t.Offset =  System.BitConverter.ToInt16(buffer,6);           // where (in sprite texture list) this sequence starts
-			retval = t;
-		}
-		else if(type ==  typeof(Tr2Camera)) 
-		{ 
-			Tr2Camera t = new Tr2Camera();
-			t.x  =  System.BitConverter.ToInt32(buffer,0);
-			t.y  =  System.BitConverter.ToInt32(buffer,4);
-			t.z  =  System.BitConverter.ToInt32(buffer,8);
-			t.Room  =  System.BitConverter.ToInt16(buffer,12); 
-			t.Unknown1  =  System.BitConverter.ToUInt16(buffer,14);        // correlates to Boxes[]?
-			retval = t;
-		}
-		else if(type ==  typeof(Tr2SoundSource)) 
-		{   
-			Tr2SoundSource t =new Tr2SoundSource();
-			t.x =  System.BitConverter.ToInt32(buffer,0);;                 // position of sound source
-			t.y =  System.BitConverter.ToInt32(buffer,4);;
-			t.z =  System.BitConverter.ToInt32(buffer,8);;
-			t.SoundID =  System.BitConverter.ToUInt16(buffer,12);;         // internal sound index
-			t.Flags =  System.BitConverter.ToUInt16(buffer,14);;  ;        // 0x40, 0x80, or 0xc0
-			retval = t;
-		}
-		else if(type ==  typeof(Tr2BBox)) 
-		{   
-			Tr2BBox t = new Tr2BBox();
-			t.Zmin = buffer[0];             // sectors (* 1024 units)
-			t.Zmax = buffer[1];
-			t.Xmin = buffer[2];
-			t.Xmax = buffer[3];
-			t.TrueFloor =  System.BitConverter.ToInt16(buffer,4);        // Y value (no scaling)
-			t.OverlapIndex =  System.BitConverter.ToInt16(buffer,6);     // index into Overlaps[]
-			retval = t;
-		}
-		else if(type ==  typeof(Tr2Item)) 
-		{   
-			Tr2Item t = new Tr2Item();
-			t.ObjectID  =  System.BitConverter.ToInt16(buffer,0); ;
-			t.Room  =  System.BitConverter.ToInt16(buffer,2); ;
-			t.x  =  System.BitConverter.ToInt32(buffer,4); ;
-			t.y  =  System.BitConverter.ToInt32(buffer,8); ;
-			t.z  =  System.BitConverter.ToInt32(buffer,12); ;
-			t.Angle  =  System.BitConverter.ToInt16(buffer,16); ;
-			t.Intensity1  =  System.BitConverter.ToInt16(buffer,18); ;
-			t.Intensity2  =  System.BitConverter.ToInt16(buffer,20); ;
-			t.Flags  =  System.BitConverter.ToInt16(buffer,22); ;         // 0x0100 indicates "inactive" or "invisible"
-			retval = t;
-		}
-		else if(type ==  typeof(Tr2CinematicFrame))
-		{
-			Tr2CinematicFrame t = new Tr2CinematicFrame();
-			t.rotY = System.BitConverter.ToInt16(buffer,2);           
-			t.rotZ = System.BitConverter.ToInt16(buffer,2);              
-			t.rotZ2 = System.BitConverter.ToInt16(buffer,2);               
-			t.posZ = System.BitConverter.ToInt16(buffer,2);               
-			t.posY = System.BitConverter.ToInt16(buffer,2);               
-			t.posX = System.BitConverter.ToInt16(buffer,2);                
-			t.Unknown1 = System.BitConverter.ToInt16(buffer,2);    
-			t.rotX= System.BitConverter.ToInt16(buffer,2);   /*forgot to return it, causing error in some level :)*/     retval = t;   
-		}
-	
-		return retval;
 	}
 
-	static void ExtractMeshes(Tr2Level Level, byte[] MeshData, uint NumMeshPointers, uint[] MeshPointers)
+    //Raw structure data casting is problematice in C#. So break down a structure to it's fields and read them individually. This looks 
+    //ugly but works : )
+    private static object Cast2Struct(byte[] buffer, System.Type type)
+    {
+        object obj = (object)null;
+        if (type == typeof(Parser.Tr2RoomInfo))
+            obj = (object)new Parser.Tr2RoomInfo()
+            {
+                x = System.BitConverter.ToInt32(buffer, 0),
+                z = System.BitConverter.ToInt32(buffer, 4),
+                yBottom = System.BitConverter.ToInt32(buffer, 8),
+                yTop = System.BitConverter.ToInt32(buffer, 8)
+            };
+        else if (type == typeof(Parser.Tr2VertexRoom))
+            obj = (object)new Parser.Tr2VertexRoom()
+            {
+                Vertex = new Tr2Vertex{
+                    x = System.BitConverter.ToInt16(buffer, 0),
+                    y = System.BitConverter.ToInt16(buffer, 2),
+                    z = System.BitConverter.ToInt16(buffer, 4)
+                },
+                Lighting1 = System.BitConverter.ToInt16(buffer, 6),
+                Attributes = System.BitConverter.ToUInt16(buffer, 8),
+                Lighting2 = System.BitConverter.ToInt16(buffer, 10)
+            };
+        else if (type == typeof(Parser.Tr2Vertex))
+            obj = (object)new Parser.Tr2Vertex()
+            {
+                x = System.BitConverter.ToInt16(buffer, 0),
+                y = System.BitConverter.ToInt16(buffer, 2),
+                z = System.BitConverter.ToInt16(buffer, 4)
+            };
+        else if (type == typeof(Parser.Tr2RoomSector))
+            obj = (object)new Parser.Tr2RoomSector()
+            {
+                FDindex = System.BitConverter.ToUInt16(buffer, 0),
+                BoxIndex = System.BitConverter.ToUInt16(buffer, 2),
+                RoomBelow = buffer[4],
+                Floor = (sbyte)buffer[5],
+                RoomAbove = buffer[6],
+                Ceiling = (sbyte)buffer[7]
+            };
+        else if (type == typeof(Parser.Tr2RoomLight))
+            obj = (object)new Parser.Tr2RoomLight()
+            {
+                x = System.BitConverter.ToInt32(buffer, 0),
+                y = System.BitConverter.ToInt32(buffer, 4),
+                z = System.BitConverter.ToInt32(buffer, 8),
+                Intensity1 = System.BitConverter.ToUInt16(buffer, 12),
+                Intensity2 = System.BitConverter.ToUInt16(buffer, 14),
+                Fade1 = System.BitConverter.ToUInt32(buffer, 16),
+                Fade2 = System.BitConverter.ToUInt32(buffer, 20)
+            };
+        else if (type == typeof(Parser.Tr2RoomStaticMesh))
+            obj = (object)new Parser.Tr2RoomStaticMesh()
+            {
+                x = System.BitConverter.ToInt32(buffer, 0),
+                y = System.BitConverter.ToInt32(buffer, 4),
+                z = System.BitConverter.ToInt32(buffer, 8),
+                Rotation = System.BitConverter.ToUInt16(buffer, 12),
+                Intensity1 = System.BitConverter.ToUInt16(buffer, 14),
+                Intensity2 = System.BitConverter.ToUInt16(buffer, 16),
+                ObjectID = System.BitConverter.ToUInt16(buffer, 18)
+            };
+        else if (type == typeof(Parser.Tr2RoomSprite))
+            obj = (object)new Parser.Tr2RoomSprite()
+            {
+                Vertex = System.BitConverter.ToInt16(buffer, 0),
+                Texture = System.BitConverter.ToInt16(buffer, 2)
+            };
+        else if (type == typeof(Parser.Tr2Face4))
+            obj = (object)new Parser.Tr2Face4()
+            {
+                Vertices0 = System.BitConverter.ToUInt16(buffer, 0),
+                Vertices1 = System.BitConverter.ToUInt16(buffer, 2),
+                Vertices2 = System.BitConverter.ToUInt16(buffer, 4),
+                Vertices3 = System.BitConverter.ToUInt16(buffer, 6),
+                Texture = System.BitConverter.ToUInt16(buffer, 8)
+            };
+        else if (type == typeof(Parser.Tr2Face3))
+            obj = (object)new Parser.Tr2Face3()
+            {
+                Vertices0 = System.BitConverter.ToUInt16(buffer, 0),
+                Vertices1 = System.BitConverter.ToUInt16(buffer, 2),
+                Vertices2 = System.BitConverter.ToUInt16(buffer, 4),
+                Texture = System.BitConverter.ToUInt16(buffer, 6)
+            };
+        else if (type == typeof(Parser.Tr2Animation))
+            obj = (object)new Parser.Tr2Animation()
+            {
+                FrameOffset = System.BitConverter.ToUInt32(buffer, 0),
+                FrameRate = buffer[4],
+                FrameSize = buffer[5],
+                StateID = System.BitConverter.ToInt16(buffer, 6),
+                Unknown1 = System.BitConverter.ToInt16(buffer, 8),
+                Unknown2 = System.BitConverter.ToInt16(buffer, 10),
+                Unknown3 = System.BitConverter.ToInt16(buffer, 12),
+                Unknown4 = System.BitConverter.ToInt16(buffer, 14),
+                FrameStart = System.BitConverter.ToUInt16(buffer, 16),
+                FrameEnd = System.BitConverter.ToUInt16(buffer, 18),
+                NextAnimation = System.BitConverter.ToUInt16(buffer, 20),
+                NextFram = System.BitConverter.ToUInt16(buffer, 22),
+                NumStateChanges = System.BitConverter.ToUInt16(buffer, 24),
+                StateChangeOffset = System.BitConverter.ToUInt16(buffer, 26),
+                NumAnimCommands = System.BitConverter.ToUInt16(buffer, 28),
+                AnimCommand = System.BitConverter.ToUInt16(buffer, 30)
+            };
+        else if (type == typeof(Parser.Tr2StateChange))
+            obj = (object)new Parser.Tr2StateChange()
+            {
+                StateID = System.BitConverter.ToUInt16(buffer, 0),
+                NumAnimDispatches = System.BitConverter.ToUInt16(buffer, 2),
+                AnimDispatch = System.BitConverter.ToUInt16(buffer, 4)
+            };
+        else if (type == typeof(Parser.Tr2AnimDispatch))
+            obj = (object)new Parser.Tr2AnimDispatch()
+            {
+                Low = System.BitConverter.ToInt16(buffer, 0),
+                High = System.BitConverter.ToInt16(buffer, 2),
+                NextAnimation = System.BitConverter.ToInt16(buffer, 4),
+                NextFrame = System.BitConverter.ToInt16(buffer, 6)
+            };
+        else if (type == typeof(Parser.Tr2AnimCommand))
+            obj = (object)new Parser.Tr2AnimCommand()
+            {
+                Value = System.BitConverter.ToInt16(buffer, 0)
+            };
+        else if (type == typeof(Tr2Moveable))
+            obj = (object)new Tr2Moveable()
+            {
+                ObjectID = System.BitConverter.ToUInt32(buffer, 0),
+                NumMeshes = System.BitConverter.ToUInt16(buffer, 4),
+                StartingMesh = System.BitConverter.ToUInt16(buffer, 6),
+                MeshTree = System.BitConverter.ToUInt32(buffer, 8),
+                FrameOffset = System.BitConverter.ToUInt32(buffer, 12),
+                Animation = System.BitConverter.ToUInt16(buffer, 16)
+            };
+        else if (type == typeof(Parser.Tr2ObjectTextureVertex))
+            obj = (object)new Parser.Tr2ObjectTextureVertex()
+            {
+                Xcoordinate = buffer[0],
+                Xpixel = buffer[1],
+                Ycoordinate = buffer[2],
+                Ypixel = buffer[3]
+            };
+        else if (type == typeof(Parser.Tr2SpriteTexture))
+            obj = (object)new Parser.Tr2SpriteTexture()
+            {
+                Tile = System.BitConverter.ToUInt16(buffer, 0),
+                x = buffer[2],
+                y = buffer[3],
+                Width = System.BitConverter.ToUInt16(buffer, 4),
+                Height = System.BitConverter.ToUInt16(buffer, 6),
+                LeftSide = System.BitConverter.ToInt16(buffer, 8),
+                TopSide = System.BitConverter.ToInt16(buffer, 10),
+                RightSide = System.BitConverter.ToInt16(buffer, 12),
+                Bottomside = System.BitConverter.ToInt16(buffer, 14)
+            };
+        else if (type == typeof(Parser.Tr2SpriteSequence))
+            obj = (object)new Parser.Tr2SpriteSequence()
+            {
+                ObjectID = System.BitConverter.ToInt32(buffer, 0),
+                NegativeLength = System.BitConverter.ToInt16(buffer, 4),
+                Offset = System.BitConverter.ToInt16(buffer, 6)
+            };
+        else if (type == typeof(Parser.Tr2Camera))
+            obj = (object)new Parser.Tr2Camera()
+            {
+                x = System.BitConverter.ToInt32(buffer, 0),
+                y = System.BitConverter.ToInt32(buffer, 4),
+                z = System.BitConverter.ToInt32(buffer, 8),
+                Room = System.BitConverter.ToInt16(buffer, 12),
+                Unknown1 = System.BitConverter.ToUInt16(buffer, 14)
+            };
+        else if (type == typeof(Parser.Tr2SoundSource))
+            obj = (object)new Parser.Tr2SoundSource()
+            {
+                x = System.BitConverter.ToInt32(buffer, 0),
+                y = System.BitConverter.ToInt32(buffer, 4),
+                z = System.BitConverter.ToInt32(buffer, 8),
+                SoundID = System.BitConverter.ToUInt16(buffer, 12),
+                Flags = System.BitConverter.ToUInt16(buffer, 14)
+            };
+        else if (type == typeof(Parser.Tr2BBox))
+            obj = (object)new Parser.Tr2BBox()
+            {
+                Zmin = buffer[0],
+                Zmax = buffer[1],
+                Xmin = buffer[2],
+                Xmax = buffer[3],
+                TrueFloor = System.BitConverter.ToInt16(buffer, 4),
+                OverlapIndex = System.BitConverter.ToInt16(buffer, 6)
+            };
+        else if (type == typeof(Parser.Tr2Item))
+            obj = (object)new Parser.Tr2Item()
+            {
+                ObjectID = System.BitConverter.ToInt16(buffer, 0),
+                Room = System.BitConverter.ToInt16(buffer, 2),
+                x = System.BitConverter.ToInt32(buffer, 4),
+                y = System.BitConverter.ToInt32(buffer, 8),
+                z = System.BitConverter.ToInt32(buffer, 12),
+                Angle = System.BitConverter.ToInt16(buffer, 16),
+                Intensity1 = System.BitConverter.ToInt16(buffer, 18),
+                Intensity2 = System.BitConverter.ToInt16(buffer, 20),
+                Flags = System.BitConverter.ToInt16(buffer, 22)
+            };
+        else if (type == typeof(Parser.Tr2CinematicFrame))
+            obj = (object)new Parser.Tr2CinematicFrame()
+            {
+                rotY = System.BitConverter.ToInt16(buffer, 2),
+                rotZ = System.BitConverter.ToInt16(buffer, 2),
+                rotZ2 = System.BitConverter.ToInt16(buffer, 2),
+                posZ = System.BitConverter.ToInt16(buffer, 2),
+                posY = System.BitConverter.ToInt16(buffer, 2),
+                posX = System.BitConverter.ToInt16(buffer, 2),
+                Unknown1 = System.BitConverter.ToInt16(buffer, 2),
+                rotX = System.BitConverter.ToInt16(buffer, 2)
+            };
+        return obj;
+    }
+
+    static void ExtractMeshes(Tr2Level Level, byte[] MeshData, uint NumMeshPointers, uint[] MeshPointers)
 	{
 		bool  NegativeSize;
 		
@@ -1079,8 +1052,8 @@ public class Parser
 			//int sizetr2Vertex =  6;
 			//int sizetr2Vertex =  Tr2VertexSize;
 			byte[] bcenter = meshReader.ReadBytes(Tr2VertexSize);
-			Level.Meshes[i].Centre =(Tr2Vertex) Cast2Struct(bcenter,typeof (Tr2Vertex));
-			
+            Level.Meshes[i] = new Tr2Mesh { Centre = (Tr2Vertex)Cast2Struct(bcenter, typeof(Tr2Vertex)) };
+
 			//dummy read for bunkown
 			meshReader.ReadBytes(4);
 			
@@ -1266,15 +1239,12 @@ public class Parser
 			m_Level.Palette16 = new uint[256];
 			for(int colorIdx = 0 ; colorIdx < 256; colorIdx++)
 			{
-				m_Level.Palette8 [colorIdx].Red = br.ReadByte();
-				m_Level.Palette8 [colorIdx].Green = br.ReadByte();
-				m_Level.Palette8 [colorIdx].Blue = br.ReadByte();
-			}
+                m_Level.Palette8[colorIdx] = new Tr2Colour { Red = br.ReadByte(), Blue = br.ReadByte(), Green = br.ReadByte() };
+            }
 			
 			
 			for(int colorIdx = 0 ; colorIdx < 256; colorIdx++)
 			{
-					
 				m_Level.Palette16[colorIdx] = br.ReadUInt32();
 			}
 
@@ -1286,15 +1256,14 @@ public class Parser
 			m_Level.Textile8 = new Tr2Textile8[m_Level.NumTextiles];
 			for(int texTilecount = 0 ;  texTilecount < m_Level.NumTextiles; texTilecount++)
 			{
-				m_Level.Textile8[texTilecount].Tile = br.ReadBytes(256 * 256);
-			}
+                m_Level.Textile8[texTilecount] = new Tr2Textile8 { Tile = br.ReadBytes(256 * 256) };
+            }
 			
 			//Tr2Textile16 
 			m_Level.Textile16 = new Tr2Textile16[m_Level.NumTextiles];
 			for(int texTilecount = 0 ;  texTilecount < m_Level.NumTextiles; texTilecount++)
 			{
-						
-				m_Level.Textile16[texTilecount].Tile = new ushort[256 * 256];
+                m_Level.Textile16[texTilecount] = new Tr2Textile16 { Tile = new ushort[256 * 256] };
 				for(uint shortcnt = 0; shortcnt < (256 * 256); shortcnt++)
 				{
 					m_Level.Textile16[texTilecount].Tile[shortcnt] = br.ReadUInt16();
@@ -1322,7 +1291,8 @@ public class Parser
 				//m_Level.Rooms[i].info = new Tr2RoomInfo();
 				
 				byte[] tmpArr =  br.ReadBytes(Tr2RoomInfoSize);
-				m_Level.Rooms[i].info =(Tr2RoomInfo) Cast2Struct(tmpArr,typeof(Tr2RoomInfo)); 
+                m_Level.Rooms[i] = new Tr2Room { info = (Tr2RoomInfo)Cast2Struct(tmpArr, typeof(Tr2RoomInfo))};
+
 				//print("m_Level.Rooms["+i+"].info length" + sizeData);
 				//print("m_Level.Rooms["+i+"].info x z: " + m_Level.Rooms[i].info.x + " " + m_Level.Rooms[i].info.z);
 				
@@ -1337,9 +1307,10 @@ public class Parser
 				//create a stream reader
 				MemoryStream roomDataStream = new MemoryStream(dataArr);
 				BinaryReader roomReader = new BinaryReader(roomDataStream);
-				
-				//process ushort NumVertices;
-				m_Level.Rooms[i].RoomData.NumVertices = roomReader.ReadInt16();
+
+                //process ushort NumVertices;
+                m_Level.Rooms[i].RoomData = new Tr2RoomData();
+                m_Level.Rooms[i].RoomData.NumVertices = roomReader.ReadInt16();
 				
 				if(m_Level.Rooms[i].RoomData.NumVertices > 0)
 				{
@@ -1406,7 +1377,7 @@ public class Parser
 				}
 				
 				//Done:
-				//struct Tr2RoomData
+				//class Tr2RoomData
 				//now can free room data
 				
 				m_Level.Rooms[i].NumPortals = br.ReadUInt16();
@@ -1419,11 +1390,10 @@ public class Parser
 					
 					for(int portalCount = 0; portalCount < m_Level.Rooms[i].NumPortals; portalCount++)
 					{
-						//public ushort AdjoiningRoom;   // which room this "door" leads to 2 bytes
-						//public Tr2Vertex Normal;       // which way the "door" faces  6 bytes
-						//public Tr2Vertex[] Vertices;  // the 4 corners of the "door"  4 * 6 = 24 byte
-						
-						m_Level.Rooms[i].Portals[portalCount].AdjoiningRoom = br.ReadUInt16();
+                        //public ushort AdjoiningRoom;   // which room this "door" leads to 2 bytes
+                        //public Tr2Vertex Normal;       // which way the "door" faces  6 bytes
+                        //public Tr2Vertex[] Vertices;  // the 4 corners of the "door"  4 * 6 = 24 byte
+                        m_Level.Rooms[i].Portals[portalCount] = new Tr2RoomPortal { AdjoiningRoom = br.ReadUInt16() };
 						byte[] dataPortalNormal = br.ReadBytes(Tr2VertexSize);
 						m_Level.Rooms[i].Portals[portalCount].Normal = (Tr2Vertex) Cast2Struct(dataPortalNormal,typeof(Tr2Vertex));
 						
@@ -1645,7 +1615,7 @@ public class Parser
 			m_Level.StaticMeshes = new Tr2StaticMesh[m_Level.NumStaticMeshes];
 			for(int staticMeshCount = 0; staticMeshCount < m_Level.NumStaticMeshes;staticMeshCount++)
 			{
-				m_Level.StaticMeshes[staticMeshCount].BoundingBox = new Tr2Vertex[4];
+                m_Level.StaticMeshes[staticMeshCount] = new Tr2StaticMesh { BoundingBox = new Tr2Vertex[4] };
 				m_Level.StaticMeshes[staticMeshCount].ObjectID = br.ReadUInt32(); 
 				m_Level.StaticMeshes[staticMeshCount].StartingMesh = br.ReadUInt16(); 
 				
@@ -1670,7 +1640,7 @@ public class Parser
 			m_Level.ObjectTextures = new Tr2ObjectTexture[m_Level.NumObjectTextures];
 			for(int objTexCount = 0; objTexCount < m_Level.NumObjectTextures; objTexCount++)
 			{
-				m_Level.ObjectTextures[objTexCount].Vertices = new Tr2ObjectTextureVertex[4];
+                m_Level.ObjectTextures[objTexCount] = new Tr2ObjectTexture { Vertices = new Tr2ObjectTextureVertex[4] };
 				m_Level.ObjectTextures[objTexCount].TransparencyFlags = br.ReadUInt16();
 				m_Level.ObjectTextures[objTexCount].Tile = br.ReadUInt16();
 					
