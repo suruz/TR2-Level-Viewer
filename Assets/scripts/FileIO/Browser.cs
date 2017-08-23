@@ -36,9 +36,15 @@ public class Browser : MonoBehaviour {
 		}
 		
 		m_windowRect = new Rect(Screen.width * 0.1f, Screen.height * 0.1f,Screen.width - Screen.width * 0.3f, 300);
-	}
- 
-	protected void OnGUI () {
+
+
+#if !UNITY_EDITOR && UNITY_WEBGL
+    WebGLInput.captureAllKeyboardInput = true;  //
+#endif
+
+    }
+
+    protected void OnGUI () {
 		GUI.DrawTexture(new Rect(0,0, Screen.width, Screen.height), m_TitleTex);
 		OnGUIMain();
 		if (m_fileBrowser != null) {
