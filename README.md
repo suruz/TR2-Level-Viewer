@@ -1,7 +1,5 @@
 
 
-
-
 <b>Features: </b>
 - It parses Tomb Raider 2 level data like models, animation, textures. Then it renders them back in unity3D.
 - It uses data driven shader model instead of fixed function render pipeline. 
@@ -16,7 +14,10 @@
 - Properly scaled level, ready for Unity physics and GI lighting system.
 - Included experimental day-night system.
 
+<b> Demo</b>
 
+- WebGL build http://tickleheadstudios.com/demo/unity/tr2webgl/
+- Tomb Raider 2 Custom Level https://www.youtube.com/watch?v=P8GPi6-G9CM
 
 <h3>Frequently asked qustions about TR2 Level Viewer</h3>
 
