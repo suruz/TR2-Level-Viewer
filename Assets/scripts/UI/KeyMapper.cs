@@ -7,19 +7,22 @@ public delegate  bool GoToDelegate(Vector3 pos);
 
 public enum function
 {
-	//Action key
-	Idle = 0,		
-	Action,			
-	DrawWeapon,		
-	Roll,			
-	//movement key
-	Walk,			
-	Jump,	
+	Idle = 0,
 	//Direction key
 	Run ,   		
 	Back,      		
 	Left,      		
-	Right,     		
+	Right,  
+	
+	//movement key
+	Walk,			
+	Jump,	
+	
+	//Action key
+	Action,			
+	DrawWeapon,		
+	Roll
+   		
 }
 
 [System.Serializable]
@@ -40,19 +43,20 @@ public class KeyMapper : MonoBehaviour {
 	
 	public static KeyCode[] defaultkeycodes ={
 		
-		//Action key
 		KeyCode.Escape,
-		KeyCode.Mouse0,
-		KeyCode.KeypadEnter,
-		KeyCode.RightShift,
-		//movement key
-		KeyCode.Keypad5,
-		KeyCode.Mouse1,
 		//Direction key
 		KeyCode.UpArrow,
 		KeyCode.DownArrow,
 		KeyCode.LeftArrow,
 		KeyCode.RightArrow,
+	
+		//movement key
+		KeyCode.Keypad5,
+		KeyCode.Mouse1,
+		//Action key
+		KeyCode.Mouse0,
+		KeyCode.KeypadEnter,
+		KeyCode.RightShift
 	};
 	
 	public static KeyMap[] Keys = null;
@@ -75,10 +79,10 @@ public class KeyMapper : MonoBehaviour {
 	public static int Jump = 0;
 	public static int Idle = 0;
 	
-	public static int Run = 16;
-	public static int Down = 32;
-	public static int Left = 64;
-	public static int Right = 128;
+	public static int Run = 0;
+	public static int Down = 0;
+	public static int Left = 0;
+	public static int Right = 0;
 	
 	//compound code
 	public static int JumpAir = 0;
@@ -89,25 +93,22 @@ public class KeyMapper : MonoBehaviour {
 	public static int JumpLeft = 0;
 
 	//AI generated code
-	public static int Grab = 256 + 2;
-	public static int PullUpLow = 256 + 4;
-	public static int PullUpHigh = 256 + 8;
-	public static int PullUpAcrobatic = 256 + 16;
-	public static int WalkUp = 256 + 32;
+	public static int Grab = 24 + 1;
+	public static int PullUpLow = 24 + 2;
+	public static int PullUpHigh = 24 + 3;
+	public static int PullUpAcrobatic = 24 + 4;
+	public static int WalkUp = 24 + 5;
 	
 
-	int[] dpadmap = {16,32,64,128};
 	int	keypadmovement = 0;
 	int	keypadaction = 0;
 	int dpad = 0;
 	int statecode = 0;
-	int activestate = 0;
 
 	int keyshift = 0; // determine key order
 	int keycount = 0;
 	
 	public static bool active = false;
-
 	//public List<int> keystack;
 	
 	// Use this for initialization
@@ -150,11 +151,11 @@ public class KeyMapper : MonoBehaviour {
 		}
 		// [d][d][d][d][m][m][a][a];
 		//2 bit action key
-		for(int i = 0 ; i < 4; i++)
+		for(int i = 0 ; i < nkey; i++)
 		{
 			Keys[i].InterfaceCode = i;
 		}
-		//2 bit movement key
+		/*//2 bit movement key
 		for(int i = nkey - 6; i < nkey - 4; i++)
 		{
 			int shift  = (i - nkey + 6) + 2;
@@ -165,21 +166,22 @@ public class KeyMapper : MonoBehaviour {
 		{
 			int shift  = (i - nkey + 4) + 4;
 			Keys[i].InterfaceCode = 1 << shift;
-		}
+		}*/
 
 		//generate player state code from key codes
 		Idle = (int) function.Idle;
+		
+		Run =  (int)function.Run;
+		Down = (int)function.Back;
+		Left = (int)function.Left;
+		Right = (int)function.Right;
+		
+		Walk = (int)function.Walk + (int)function.Walk * Run;
+		Jump = (int)function.Jump;
+		
 		PrimaryAction =(int)function.Action;
 		DrawWeapon = (int)function.DrawWeapon;
 		Roll = (int)function.Roll;
-		
-		Run =  1 <<(((int)function.Run - nkey + 4) + 4);
-		Down = 1 <<(((int)function.Back - nkey + 4) + 4);
-		Left = 1 <<(((int)function.Left - nkey + 4) + 4);
-		Right = 1 <<(((int)function.Right - nkey + 4) + 4);
-		
-		Walk = Run | (1 << (((int)function.Walk - nkey + 6) + 2));
-		Jump = 1 << (((int)function.Jump - nkey + 6) + 2);
 		
 		//Search = (int)function.Search;
 		//Menu = (int)function.Menu;
@@ -188,31 +190,34 @@ public class KeyMapper : MonoBehaviour {
 		//StepToRight = (int)function.StepToRight;
 		
 		//compound code
-		JumpAir = Run | Jump;
-		JumpAirStanding = JumpAir + 256;
+		JumpAir = Jump + Jump * Run;
+		JumpAirStanding = nkey;
 		
-		jumpBack = Down;
-		FlipBack = Down | Jump;
+		jumpBack = Jump + Jump * Down;
+		FlipBack = nkey + 3;
 		
-		JumpRight = Right | Jump;
-		JumpLeft =  Left | Jump;
+		JumpRight = Jump + Jump * Right;
+		JumpLeft =  Jump + Jump * Left;
 
-		Debug.Log("Key Mapper StateCode: JumpAir" + JumpAir);
+		Debug.Log("Key Mapper StateCode: Run " + Run);
+		Debug.Log("Key Mapper StateCode: Jump " + Jump);
+		Debug.Log("Key Mapper StateCode: Idle " + Idle);
+		Debug.Log("Key Mapper StateCode: PrimaryAction " + JumpLeft);
 		active = true;
 
 	}
 	
 	void ClearKey()
 	{
-		if(keypadaction != 0)
+		if(dpad != 0)
 		{
-			for(int i = 0; i < 4; i++)
+			for(int i = 1; i <= 4; i++)
 			{
 				function func = (function) i;
 				if(GetKeyUpCode(func) )
 				{
-					keypadaction = 0;
-					statecode = statecode & 0xfc;
+					dpad = 0;
+					statecode = 0;
 					HandleIdleKey(statecode);
 					break;
 				}
@@ -221,13 +226,13 @@ public class KeyMapper : MonoBehaviour {
 		
 		if(keypadmovement != 0)
 		{
-			for(int i = keycount - 6; i < keycount - 4; i++)
+			for(int i = 5; i <=6; i++)
 			{
 				function func = (function) i;
 				if(GetKeyUpCode(func) )
 				{
 					keypadmovement = 0;
-					statecode = statecode & ~Keys[i].InterfaceCode;
+					statecode = 0;
 					HandleIdleKey(statecode);
 					break;
 				}
@@ -235,21 +240,20 @@ public class KeyMapper : MonoBehaviour {
 		}
 		
 		
-		if(dpad != 0)
+		if(keypadaction != 0)
 		{
-			for(int i = keycount - 4; i < keycount; i++)
+			for(int i = 7 ; i <= 9; i++)
 			{
 				function func = (function) i;
-				if(GetKeyUpCode(func) )
+				if(GetKeyCode(func) )
 				{
-					dpad = 0;
-					statecode = statecode & ~Keys[i].InterfaceCode;
+					keypadaction = 0;
+					statecode = 0;
 					HandleIdleKey(statecode);
 					break;
 				}
 			}
 		}
-	
 	}
 	
 	void HandleKeyOrder()
@@ -266,21 +270,19 @@ public class KeyMapper : MonoBehaviour {
 			keypadaction = 0;
 	 		dpad = 0;
 	 		statecode = 0;
-	 		activestate = 0;
 			reset = false;
 		}
 		
-		if(keypadaction == 0)
+		if(dpad == 0) //if not pressed
 		{
-			for(int i = 0 ; i < 4; i++)
+			for(int i = 1; i <= 4; i++)
 			{
 				function func = (function) i;
 				if(GetKeyCode(func) )
 				{
-					keypadaction = i;
-					statecode |= Keys[i].InterfaceCode;
+					dpad = i;
+					statecode = dpad;
 					HandleKey(statecode,0x0);
-					//Debug.Log(func);
 					break;
 				}
 			}
@@ -288,37 +290,34 @@ public class KeyMapper : MonoBehaviour {
 		
 		if(keypadmovement == 0)
 		{
-			for(int i = keycount - 6; i < keycount - 4; i++)
+			for(int i = 5; i <= 6; i++)
 			{
 				function func = (function) i;
 				if(GetKeyCode(func) )
 				{
 					keypadmovement = i;
-					statecode |= Keys[i].InterfaceCode ;
-					HandleKey(statecode,dpad);
-					//Debug.Log(func);
+					statecode = keypadmovement + (dpad * keypadmovement);
+					HandleKey(statecode,0x0);
 					break;
 				}
 			}
 		}
 		
-		
-		if(dpad == 0)
+		if(keypadaction == 0)
 		{
-			for(int i = keycount - 4; i < keycount; i++)
+			for(int i = 7 ; i <= 9; i++)
 			{
 				function func = (function) i;
 				if(GetKeyCode(func) )
 				{
-					dpad = i;
-					statecode |= Keys[i].InterfaceCode;
-					HandleKey(statecode,keypadmovement);
-					//Debug.Log(func);
+					keypadaction = i;
+					statecode = keypadaction;
+					HandleKey(statecode,0x0);
 					break;
 				}
 			}
 		}
-
+		
 		IsDoubleClick();
 
 	}
@@ -341,7 +340,7 @@ public class KeyMapper : MonoBehaviour {
 		if(clickcount >= 2)
 		{
 			int statecode = Keys [defaultkeycodes.Length - 4].InterfaceCode;
-			HandleKey(statecode,keypadmovement);
+			HandleKey(Run,keypadmovement);
 		}
 		clickcount = 0;
 	}

@@ -8,5 +8,7 @@ public class ObjectExt: MonoBehaviour  {
 	
 	protected Vector3 m_PrevPlayPos;
 	protected Transform m_Transform;
+	
+	public SwimmingState m_SwimState = SwimmingState.None;
 
 }

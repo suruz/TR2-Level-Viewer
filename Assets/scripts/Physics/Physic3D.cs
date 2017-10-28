@@ -33,6 +33,7 @@ public class Physic3D {
 		float dx = deltatime * Hv ;
 		float dy = Vv * deltatime - (0.5f * g * deltatime * deltatime);
 		Vector3 posvec = new Vector3(0.0f,dy,dx);
+		//Debug.Log("Physic3D: Jump ");
 		return Start + rotation * posvec;
   	}		
 	

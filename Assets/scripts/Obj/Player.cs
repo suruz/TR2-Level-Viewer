@@ -38,12 +38,13 @@ public class Player : ObjectExt
 
     Vector3 m_FreePosition = Vector3.zero;
     float m_PlayerYaw = 0;
-    LaraStatePlayer m_AnimStatePlayer = null;
+	float m_PlayerTilt = 0;
+    public LaraStatePlayer m_AnimStatePlayer = null;
 
     //Mouse Controller
     float mouse_dx;
     float mouse_dy;
-
+	
     // Use this for initialization
     void Start()
     {
@@ -97,13 +98,7 @@ public class Player : ObjectExt
             m_PrevPlayPos = m_Transform.position;
         }
 
-        m_Room.DebugRoomSurface(facing_edeges);
-
-        if (m_AnimStatePlayer == null)
-        {
-            m_AnimStatePlayer = GetComponent<LaraStatePlayer>();
-            //m_AnimStatePlayer.enabled = true;
-        }
+        //m_Room.DebugRoomSurface(facing_edeges);
 
         InputUpdate();
 
@@ -123,8 +118,11 @@ public class Player : ObjectExt
             }
             else // simple height fixing
             {
-                float h = Mathf.Lerp(transform.position.y, m_GroundHeight, Time.deltaTime * 10.0f);// + 0.1f;
-                transform.position = new Vector3(transform.position.x, h, transform.position.z);
+				if(m_SwimState == SwimmingState.None)
+				{
+                	float h = Mathf.Lerp(transform.position.y, m_GroundHeight, Time.deltaTime * 10.0f);// + 0.1f;
+                	transform.position = new Vector3(transform.position.x, h, transform.position.z);
+				}
             }
         }
 
@@ -165,14 +163,17 @@ public class Player : ObjectExt
             if (hit.transform != null )
             {
 				//there may be lara's current room == null,  first check for this
-				if(m_Room!=null && hit.transform != m_Room.transform)
+				if(m_Room!=null )
 				{
-                	RoomEx room = hit.transform.GetComponent<RoomEx>();
-                	if (room != null) //All hit objects need not to be a room
-                	{
-                    	m_Room = room;
-                    	Debug.Log("m_Room" + m_Room.name);
-                	}
+					if(hit.transform != m_Room.transform)
+					{
+                		RoomEx room = hit.transform.GetComponent<RoomEx>();
+                		if (room != null) //All hit objects need not to be a room
+                		{
+                    		m_Room = room;
+                    		//Debug.Log("m_Room" + m_Room.name + "room flag " + m_Room.m_Tr2Room.Flags );
+                		}
+					}
 				}
 				else
 				{
@@ -180,10 +181,12 @@ public class Player : ObjectExt
                 	if (room != null) //All hit objects need not to be a room
                 	{
                     	m_Room = room;
-                    	Debug.Log("m_Room" + m_Room.name);
+                    	//Debug.Log("m_Room" + m_Room.name);
                 	}
 					
 				}
+				
+				SetSwimState(m_Room);
             }
         }
         FreeFallHandler();
@@ -191,9 +194,9 @@ public class Player : ObjectExt
 
     int PrimaryActionHandler()
     {
-        Debug.Log("Primary Action Handler");
+        //Debug.Log("Primary Action Handler");
 
-        int retval = KeyMapper.Idle;
+        int retval = KeyMapper.Idle + (int)m_SwimState;
 
         //if true animation state player will change state for primary animation
         //pull up animations:
@@ -213,7 +216,7 @@ public class Player : ObjectExt
         //will be effected
 
         bool hasGrabableEdge = false;
-        Transform t = m_Transform.FindChild("objPart:0");
+        Transform t = m_Transform.Find("objPart:0");
         List<Edge> horizontal_edeges = m_Room.RayCast(t.position, transform.forward, 200 * Settings.SceneScaling);
 
         if (horizontal_edeges.Count > 0)
@@ -260,11 +263,12 @@ public class Player : ObjectExt
                         JumpTarget = Vector3.zero;
                         PullUpTarget = transform.position;
                         m_bWalkingUp = true;
-                        retval = KeyMapper.WalkUp;
+                        retval = KeyMapper.WalkUp + (int)m_SwimState; //consider under water
                     }
                 }
 
-                /*bool inside_edge = (Vector3.Dot (edge.normalized, toplayer.normalized ) > 0);
+                /*
+                 * bool inside_edge = (Vector3.Dot (edge.normalized, toplayer.normalized ) > 0);
 				//bool facing = (Vector3.Dot (edge.normalized, toplayer.normalized ) > 0);
 				//if(ep0.y > transform.position.y)
 				//{
@@ -272,7 +276,7 @@ public class Player : ObjectExt
 					//hasGrabableEdge = true;
 					//break;
 				//}
-
+				
 				if((ep0.y - transform.position.y) > this.m_Height )
 				{
 					hasGrabableEdge = true;
@@ -288,7 +292,7 @@ public class Player : ObjectExt
 
     void FreeFallHandler()
     {
-        if (m_bPullingUp || m_bWalkingUp || m_bStandingUp)
+        if (m_bPullingUp || m_bWalkingUp || m_bStandingUp || (m_SwimState == SwimmingState.InDeepWater) || (m_SwimState == SwimmingState.InShallowWater)  )
         {
             m_bFreeFall = false;
             return;
@@ -301,7 +305,7 @@ public class Player : ObjectExt
 #endif
         RaycastHit hit = new RaycastHit();
 
-        Transform t = m_Transform.FindChild("objPart:0");
+        Transform t = m_Transform.Find("objPart:0");
         Vector3 origin = t.position + Vector3.up * 0 - Vector3.forward * (50 * Settings.SceneScaling);
 
         if (Physics.Raycast(origin, -Vector3.up, out hit, 14096, mask))
@@ -319,7 +323,7 @@ public class Player : ObjectExt
                     m_bFreeFall = (transform.position.y - hit.point.y > m_FreeFallStartHeight);
                     physics.StartFreeFall(transform.position);
                     m_FreeFallStartTime = Time.time;
-                    Debug.Log("Start Free Fall");
+                    //Debug.Log("Start Free Fall");
                 }
             }
 
@@ -346,7 +350,7 @@ public class Player : ObjectExt
         {
             m_bJumping = physics.CalculateCurve(From, To, rot, sign);
         }
-        //Debug.Log("Jump Physics Handler" + m_bJumping);
+        Debug.Log("Jump Physics Handler" + m_bJumping);
     }
 
     void JumpingHandler(Vector3 dir)
@@ -418,7 +422,7 @@ public class Player : ObjectExt
 
     void OnStandingUp()
     {
-        Transform t = m_Transform.FindChild("objPart:0");
+        Transform t = m_Transform.Find("objPart:0");
         float diff = t.position.y - m_Transform.position.y;
         if (diff > (1100 * Settings.SceneScaling)) //ful standing position
         {
@@ -443,7 +447,7 @@ public class Player : ObjectExt
         }
         else
         {
-            Debug.Log("Stading UP!" + diff);
+            //Debug.Log("Stading UP!" + diff);
         }
     }
 
@@ -452,9 +456,9 @@ public class Player : ObjectExt
 
     void OnWalkingUp()
     {
-        Transform t = m_Transform.FindChild("objPart:0");
+        Transform t = m_Transform.Find("objPart:0");
         float diff = t.position.y - m_Transform.position.y;
-        Debug.Log("OnWalkingUp:" + diff);
+        //Debug.Log("OnWalkingUp:" + diff);
 
         if (diff > (935 * Settings.SceneScaling)) //ful standing position
         {
@@ -498,7 +502,7 @@ public class Player : ObjectExt
 #else
 		int mask = Physics.kDefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
 #endif
-            Transform t = m_Transform.FindChild("objPart:0");
+            Transform t = m_Transform.Find("objPart:0");
             bool collision = Physics.Raycast(t.position, dir, out hit2, 150 * Settings.SceneScaling, mask);
 
             if (collision)
@@ -524,16 +528,16 @@ public class Player : ObjectExt
             if (keystate == KeyMapper.Run && m_Room != null)
             {
                 Vector3 normal = Vector3.up;
-                Transform t = m_Transform.FindChild("objPart:0");
+                Transform t = m_Transform.Find("objPart:0");
                 bool hit = m_Room.HitTest(t.position, m_Transform.forward, ref normal, 200 * Settings.SceneScaling);
                 if (hit)
                 {
                     Debug.Log("Wall Hit Test:" + hit);
-                    keystate = 17;
+                    keystate = (int)KeyMapper.PrimaryAction;
                 }
             }
 
-            m_AnimStatePlayer.StateCodeHandler(keystate, otherkey, time);
+            m_AnimStatePlayer.StateCodeHandler(keystate + (int)m_SwimState, otherkey, time);
         }
     }
 
@@ -543,7 +547,7 @@ public class Player : ObjectExt
         if (m_bJumping || m_bPullingUp || m_bWalkingUp || m_bStandingUp) return;
         if (m_AnimStatePlayer != null)
         {
-            m_AnimStatePlayer.IdleStateHandler(keystate, time);
+            m_AnimStatePlayer.IdleStateHandler(keystate + (int)m_SwimState, time);
         }
     }
 
@@ -553,7 +557,24 @@ public class Player : ObjectExt
         {
             m_PlayerYaw += mouse_dx * 0.5f;
             mouse_dx = 0;
-            transform.rotation = Quaternion.Euler(0.0f, m_PlayerYaw, 0.0f);
+			
+			if((m_SwimState == SwimmingState.InDeepWater) || (m_SwimState == SwimmingState.InWaterSurface))
+			{
+				if(m_SwimState == SwimmingState.InDeepWater)
+				{
+					m_PlayerTilt -= mouse_dy ;
+				}
+				else if(mouse_dy <=0) //dont tilt up in water surface
+				{
+					m_PlayerTilt -= mouse_dy ;
+				}
+				transform.rotation = Quaternion.Euler(m_PlayerTilt, m_PlayerYaw, 0.0f);
+			}
+			else
+			{
+				transform.rotation = Quaternion.Euler(0.0f, m_PlayerYaw, 0.0f);
+			}
+				
         }
     }
 
@@ -579,14 +600,88 @@ public class Player : ObjectExt
 	}*/
 
     float m_maxHorizontalDisplacement = Settings.SceneScaling * Settings.SceneScaling * 2500;
-
-    void OnDestroy()
-    {
-        //release handlers for external events to avoid broken link caused by object destruction
-        LaraStatePlayer.OnJump -= JumpHandler;
-        LaraStatePlayer.OnJumping -= JumpingHandler;
-        LaraStatePlayer.OnMovement -= MovementHandler;
-        LaraStatePlayer.OnPrimaryAction -= PrimaryActionHandler;
-    }
-
+    public void SetSwimState(RoomEx room  )
+	{
+		if(m_Room!=null && (m_Room.m_Tr2Room.Flags == 0x0001))//check if room filled with watere
+		{
+			m_SwimState = SwimmingState.InDeepWater;
+			LaraStatePlayer.SetSwimState(m_SwimState);
+		}
+		else if(m_Room!=null && (m_Room.m_Tr2Room.Flags == 65))
+		{
+			/*if(m_SwimState != SwimmingState.InShallowWater)
+			{
+				m_SwimState = SwimmingState.InShallowWater;
+				LaraStatePlayer.SetSwimState(m_SwimState);
+				IdleStateHandler(0,0);
+			}*/
+			
+			float surface = (-m_Room.m_Tr2Room.info.yTop * Settings.SceneScaling);
+			if((surface - transform.position.y) >  0.5f  && ((m_SwimState == SwimmingState.InShallowWater) || (m_SwimState == SwimmingState.None)))
+			{
+				m_SwimState = SwimmingState.InDeepWater;
+				LaraStatePlayer.SetSwimState(m_SwimState);
+				PlayerCollisionHandler.ResizeSwimmCollider();
+				IdleStateHandler(0,0);
+				
+				//Vector3 pos = transform.position;
+				//transform.position  =  new Vector3(pos.x, surface -0.8f , pos.z);
+			}
+			
+			if((surface - transform.position.y) >  0.1f  && (m_SwimState ==  SwimmingState.InWaterSurface) )
+			{
+				m_SwimState = SwimmingState.InDeepWater;
+				LaraStatePlayer.SetSwimState(m_SwimState);
+				PlayerCollisionHandler.ResizeSwimmCollider();
+				IdleStateHandler(0,0);
+				
+				//Vector3 pos = transform.position;
+				//transform.position  =  new Vector3(pos.x, surface -0.8f , pos.z);
+			}
+			
+			if((surface - transform.position.y) >  0f  && m_SwimState == SwimmingState.InDeepWater)
+			{
+		
+				if((surface - transform.position.y) <  0.1f)
+				{
+					m_SwimState = SwimmingState.InWaterSurface;
+					LaraStatePlayer.SetSwimState(m_SwimState);
+					PlayerCollisionHandler.ResizeNormalCollider();
+					
+					IdleStateHandler(0,0);
+				}
+			}
+			
+			/*if((surface - transform.position.y) >  0.35f  && (m_SwimState == SwimmingState.None))
+			{
+				m_SwimState = SwimmingState.InShallowWater;
+				LaraStatePlayer.SetSwimState(m_SwimState);
+				PlayerCollisionHandler.ResizeNormalCollider();
+				IdleStateHandler(0,0);
+			}*/
+			
+			if(m_SwimState == SwimmingState.InWaterSurface)
+			{
+				
+				//Grab ledge and get outof water
+			}
+			
+			//define shallow water analyzing tub depth
+			
+			
+			//Debug.Log("m_Room.m_Tr2Room.info.yTop " + (-m_Room.m_Tr2Room.info.yTop * Settings.SceneScaling));
+			//Debug.Log("m_Room.m_Tr2Room.info.yBottom " + (-m_Room.m_Tr2Room.info.yBottom * Settings.SceneScaling));
+			
+		}
+		else
+		{
+			m_SwimState = SwimmingState.None;
+			LaraStatePlayer.SetSwimState(m_SwimState);
+			PlayerCollisionHandler.ResizeNormalCollider();
+			//IdleStateHandler(0,0);
+		}
+		
+		
+	}
+	
 }

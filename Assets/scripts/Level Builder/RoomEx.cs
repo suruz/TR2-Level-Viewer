@@ -11,9 +11,10 @@ public class RoomEx: MonoBehaviour  {
 	int ID = 0;
 	public int[] m_SharedTriangles = null;
 	List<Edge> m_RoomEdges = null;
-
+	public float m_CeilingHeight = -Mathf.Infinity;
+	public float m_FloorHeight = Mathf.Infinity;
 	public List<GameObject> m_StaticObjects = null;
-
+	Material m_Material;
 	Parser.Tr2Level m_leveldata = null;
 
 	void Start()
@@ -22,6 +23,7 @@ public class RoomEx: MonoBehaviour  {
 		m_SharedTriangles = MeshModifier.GetSharedTriangles(m_Mesh);
 		m_RoomAnalyzer = new SurfaceAnalyzer(m_Mesh);
 		m_RoomEdges = m_RoomAnalyzer.Analyze(m_RoomVertices, m_SharedTriangles,null);
+		m_Material = GetComponent<MeshRenderer>().sharedMaterial;
 	}
 
 	void Update()
@@ -94,7 +96,7 @@ public class RoomEx: MonoBehaviour  {
 		List<Edge> edges = new List<Edge>();
 		if(faceid != -1)
 		{
-			Debug.Log("Room.RayCast:" + faceid);
+			//Debug.Log("Room.RayCast:" + faceid);
 			Triangle face = m_RoomAnalyzer.LodTriangles[faceid];
 			int ntrycount = 0;
 
@@ -216,4 +218,11 @@ public class RoomEx: MonoBehaviour  {
 
 		return edges;
 	}
+	
+	public  Material GetRoomMaterial()
+	{
+		return m_Material;
+	}
+	
+	//Added method GetRoomMaterial() to modify shared mat
 }

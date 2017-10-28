@@ -3,38 +3,47 @@ using System.Collections;
 
 public class MeshBuilder  {
 	
-	public static Mesh CreateRoomMesh(Parser.Tr2Room tr2room, Parser.Tr2Level  leveldata)
+	public static Mesh CreateRoomMesh(Parser.Tr2Room tr2room, Parser.Tr2Level  leveldata, ref bool has_water)
 	{
 		Vector3[] sharedVertices = null;
-	
-		if(tr2room.RoomData.NumVertices > 0)
-		{
-			sharedVertices = new Vector3[tr2room.RoomData.NumVertices];
-			for(int vertAttribCount = 0; vertAttribCount < tr2room.RoomData.NumVertices; vertAttribCount++)
-			{
-				float x = tr2room.RoomData.Vertices[vertAttribCount].Vertex.x; 
-				float y = tr2room.RoomData.Vertices[vertAttribCount].Vertex.y; 
-				float z = tr2room.RoomData.Vertices[vertAttribCount].Vertex.z;
-				
-				////print("chk vtx x y z:" +x+ " " +y + " " +z);
-				
-				sharedVertices[vertAttribCount].x = x;
-				sharedVertices[vertAttribCount].y =-y;
-				sharedVertices[vertAttribCount].z = z; 
-			}
-		}
-		
-		//warning: avariable lengh array in a structure can cause access violence
-		
-		
-		//if(tr2room.RoomData.NumRectangles > 0)
-		//{
-		
-		//selected_texObjectIdx = tr2room.RoomData.Rectangles[0].Texture;
-		//selected_texObj =  leveldata.ObjectTextures[selected_texObjectIdx];
-		//selected_texTileIdx = selected_texObj.Tile;
-		
-		int strideVertIdx = (tr2room.RoomData.NumRectangles * 4);
+        has_water = false;
+        byte[] is_water_vertex = null;
+        if (tr2room.RoomData.NumVertices > 0)
+        {
+            sharedVertices = new Vector3[tr2room.RoomData.NumVertices];
+            is_water_vertex = new byte[sharedVertices.Length];
+
+            for (int vertAttribCount = 0; vertAttribCount < tr2room.RoomData.NumVertices; vertAttribCount++)
+            {
+                float x = tr2room.RoomData.Vertices[vertAttribCount].Vertex.x;
+                float y = tr2room.RoomData.Vertices[vertAttribCount].Vertex.y;
+                float z = tr2room.RoomData.Vertices[vertAttribCount].Vertex.z;
+
+                ////print("chk vtx x y z:" +x+ " " +y + " " +z);
+
+                sharedVertices[vertAttribCount].x = x;
+                sharedVertices[vertAttribCount].y = -y;
+                sharedVertices[vertAttribCount].z = z;
+                is_water_vertex[vertAttribCount] = 10;
+                if ((tr2room.RoomData.Vertices[vertAttribCount].Attributes & 0x8000L) == 0x8000L)
+                {
+                    is_water_vertex[vertAttribCount] = 1;
+                    has_water = true;
+                }
+            }
+        }
+
+        //warning: avariable lengh array in a structure can cause access violence
+
+
+        //if(tr2room.RoomData.NumRectangles > 0)
+        //{
+
+        //selected_texObjectIdx = tr2room.RoomData.Rectangles[0].Texture;
+        //selected_texObj =  leveldata.ObjectTextures[selected_texObjectIdx];
+        //selected_texTileIdx = selected_texObj.Tile;
+
+        int strideVertIdx = (tr2room.RoomData.NumRectangles * 4);
 		int strideTriIdx = (tr2room.RoomData.NumRectangles* 3 * 2) ;
 		
 		int numNonsharedVertices = strideVertIdx + (tr2room.RoomData.NumTriangles * 3) ;
@@ -62,9 +71,13 @@ public class MeshBuilder  {
 			int vertOrUVIdx1 = rectCount * 4 + 1;
 			int vertOrUVIdx2 = rectCount * 4 + 2;
 			int vertOrUVIdx3 = rectCount * 4 + 3;
-			
-			
-			nonSharedVertices[vertOrUVIdx0] = sharedVertices[Idx0];
+            if (is_water_vertex[Idx0] == 1 &&  //if all vertices are in water
+                is_water_vertex[Idx1] == 1 &&
+                is_water_vertex[Idx2] == 1 &&
+                is_water_vertex[Idx3] == 1 
+                ) continue;
+
+            nonSharedVertices[vertOrUVIdx0] = sharedVertices[Idx0];
 			nonSharedVertices[vertOrUVIdx1] = sharedVertices[Idx1];
 			nonSharedVertices[vertOrUVIdx2] = sharedVertices[Idx2];
 			nonSharedVertices[vertOrUVIdx3] = sharedVertices[Idx3];
@@ -80,18 +93,8 @@ public class MeshBuilder  {
 			////print("newMatCount:"+ newMatCount);
 			//}
 			
-			nonSharedUVs[vertOrUVIdx0].x = (float) 	TextureUV.AdjustTextureCoordinateX((byte)texObj.Vertices[0].Xpixel,(sbyte)texObj.Vertices[0].Xcoordinate,texTileIdx);
-			nonSharedUVs[vertOrUVIdx0].y = (float) 	TextureUV.AdjustTextureCoordinateY((byte)texObj.Vertices[0].Ypixel,(sbyte)texObj.Vertices[0].Ycoordinate,texTileIdx);
-			
-			nonSharedUVs[vertOrUVIdx1].x = (float) 	TextureUV.AdjustTextureCoordinateX((byte)texObj.Vertices[1].Xpixel,(sbyte)texObj.Vertices[1].Xcoordinate,texTileIdx);
-			nonSharedUVs[vertOrUVIdx1].y = (float) 	TextureUV.AdjustTextureCoordinateY((byte)texObj.Vertices[1].Ypixel,(sbyte)texObj.Vertices[1].Ycoordinate,texTileIdx);
-			
-			nonSharedUVs[vertOrUVIdx2].x = (float) 	TextureUV.AdjustTextureCoordinateX((byte)texObj.Vertices[2].Xpixel,(sbyte)texObj.Vertices[2].Xcoordinate,texTileIdx);
-			nonSharedUVs[vertOrUVIdx2].y = (float) 	TextureUV.AdjustTextureCoordinateY((byte)texObj.Vertices[2].Ypixel,(sbyte)texObj.Vertices[2].Ycoordinate,texTileIdx);
-			
-			nonSharedUVs[vertOrUVIdx3].x = (float) 	TextureUV.AdjustTextureCoordinateX((byte)texObj.Vertices[3].Xpixel,(sbyte)texObj.Vertices[3].Xcoordinate,texTileIdx);
-			nonSharedUVs[vertOrUVIdx3].y = (float) 	TextureUV.AdjustTextureCoordinateY((byte)texObj.Vertices[3].Ypixel,(sbyte)texObj.Vertices[3].Ycoordinate,texTileIdx);
-			
+			SetFaceUVs(nonSharedUVs, vertOrUVIdx0, vertOrUVIdx1, vertOrUVIdx2,vertOrUVIdx3, texObj);
+					
 			////print("uv[Idx0]"+ uv[Idx0].x + " " + uv[Idx0].y);
 			////print("uv[Idx1]"+ uv[Idx1].x + " " + uv[Idx1].y);
 			
@@ -123,16 +126,18 @@ public class MeshBuilder  {
 			int vertOrUVIdx0 = triCount * 3+ 0;
 			int vertOrUVIdx1 = triCount * 3+ 1;
 			int vertOrUVIdx2 = triCount * 3+ 2;
-			
-			
-			nonSharedVertices[strideVertIdx + vertOrUVIdx0] = sharedVertices[Idx0];
+            if (is_water_vertex[Idx0] == 1 &&  //if all vertices are in water
+                is_water_vertex[Idx1] == 1 &&
+                is_water_vertex[Idx2] == 1
+                ) continue;
+
+            nonSharedVertices[strideVertIdx + vertOrUVIdx0] = sharedVertices[Idx0];
 			nonSharedVertices[strideVertIdx + vertOrUVIdx1] = sharedVertices[Idx1];
 			nonSharedVertices[strideVertIdx + vertOrUVIdx2] = sharedVertices[Idx2];
 			
 			
 			ushort texObjectIdx = tr2room.RoomData.Triangles[triCount].Texture;
 			Parser.Tr2ObjectTexture texObj =  leveldata.ObjectTextures[texObjectIdx];
-			ushort texTileIdx = texObj.Tile;  //bind this textile in material?
 			
 			//if(texTileIdx != prevTexture)
 			//{
@@ -141,14 +146,7 @@ public class MeshBuilder  {
 			////print("newMatCount:"+ newMatCount);
 			//}
 			
-			nonSharedUVs[strideVertIdx + vertOrUVIdx0].x = (float) 	TextureUV.AdjustTextureCoordinateX((byte)texObj.Vertices[0].Xpixel,(sbyte)texObj.Vertices[0].Xcoordinate,texTileIdx);
-			nonSharedUVs[strideVertIdx + vertOrUVIdx0].y = (float) 	TextureUV.AdjustTextureCoordinateY((byte)texObj.Vertices[0].Ypixel,(sbyte)texObj.Vertices[0].Ycoordinate,texTileIdx);
-			
-			nonSharedUVs[strideVertIdx + vertOrUVIdx1].x = (float) 	TextureUV.AdjustTextureCoordinateX((byte)texObj.Vertices[1].Xpixel,(sbyte)texObj.Vertices[1].Xcoordinate,texTileIdx);
-			nonSharedUVs[strideVertIdx + vertOrUVIdx1].y = (float) 	TextureUV.AdjustTextureCoordinateY((byte)texObj.Vertices[1].Ypixel,(sbyte)texObj.Vertices[1].Ycoordinate,texTileIdx);
-			
-			nonSharedUVs[strideVertIdx + vertOrUVIdx2].x = (float) 	TextureUV.AdjustTextureCoordinateX((byte)texObj.Vertices[2].Xpixel,(sbyte)texObj.Vertices[2].Xcoordinate,texTileIdx);
-			nonSharedUVs[strideVertIdx + vertOrUVIdx2].y = (float) 	TextureUV.AdjustTextureCoordinateY((byte)texObj.Vertices[2].Ypixel,(sbyte)texObj.Vertices[2].Ycoordinate,texTileIdx);
+			SetFaceUVs(nonSharedUVs,strideVertIdx + vertOrUVIdx0, strideVertIdx + vertOrUVIdx1,strideVertIdx + vertOrUVIdx2, texObj);
 			
 			
 			////print("uv[Idx0]"+ uv[Idx0].x + " " + uv[Idx0].y);
@@ -167,12 +165,6 @@ public class MeshBuilder  {
 		//SetTriangles (triangles : int[], submesh : int) : void
 		//generate secondary uv set
 		
-		for(int uvIdx = 0; uvIdx < nonSharedUVs.Length; uvIdx++)
-		{
-			nonSharedUV2s[uvIdx] = nonSharedUVs[uvIdx];
-			nonSharedUV2s[uvIdx].x+=0.001f;
-			nonSharedUV2s[uvIdx].y+=0.001f;
-		}
         for (int i = 0; i < nonSharedVertices.Length; i++) { nonSharedVertices[i] = nonSharedVertices[i] * Settings.SceneScaling; }
         Mesh mesh  = new Mesh();
 		mesh.Clear();
@@ -200,8 +192,214 @@ public class MeshBuilder  {
 
 		return mesh;
 	}
-	
-	public static Mesh CreateObjectMesh(Parser.Tr2Mesh tr2mesh , Parser.Tr2Level  leveldata)
+
+    public static Mesh CreateRoomWaterMesh(Parser.Tr2Room tr2room, Parser.Tr2Level leveldata)
+    {
+        Vector3[] sharedVertices = null;
+        byte[] is_water_vertex = null;
+
+        if (tr2room.RoomData.NumVertices > 0)
+        {
+            sharedVertices = new Vector3[tr2room.RoomData.NumVertices];
+            is_water_vertex = new byte[sharedVertices.Length];
+
+            for (int vertAttribCount = 0; vertAttribCount < tr2room.RoomData.NumVertices; vertAttribCount++)
+            {
+                float x = tr2room.RoomData.Vertices[vertAttribCount].Vertex.x;
+                float y = tr2room.RoomData.Vertices[vertAttribCount].Vertex.y;
+                float z = tr2room.RoomData.Vertices[vertAttribCount].Vertex.z;
+
+                ////print("chk vtx x y z:" +x+ " " +y + " " +z);
+
+                sharedVertices[vertAttribCount].x = x;
+                sharedVertices[vertAttribCount].y = -y;
+                sharedVertices[vertAttribCount].z = z;
+
+                is_water_vertex[vertAttribCount] = 10;
+                if ((tr2room.RoomData.Vertices[vertAttribCount].Attributes & 0x8000L) == 0x8000L)
+                {
+                    is_water_vertex[vertAttribCount] = 1;
+                }
+
+            }
+        }
+
+        //warning: avariable lengh array in a structure can cause access violence
+
+
+        //if(tr2room.RoomData.NumRectangles > 0)
+        //{
+
+        //selected_texObjectIdx = tr2room.RoomData.Rectangles[0].Texture;
+        //selected_texObj =  leveldata.ObjectTextures[selected_texObjectIdx];
+        //selected_texTileIdx = selected_texObj.Tile;
+
+        int strideVertIdx = (tr2room.RoomData.NumRectangles * 4);
+        int strideTriIdx = (tr2room.RoomData.NumRectangles * 3 * 2);
+
+        int numNonsharedVertices = strideVertIdx + (tr2room.RoomData.NumTriangles * 3);
+        int numNonsharedTris = strideTriIdx + (tr2room.RoomData.NumTriangles * 3);
+
+        Vector3[] nonSharedVertices = new Vector3[numNonsharedVertices];
+        Vector2[] nonSharedUVs = new Vector2[numNonsharedVertices];
+        Vector2[] nonSharedUV2s = new Vector2[numNonsharedVertices];
+        int[] nonSharedTris = new int[numNonsharedTris];
+
+        //triangles = new int[tr2room.RoomData.NumRectangles * 3 * 2];
+
+        for (int rectCount = 0; rectCount < tr2room.RoomData.NumRectangles; rectCount++)
+        {
+
+            int Idx0 = tr2room.RoomData.Rectangles[rectCount].Vertices0;
+            int Idx1 = tr2room.RoomData.Rectangles[rectCount].Vertices1;
+            int Idx2 = tr2room.RoomData.Rectangles[rectCount].Vertices2;
+            int Idx3 = tr2room.RoomData.Rectangles[rectCount].Vertices3;
+
+            ////print ("idx0 - Idx1 - Idx2 - Idx3:" + Idx0 + " " + Idx1 + " " + Idx2 +" " + Idx3);
+
+
+            int vertOrUVIdx0 = rectCount * 4 + 0;
+            int vertOrUVIdx1 = rectCount * 4 + 1;
+            int vertOrUVIdx2 = rectCount * 4 + 2;
+            int vertOrUVIdx3 = rectCount * 4 + 3;
+            if (is_water_vertex[Idx0] == 10) continue;
+            if (is_water_vertex[Idx1] == 10) continue;
+            if (is_water_vertex[Idx2] == 10) continue;
+            if (is_water_vertex[Idx3] == 10) continue;
+
+            nonSharedVertices[vertOrUVIdx0] = sharedVertices[Idx0];
+            nonSharedVertices[vertOrUVIdx1] = sharedVertices[Idx1];
+            nonSharedVertices[vertOrUVIdx2] = sharedVertices[Idx2];
+            nonSharedVertices[vertOrUVIdx3] = sharedVertices[Idx3];
+
+            ushort texObjectIdx = tr2room.RoomData.Rectangles[rectCount].Texture;
+            Parser.Tr2ObjectTexture texObj = leveldata.ObjectTextures[texObjectIdx];
+            ushort texTileIdx = texObj.Tile;  //bind this textile in material?
+
+            //if(texTileIdx != prevTexture)
+            //{
+            //newMatCount +=1;
+            //prevTexture = texTileIdx;
+            ////print("newMatCount:"+ newMatCount);
+            //}
+			
+			SetFaceUVs(nonSharedUVs,vertOrUVIdx0, vertOrUVIdx1,vertOrUVIdx2, vertOrUVIdx3, texObj);
+		
+            ////print("uv[Idx0]"+ uv[Idx0].x + " " + uv[Idx0].y);
+            ////print("uv[Idx1]"+ uv[Idx1].x + " " + uv[Idx1].y);
+
+
+            //ushort opacity = texObj.TransparencyFlags;  //isItOpacq
+			
+			//generate secondary uv for animation by going through all animated texture group and checking existance of 
+			//texObjectIdx in that group
+			//leveldata.AnimatedTextures[]  // this is varable length record of animated texture group
+			
+		     int texture_idx = GetAnimatedTextureIndex(leveldata.AnimatedTextures, leveldata.NumAnimatedTextures, texObjectIdx);
+			 if(texture_idx > -1)
+			 {
+				texObj = leveldata.ObjectTextures[texture_idx];
+				SetFaceUVs(nonSharedUV2s,vertOrUVIdx0, vertOrUVIdx1,vertOrUVIdx2, vertOrUVIdx3, texObj);
+			 }
+			
+
+            nonSharedTris[rectCount * 6 + 0] = vertOrUVIdx0;
+            nonSharedTris[rectCount * 6 + 1] = vertOrUVIdx1;
+            nonSharedTris[rectCount * 6 + 2] = vertOrUVIdx2;
+
+            nonSharedTris[rectCount * 6 + 3] = vertOrUVIdx2;
+            nonSharedTris[rectCount * 6 + 4] = vertOrUVIdx3;
+            nonSharedTris[rectCount * 6 + 5] = vertOrUVIdx0;
+
+        }
+
+
+        for (int triCount = 0; triCount < tr2room.RoomData.NumTriangles; triCount++)
+        {
+
+            ////print("tr2room.RoomData.NumTriangles"+ tr2room.RoomData.NumTriangles);
+
+            int Idx0 = tr2room.RoomData.Triangles[triCount].Vertices0;
+            int Idx1 = tr2room.RoomData.Triangles[triCount].Vertices1;
+            int Idx2 = tr2room.RoomData.Triangles[triCount].Vertices2;
+
+            ////print ("idx0 - Idx1 - Idx2:" + Idx0 + " " + Idx1 + " " + Idx2);
+            //[][][][]+[][][]
+            int vertOrUVIdx0 = triCount * 3 + 0;
+            int vertOrUVIdx1 = triCount * 3 + 1;
+            int vertOrUVIdx2 = triCount * 3 + 2;
+            if (is_water_vertex[Idx0] == 10) continue;
+            if (is_water_vertex[Idx1] == 10) continue;
+            if (is_water_vertex[Idx2] == 10) continue;
+      
+
+            nonSharedVertices[strideVertIdx + vertOrUVIdx0] = sharedVertices[Idx0];
+            nonSharedVertices[strideVertIdx + vertOrUVIdx1] = sharedVertices[Idx1];
+            nonSharedVertices[strideVertIdx + vertOrUVIdx2] = sharedVertices[Idx2];
+
+            ushort texObjectIdx = tr2room.RoomData.Triangles[triCount].Texture;
+            Parser.Tr2ObjectTexture texObj = leveldata.ObjectTextures[texObjectIdx];
+           
+            //if(texTileIdx != prevTexture)
+            //{
+            //newMatCount +=1;
+            //prevTexture = texTileIdx;
+            ////print("newMatCount:"+ newMatCount);
+            //}
+			
+			SetFaceUVs(nonSharedUVs,strideVertIdx + vertOrUVIdx0, strideVertIdx + vertOrUVIdx1,strideVertIdx + vertOrUVIdx2, texObj);
+			int texture_idx = GetAnimatedTextureIndex(leveldata.AnimatedTextures, leveldata.NumAnimatedTextures, texObjectIdx);
+			if(texture_idx > -1)
+			{
+				texObj = leveldata.ObjectTextures[texture_idx];
+                SetFaceUVs(nonSharedUV2s, strideVertIdx + vertOrUVIdx0, strideVertIdx + vertOrUVIdx1, strideVertIdx + vertOrUVIdx2, texObj);
+            }
+          
+			////print("uv[Idx0]"+ uv[Idx0].x + " " + uv[Idx0].y);
+            ////print("uv[Idx1]"+ uv[Idx1].x + " " + uv[Idx1].y);
+
+            //ushort opacity = texObj.TransparencyFlags;  //isItOpacq
+
+            nonSharedTris[strideTriIdx + vertOrUVIdx0] = strideVertIdx + vertOrUVIdx0;
+            nonSharedTris[strideTriIdx + vertOrUVIdx1] = strideVertIdx + vertOrUVIdx1;
+            nonSharedTris[strideTriIdx + vertOrUVIdx2] = strideVertIdx + vertOrUVIdx2;
+
+            ////print ("idx0 - Idx1 - Idx2:" + nonSharedTris[strideTriIdx + vertOrUVIdx0]  + " " + 	nonSharedTris[strideTriIdx + vertOrUVIdx1]  + " " + nonSharedTris[strideTriIdx + vertOrUVIdx2] );
+        }
+
+        ////print("leveldata.Rooms[5].RoomData.NumRectangles:"+ tr2room.RoomData.NumRectangles);
+        //SetTriangles (triangles : int[], submesh : int) : void
+        //generate secondary uv set
+		
+        for (int i = 0; i < nonSharedVertices.Length; i++) { nonSharedVertices[i] = nonSharedVertices[i] * Settings.SceneScaling; }
+        Mesh mesh = new Mesh();
+        mesh.Clear();
+        mesh.vertices = nonSharedVertices;
+        mesh.uv = nonSharedUVs;
+        mesh.uv2 = nonSharedUV2s;
+        mesh.triangles = nonSharedTris;
+        //mesh.Optimize();
+        mesh.RecalculateNormals();
+#if UNITY_EDITOR
+        Vector4[] tangents = new Vector4[mesh.vertices.Length];
+        computeTangentsAndBinormals(nonSharedVertices, mesh.normals, nonSharedUVs, nonSharedTris, tangents);
+        mesh.tangents = tangents;
+        tangents = null;
+#endif
+        //free some memory
+        nonSharedVertices = null;
+        nonSharedUVs = null;
+        nonSharedUV2s = null;
+        nonSharedTris = null;
+
+
+        //}
+
+        return mesh;
+    }
+
+
+    public static Mesh CreateObjectMesh(Parser.Tr2Mesh tr2mesh , Parser.Tr2Level  leveldata)
 	{
 		Vector3[] sharedVertices = null;
 		if(tr2mesh.NumVertices> 0)
@@ -271,18 +469,8 @@ public class MeshBuilder  {
 			////print("newMatCount:"+ newMatCount);
 			//}
 			
-			nonSharedUVs[vertOrUVIdx0].x = (float) TextureUV.AdjustTextureCoordinateX((byte)texObj.Vertices[0].Xpixel,(sbyte)texObj.Vertices[0].Xcoordinate,texTileIdx);
-			nonSharedUVs[vertOrUVIdx0].y = (float) TextureUV.AdjustTextureCoordinateY((byte)texObj.Vertices[0].Ypixel,(sbyte)texObj.Vertices[0].Ycoordinate,texTileIdx);
-			
-			nonSharedUVs[vertOrUVIdx1].x = (float) TextureUV.AdjustTextureCoordinateX((byte)texObj.Vertices[1].Xpixel,(sbyte)texObj.Vertices[1].Xcoordinate,texTileIdx);
-			nonSharedUVs[vertOrUVIdx1].y = (float) TextureUV.AdjustTextureCoordinateY((byte)texObj.Vertices[1].Ypixel,(sbyte)texObj.Vertices[1].Ycoordinate,texTileIdx);
-			
-			nonSharedUVs[vertOrUVIdx2].x = (float) TextureUV.AdjustTextureCoordinateX((byte)texObj.Vertices[2].Xpixel,(sbyte)texObj.Vertices[2].Xcoordinate,texTileIdx);
-			nonSharedUVs[vertOrUVIdx2].y = (float) TextureUV.AdjustTextureCoordinateY((byte)texObj.Vertices[2].Ypixel,(sbyte)texObj.Vertices[2].Ycoordinate,texTileIdx);
-			
-			nonSharedUVs[vertOrUVIdx3].x = (float) TextureUV.AdjustTextureCoordinateX((byte)texObj.Vertices[3].Xpixel,(sbyte)texObj.Vertices[3].Xcoordinate,texTileIdx);
-			nonSharedUVs[vertOrUVIdx3].y = (float) TextureUV.AdjustTextureCoordinateY((byte)texObj.Vertices[3].Ypixel,(sbyte)texObj.Vertices[3].Ycoordinate,texTileIdx);
-			
+			SetFaceUVs(nonSharedUVs, vertOrUVIdx0,  vertOrUVIdx1, vertOrUVIdx2, vertOrUVIdx3,texObj);
+		
 			////print("uv[Idx0]"+ uv[Idx0].x + " " + uv[Idx0].y);
 			////print("uv[Idx1]"+ uv[Idx1].x + " " + uv[Idx1].y);
 			
@@ -320,7 +508,7 @@ public class MeshBuilder  {
 			
 			ushort texObjectIdx = tr2mesh.TexturedTriangles[triCount].Texture;
 			Parser.Tr2ObjectTexture texObj =  leveldata.ObjectTextures[texObjectIdx];
-			ushort texTileIdx = texObj.Tile;  //bind this textile in material?
+			
 			
 			//if(texTileIdx != prevTexture)
 			//{
@@ -329,15 +517,8 @@ public class MeshBuilder  {
 			////print("newMatCount:"+ newMatCount);
 			//}
 			
-			nonSharedUVs[strideVertIdx+vertOrUVIdx0].x = (float) TextureUV.AdjustTextureCoordinateX((byte)texObj.Vertices[0].Xpixel,(sbyte)texObj.Vertices[0].Xcoordinate,texTileIdx);
-			nonSharedUVs[strideVertIdx+vertOrUVIdx0].y = (float) TextureUV.AdjustTextureCoordinateY((byte)texObj.Vertices[0].Ypixel,(sbyte)texObj.Vertices[0].Ycoordinate,texTileIdx);
-			
-			nonSharedUVs[strideVertIdx+vertOrUVIdx1].x = (float) TextureUV.AdjustTextureCoordinateX((byte)texObj.Vertices[1].Xpixel,(sbyte)texObj.Vertices[1].Xcoordinate,texTileIdx);
-			nonSharedUVs[strideVertIdx+vertOrUVIdx1].y = (float) TextureUV.AdjustTextureCoordinateY((byte)texObj.Vertices[1].Ypixel,(sbyte)texObj.Vertices[1].Ycoordinate,texTileIdx);
-			
-			nonSharedUVs[strideVertIdx+vertOrUVIdx2].x = (float) TextureUV.AdjustTextureCoordinateX((byte)texObj.Vertices[2].Xpixel,(sbyte)texObj.Vertices[2].Xcoordinate,texTileIdx);
-			nonSharedUVs[strideVertIdx+vertOrUVIdx2].y = (float) TextureUV.AdjustTextureCoordinateY((byte)texObj.Vertices[2].Ypixel,(sbyte)texObj.Vertices[2].Ycoordinate,texTileIdx);
-			
+			SetFaceUVs(nonSharedUVs,strideVertIdx + vertOrUVIdx0, strideVertIdx + vertOrUVIdx1,strideVertIdx + vertOrUVIdx2, texObj);
+
 			
 			////print("uv[Idx0]"+ uv[Idx0].x + " " + uv[Idx0].y);
 			////print("uv[Idx1]"+ uv[Idx1].x + " " + uv[Idx1].y);
@@ -496,4 +677,92 @@ public class MeshBuilder  {
 		retval.layer = UnityLayer.Player;
 		return retval;
 	}
+	
+	static void SetFaceUVs(Vector2[] nonSharedUVs, int vertOrUVIdx0, int vertOrUVIdx1, int vertOrUVIdx2, int vertOrUVIdx3, Parser.Tr2ObjectTexture texObj)
+	{
+		 ushort texTileIdx = texObj.Tile;  //bind this textile in material?
+		
+		nonSharedUVs[vertOrUVIdx0].x = (float) TextureUV.AdjustTextureCoordinateX((byte)texObj.Vertices[0].Xpixel,(sbyte)texObj.Vertices[0].Xcoordinate,texTileIdx);
+		nonSharedUVs[vertOrUVIdx0].y = (float) TextureUV.AdjustTextureCoordinateY((byte)texObj.Vertices[0].Ypixel,(sbyte)texObj.Vertices[0].Ycoordinate,texTileIdx);
+			
+		nonSharedUVs[vertOrUVIdx1].x = (float) TextureUV.AdjustTextureCoordinateX((byte)texObj.Vertices[1].Xpixel,(sbyte)texObj.Vertices[1].Xcoordinate,texTileIdx);
+		nonSharedUVs[vertOrUVIdx1].y = (float) TextureUV.AdjustTextureCoordinateY((byte)texObj.Vertices[1].Ypixel,(sbyte)texObj.Vertices[1].Ycoordinate,texTileIdx);
+			
+		nonSharedUVs[vertOrUVIdx2].x = (float) TextureUV.AdjustTextureCoordinateX((byte)texObj.Vertices[2].Xpixel,(sbyte)texObj.Vertices[2].Xcoordinate,texTileIdx);
+		nonSharedUVs[vertOrUVIdx2].y = (float) TextureUV.AdjustTextureCoordinateY((byte)texObj.Vertices[2].Ypixel,(sbyte)texObj.Vertices[2].Ycoordinate,texTileIdx);
+			
+		nonSharedUVs[vertOrUVIdx3].x = (float) TextureUV.AdjustTextureCoordinateX((byte)texObj.Vertices[3].Xpixel,(sbyte)texObj.Vertices[3].Xcoordinate,texTileIdx);
+		nonSharedUVs[vertOrUVIdx3].y = (float) TextureUV.AdjustTextureCoordinateY((byte)texObj.Vertices[3].Ypixel,(sbyte)texObj.Vertices[3].Ycoordinate,texTileIdx);
+	}
+	
+	static void SetFaceUVs(Vector2[] nonSharedUVs, int vertOrUVIdx0, int vertOrUVIdx1, int vertOrUVIdx2, Parser.Tr2ObjectTexture texObj)
+	{
+		 ushort texTileIdx = texObj.Tile;  //bind this textile in material?
+		
+		nonSharedUVs[vertOrUVIdx0].x = (float) TextureUV.AdjustTextureCoordinateX((byte)texObj.Vertices[0].Xpixel,(sbyte)texObj.Vertices[0].Xcoordinate,texTileIdx);
+		nonSharedUVs[vertOrUVIdx0].y = (float) TextureUV.AdjustTextureCoordinateY((byte)texObj.Vertices[0].Ypixel,(sbyte)texObj.Vertices[0].Ycoordinate,texTileIdx);
+			
+		nonSharedUVs[vertOrUVIdx1].x = (float) TextureUV.AdjustTextureCoordinateX((byte)texObj.Vertices[1].Xpixel,(sbyte)texObj.Vertices[1].Xcoordinate,texTileIdx);
+		nonSharedUVs[vertOrUVIdx1].y = (float) TextureUV.AdjustTextureCoordinateY((byte)texObj.Vertices[1].Ypixel,(sbyte)texObj.Vertices[1].Ycoordinate,texTileIdx);
+			
+		nonSharedUVs[vertOrUVIdx2].x = (float) TextureUV.AdjustTextureCoordinateX((byte)texObj.Vertices[2].Xpixel,(sbyte)texObj.Vertices[2].Xcoordinate,texTileIdx);
+		nonSharedUVs[vertOrUVIdx2].y = (float) TextureUV.AdjustTextureCoordinateY((byte)texObj.Vertices[2].Ypixel,(sbyte)texObj.Vertices[2].Ycoordinate,texTileIdx);
+			
+	}
+	
+	static int GetAnimatedTextureIndex(short[] AnimatedTextures, int NumAnimatedTextures, ushort SearchIndex)
+	{
+		//AnimatedTextures is variable length record
+		
+		int index = 1;
+		int headerindex = index;
+		short numids = (short)(AnimatedTextures[1] + 1);  //origininal num is encrypted by reducing value 1
+	
+		bool animated_texture_found = false; 
+		int textureframeid = 0;
+
+        //Debug.Log("header  " + numids);
+
+        /*for(int i = 1; i < NumAnimatedTextures; i++ )
+        {
+            Debug.Log("rec val " + AnimatedTextures[i] + " search index " + SearchIndex);
+        }
+
+        Debug.Log("-----------------------");
+
+        return -1;*/
+
+        while (index < NumAnimatedTextures)
+		{
+		    if(index > (headerindex + numids) )  //set new header
+			{
+				headerindex = index;
+				numids = (short)(AnimatedTextures[index] + 1);
+				textureframeid = 0;
+                //Debug.Log("header  " + numids);
+            }
+			else //record body
+			{
+				if(SearchIndex == AnimatedTextures[index]) //lookup SearchIndex in AnimatedTextures group
+				{
+				    animated_texture_found = true;
+				    //Debug.Log("found animated texture " + textureframeid + " " + SearchIndex);
+					break;
+				}
+                textureframeid++;
+   
+            }
+				
+			index ++;
+		}
+			
+		if(animated_texture_found) 
+		{
+            int next_animated_texture_offset = ((textureframeid + 1) % (numids - 1)) + 1;
+            return AnimatedTextures[headerindex + next_animated_texture_offset];
+		}
+     
+		return SearchIndex;
+	}
+	
 }

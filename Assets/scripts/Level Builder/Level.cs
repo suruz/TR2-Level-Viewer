@@ -32,6 +32,16 @@ public class Level
     public delegate bool AttachBehaviourScript(GameObject AI, int ObjectID, GameObject player, Parser.Tr2Item tr2item);
     public static AttachBehaviourScript m_OnAttachBehabiourScript = AICallBackHandler.OnAttachingBehaviourToObject;
     public static Material m_SharedMaterial;
+	public static Material m_SharedMaterialWater;
+	public static Material m_SharedMaterialWaterHolder;
+	
+	public enum FloorAttribute{
+		Water,
+		Ice,
+		Metal,
+		Solid
+	}
+
     public Level(Parser.Tr2Level leveldata)
     {
         m_leveldata = leveldata;
@@ -44,8 +54,14 @@ public class Level
             //TextureUV.GenerateTextureTile ismoved to Loader.cs for better responsibility managment 
             //Trying to set assigned render material property, marks shared material as instance.
             //So change property of shared material before assign it to renderer.
-            
-            m_SharedMaterial.color = new Color(1f, 1f, 1f, 1.0f);
+            m_SharedMaterialWater = Resources.Load("water", typeof(Material)) as Material;
+			m_SharedMaterialWaterHolder = Resources.Load("water_holder", typeof(Material)) as Material;
+			//init materials
+			m_SharedMaterial.color = new Color(1f, 1f, 1f, 1.0f);
+			m_SharedMaterialWater.mainTexture = m_SharedMaterial.mainTexture;
+			m_SharedMaterialWater.color = new Color(14f/255f, 23f/255f, 21f/255f); //should be set by user
+			m_SharedMaterialWaterHolder.mainTexture = m_SharedMaterial.mainTexture;
+			m_SharedMaterialWaterHolder.color = m_SharedMaterialWater.color * 10;
 
             m_RoomExs = new RoomEx[m_leveldata.NumRooms];
 
@@ -92,14 +108,40 @@ public class Level
             for (int i = 0; i < m_leveldata.NumRooms; i++)
             {
                 Parser.Tr2Room tr2room = leveldata.Rooms[i];
-                Mesh roommesh = MeshBuilder.CreateRoomMesh(tr2room, m_leveldata);
+                bool has_water = false;
+                Mesh roommesh = MeshBuilder.CreateRoomMesh(tr2room, m_leveldata, ref has_water);
                 Vector3 position = new Vector3(m_leveldata.Rooms[i].info.x, 0, m_leveldata.Rooms[i].info.z);
-                GameObject go = CreateRoom(roommesh, position * Settings.SceneScaling, i);
+                GameObject go = CreateRoom(roommesh, position * Settings.SceneScaling, i, m_SharedMaterial,FloorAttribute.Solid);
                 go.transform.parent = m_LevelRoot.transform;
                 m_RoomExs[i] = go.AddComponent<RoomEx>();
                 //build room object
                 List<GameObject> objects = InstantiateStaticObjects(tr2room, i);
                 m_RoomExs[i].InitRoom(tr2room, objects);
+				
+				
+				if(leveldata.Rooms[i].Flags == 0x0001) //water filled room with no surface
+				{
+					 //override water holder material
+					MeshRenderer mr = go.GetComponent<MeshRenderer>();
+					mr.sharedMaterial = m_SharedMaterialWaterHolder;
+				}
+				else if(leveldata.Rooms[i].Flags == 65) //Is room water holder
+				{
+                    //override water holder material
+					 MeshRenderer mr = go.GetComponent<MeshRenderer>();
+					mr.sharedMaterial = m_SharedMaterialWaterHolder;
+				}
+
+               //create room water surface
+                if(has_water) //surface?
+                {
+					//create water surface
+                     roommesh = MeshBuilder.CreateRoomWaterMesh(tr2room, m_leveldata);
+                     go = CreateRoom(roommesh, position * Settings.SceneScaling, i, m_SharedMaterialWater,FloorAttribute.Water);
+                     go.name = "water_" + i;
+                }
+				
+				
             }
 
             m_MovableInstances = InstantiateDynamicObjects();
@@ -116,7 +158,7 @@ public class Level
     //TODO: Determine Unity Pro / Free version and use Transparent/Cutout/Diffuse if pro otherwise
     //use Diffuse in material
 
-    GameObject CreateRoom(Mesh mesh, Vector3 position, int roomidx)
+    GameObject CreateRoom(Mesh mesh, Vector3 position, int roomidx, Material material, FloorAttribute floor_attribute)
     {
 		MeshModifier.CullAlphaFace(ref mesh, m_LevelTextureTile);
 		
@@ -127,30 +169,38 @@ public class Level
 
         go.transform.position = position;
         go.transform.rotation = Quaternion.identity;
-        renderer.sharedMaterial = m_SharedMaterial;
+        renderer.sharedMaterial = material;
 
         //renderer.material.mainTexture = m_LevelTextureTile;
         //renderer.material.color = new Color(1f, 1f, 1f, 1.0f);
         renderer.castShadows = !Settings.EnableIndoorShadow;
         //renderer.material.SetTexture("_BumpMap", Bumptex);*/
-
-        //check for inertia tensor calculation!
-        if (mesh.bounds.extents.y == 0 || mesh.bounds.extents.x == 0 || mesh.bounds.extents.z == 0)
-        {
-            BoxCollider cldr = go.AddComponent<BoxCollider>();
-            cldr.isTrigger = true;
-        }
-        else
-        {
+		
+		
+		if(floor_attribute != FloorAttribute.Water)
+		{
+        	//check for inertia tensor calculation!
+        	if (mesh.bounds.extents.y == 0 || mesh.bounds.extents.x == 0 || mesh.bounds.extents.z == 0)
+        	{
+            	BoxCollider cldr = go.AddComponent<BoxCollider>();
+            	cldr.isTrigger = true;
+        	}
+        	else
+        	{
 #if (UNITY_5_3_OR_NEWER || UNITY_5_3)
-            MeshCollider cldr = go.AddComponent<MeshCollider>();
-            //room mesh tends to be concave, MeshCollider can not be used as trigger for this kind of mesh in unity 5.3 or higher
-            cldr.isTrigger = false;
+            	MeshCollider cldr = go.AddComponent<MeshCollider>();
+            	//room mesh tends to be concave, MeshCollider can not be used as trigger for this kind of mesh in unity 5.3 or higher
+            	cldr.isTrigger = false;
 #else
-             MeshCollider cldr = go.AddComponent<MeshCollider>();
-            cldr.isTrigger = true;
+             	MeshCollider cldr = go.AddComponent<MeshCollider>();
+            	cldr.isTrigger = true;
 #endif
-        }
+        	}
+		}
+		else
+		{
+			go.AddComponent<WaterEffect>();
+		}
 
         /*Rigidbody rb = go.AddComponent<Rigidbody>();
 		rb.isKinematic = true;
@@ -449,7 +499,7 @@ public class Level
             lt.spotAngle = 70;
             lt.intensity = 5;
 
-            FlashLight.transform.parent = m_Player.transform.FindChild("objPart:0");//.Find("objPart:7").Find("objPart:14");
+            FlashLight.transform.parent = m_Player.transform.Find("objPart:0");//.Find("objPart:7").Find("objPart:14");
             FlashLight.transform.position = FlashLight.transform.parent.position;
             FlashLight.transform.forward = FlashLight.transform.parent.forward;
             lt.enabled = false;
@@ -460,7 +510,13 @@ public class Level
             PlayerCollisionHandler playercollider = go.AddComponent<PlayerCollisionHandler>();
 
             //Initialise Current Active Room for player
+			player.m_AnimStatePlayer = stateplayer;
             player.m_Room = SetRoomForPlayer();
+			if( player.m_Room !=null)
+			{
+				Debug.Log("Player Rooms: " +  player.m_Room .name);
+				player.SetSwimState( player.m_Room );
+			}
             AICondition.SetActive(m_Player, true);
 			
 			//set every game object under player as player
@@ -586,8 +642,20 @@ public class Level
                         Parser.Tr2RoomSector[] sector = m_leveldata.Rooms[r].SectorList;
                         int fdid = sector[sectorid].FDindex;
                         ushort fd = m_leveldata.FloorData[fdid];
-
-
+                        
+						/*
+						 * determine sector height info
+						 * 
+						 * 
+						
+						float celh = (float)sector[sectorid].Ceiling * Settings.SceneScaling * 256;
+					    float florh = -(float)sector[sectorid].Floor * Settings.SceneScaling * 256;
+						
+						m_RoomExs[r].m_CeilingHeight = celh;
+						m_RoomExs[r].m_FloorHeight = florh;
+						*/
+						
+						
                         //determine if floor data is a single function
                         //Function:         bits 0..7 (0x00FF)
                         //Sub Function:    	bits 8..14 (0x7F00)
