@@ -509,8 +509,22 @@ Filtering room water mesh by using  Attributes property of Tr2VertexRoom.Tr2Vert
 water surface is composed of two meshes front facing mesh and backfacing mesh.
 back facing mesh using usially includes tub wall 
 
+16/10/2017
+Update KeyMapper.cs to adapt new swimming actions. Added new algorithm to generate 
+defragmented interface code. In turn it reduces interface array length. So, it is possible
+add new layers of interface.
+
+17/10/2017
+Added method MeshBuilder.GetAnimatedTextureIndex() to genarate second
+UV set for animated frame in texture atlas. This was used for ripple
+texture animation on water surface.
+
 22/10/2017
-Determined swmimming sates in water using water surfce and room info.
+Determined swmimming sates in water using water surfce and room info. In the process
+I had to fix bug in Parser.Tr2RoomInfo(), It was a typo bug while parsing
+Parser.Tr2RoomInfo. This bug was giving wrong Parser.Tr2RoomInfo.yTop. As a result
+it was creating problem in water room depth measurement.
+
 
 Layers:
 Normal
@@ -544,3 +558,13 @@ state transition we should handle:
 
 we need adjust follow camera allowing third persion under deep under water swimming view, where forward and back will controll character tilt,
 jump will thurst character forward
+
+
+Fixed unable to change height in deepwater swimming due to addition height fix in Update, this height fix could be easily done by
+standard free fall algorithm.
+
+ if (m_SwimState != SwimmingState.InDeepWater)
+ {
+        float h = Mathf.Lerp(transform.position.y, m_GroundHeight, Time.deltaTime * 10.0f);// + 0.1f;
+        transform.position = new Vector3(transform.position.x, h, transform.position.z);
+  }
