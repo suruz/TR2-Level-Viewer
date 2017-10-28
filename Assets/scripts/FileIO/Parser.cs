@@ -814,7 +814,7 @@ public class Parser
                 x = System.BitConverter.ToInt32(buffer, 0),
                 z = System.BitConverter.ToInt32(buffer, 4),
                 yBottom = System.BitConverter.ToInt32(buffer, 8),
-                yTop = System.BitConverter.ToInt32(buffer, 8)       //typo bug: buffer offset was 8, fixed using 12
+                yTop = System.BitConverter.ToInt32(buffer, 12)       //typo bug: buffer offset was 8, fixed using 12
             };
         else if (type == typeof(Parser.Tr2VertexRoom))
             obj = (object)new Parser.Tr2VertexRoom()
