@@ -512,12 +512,21 @@ back facing mesh using usially includes tub wall
 16/10/2017
 Update KeyMapper.cs to adapt new swimming actions. Added new algorithm to generate 
 defragmented interface code. In turn it reduces interface array length. So, it is possible
-add new layers of interface.
+add new layers of interface. This fix reduces number of interfac key to reduce memory 
+foot print. keymaper statecode generator using simple keycount....
 
 17/10/2017
-Added method MeshBuilder.GetAnimatedTextureIndex() to genarate second
+Adding method MeshBuilder.GetAnimatedTextureIndex() to genarate second
 UV set for animated frame in texture atlas. This was used for ripple
 texture animation on water surface.
+
+Animated Textures : list of texture sequence
+ObjectTextures array
+I have to generate a list of animatable alternet uvs  for mesh. set shader flag water toggle to choose uv set
+
+Each face chooses as replacable texture id,
+If a texture id animatable we have to lookup it into AnimatedTexture group
+
 
 22/10/2017
 Determined swmimming sates in water using water surfce and room info. In the process
@@ -525,6 +534,8 @@ I had to fix bug in Parser.Tr2RoomInfo(), It was a typo bug while parsing
 Parser.Tr2RoomInfo. This bug was giving wrong Parser.Tr2RoomInfo.yTop. As a result
 it was creating problem in water room depth measurement.
 
+Updaing LaraStatePlayer.cs to add new layers in Lara's state machine, to support her 
+polymorfic action at various depth in water.
 
 Layers:
 Normal
@@ -568,3 +579,5 @@ standard free fall algorithm.
         float h = Mathf.Lerp(transform.position.y, m_GroundHeight, Time.deltaTime * 10.0f);// + 0.1f;
         transform.position = new Vector3(transform.position.x, h, transform.position.z);
   }
+
+
