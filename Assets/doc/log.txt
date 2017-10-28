@@ -502,3 +502,45 @@ event generator.
 
 Purify Player.cs and make it representative of player model
 by removing resposibilty external to this class
+
+12/10/2017
+
+Filtering room water mesh by using  Attributes property of Tr2VertexRoom.Tr2VertexRoom.
+water surface is composed of two meshes front facing mesh and backfacing mesh.
+back facing mesh using usially includes tub wall 
+
+22/10/2017
+Determined swmimming sates in water using water surfce and room info.
+
+Layers:
+Normal
+Shallow water movement(idle, 177 wading, 192 jump up transition)
+Inwater movement   (108 idle, 86 swim, jumpx, 130, 206 pickup)
+water surface movement (110 idle, 116 move,jumpx, pullup)
+
+Select shallow layers
+if lara in water filled room && Lara's hip < room surface height
+
+Debug.Log("Anim ID: inwater swimming " + "86" + " " + "State ID:" +  tranimations[86].stateid);    //17
+		Debug.Log("Anim ID: inwater idle " + "108" + " " + "State ID:" +  tranimations[108].stateid);    //13
+
+
+spote bug in following code, hint: disable debug log
+
+if(from == statemap[KeyMapper.Idle])
+Debug.Log("Cross fade from: " + from.AnimationID + " to:" + unitystatechange.stateid + " nstatechange: "+ nstatechange );
+CrossFadeHandler();
+
+
+23/10/2017
+We need fluid transition swmimming state and normal movement.
+
+state transition we should handle:
+1. water dive (in shallow water, in deep water).
+2. pull up (from deep water).
+3. walkup (from shallow water).
+4. deep water to shalow water movement( vice versa), considering underwater surface and wall collision system allowing free swimming
+
+
+we need adjust follow camera allowing third persion under deep under water swimming view, where forward and back will controll character tilt,
+jump will thurst character forward
