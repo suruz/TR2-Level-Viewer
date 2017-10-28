@@ -814,7 +814,7 @@ public class Parser
                 x = System.BitConverter.ToInt32(buffer, 0),
                 z = System.BitConverter.ToInt32(buffer, 4),
                 yBottom = System.BitConverter.ToInt32(buffer, 8),
-                yTop = System.BitConverter.ToInt32(buffer, 8)
+                yTop = System.BitConverter.ToInt32(buffer, 8)       //typo bug: buffer offset was 8, fixed using 12
             };
         else if (type == typeof(Parser.Tr2VertexRoom))
             obj = (object)new Parser.Tr2VertexRoom()
@@ -1012,14 +1012,14 @@ public class Parser
         else if (type == typeof(Parser.Tr2CinematicFrame))
             obj = (object)new Parser.Tr2CinematicFrame()
             {
-                rotY = System.BitConverter.ToInt16(buffer, 2),
+                rotY = System.BitConverter.ToInt16(buffer, 0),   //fixed typo bug where all offset was set to 2
                 rotZ = System.BitConverter.ToInt16(buffer, 2),
-                rotZ2 = System.BitConverter.ToInt16(buffer, 2),
-                posZ = System.BitConverter.ToInt16(buffer, 2),
-                posY = System.BitConverter.ToInt16(buffer, 2),
-                posX = System.BitConverter.ToInt16(buffer, 2),
-                Unknown1 = System.BitConverter.ToInt16(buffer, 2),
-                rotX = System.BitConverter.ToInt16(buffer, 2)
+                rotZ2 = System.BitConverter.ToInt16(buffer, 4),
+                posZ = System.BitConverter.ToInt16(buffer, 6),
+                posY = System.BitConverter.ToInt16(buffer, 8),
+                posX = System.BitConverter.ToInt16(buffer, 10),
+                Unknown1 = System.BitConverter.ToInt16(buffer, 12),
+                rotX = System.BitConverter.ToInt16(buffer, 14)
             };
         return obj;
     }
