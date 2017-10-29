@@ -8,7 +8,7 @@ public class WaterEffect : MonoBehaviour {
     static Material _Material;
 	void Start ()
     {
-        _Material = GetComponent<MeshRenderer>().sharedMaterial;
+		GetWaterMaterial(); //load water material only once!
     }
 	
 	// Update is called once per frame
@@ -24,6 +24,11 @@ public class WaterEffect : MonoBehaviour {
 
     public static Material GetWaterMaterial()
     {
+		if(_Material==null)
+		{
+			_Material = Resources.Load("water", typeof(Material)) as Material;
+		}
+		
         return _Material;
     }
 }
