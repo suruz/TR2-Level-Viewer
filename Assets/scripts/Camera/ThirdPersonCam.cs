@@ -146,25 +146,29 @@ public class ThirdPersonCam : MonoBehaviour {
 			Bounds b = new Bounds(new Vector3(x,bottom,z),  new Vector3(room_width, surface - bottom, room_depth));
 			b.SetMinMax(new Vector3(x,bottom,z), new Vector3(x + room_width, surface, z + room_depth));
 			
-			Material room_mat = player.m_Room.GetRoomMaterial();
-            Color water_color =  WaterEffect.GetWaterMaterial().color * 10;
+			//Material room_mat = player.m_Room.GetRoomMaterial();
+            //Color water_color =  WaterEffect.GetWaterMaterial().color * 10;
 			
-			/*if(b.Contains(transform.position))
+			if(b.Contains(transform.position))
 			{
 				//Debug.Log("Camera In Water");
-				if(room_mat.color != water_color)
-				{
-					room_mat.color = water_color;
-				}
+				//if(room_mat.color != water_color)
+				//{
+					//room_mat.color = water_color;
+				//}
+				
+				DayNightSystem.SetAmbientTint(1);
 			}
 			
 			if(transform.position.y > surface)
 			{
-				if(room_mat.color != Color.white)
-				{
-					room_mat.color = Color.white;
-				}
-			}*/
+				//if(room_mat.color != Color.white)
+				//{
+					//room_mat.color = Color.white;
+				//}
+				
+				DayNightSystem.SetAmbientTint(0);
+			}
 		}
 	}
 	
