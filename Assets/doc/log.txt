@@ -581,3 +581,15 @@ standard free fall algorithm.
   }
 
 
+28/10/2017
+
+Water effect shader AlphaTest-Water is not working when AlphaTest-Diffuse is used for room. strange!
+
+29/10/2017
+
+After carefull looking trough shader files it truned out that  AlphaTest-Diffuse and AlphaTest-Water using same
+render sorting order. I changed AlphaTest-Water sort order higher than that of AlphaTest-Diffuse. 
+Problem Solved!
+
+Optimizing Water Effect controller by using it as singleton.... 
+Creating Water Effect prefav....
