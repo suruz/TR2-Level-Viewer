@@ -29,6 +29,8 @@ public class DayNightSystem : MonoBehaviour {
 	public static event GUIDayTimeUpdateDelegate OnDayTimeUpdate;
 	Light light; //builtin property light has been deprecated since unity5.
 	public AnimationCurve _IntensitySampler = AnimationCurve.Linear(0,0,1,1);
+	
+	static float _AmbientTint = 0; //Useful for ambient water tint
 	// Use this for initialization
 	void Start () 
 	{
@@ -105,8 +107,7 @@ public class DayNightSystem : MonoBehaviour {
 			{
 				intensity = 0.75f;
 			}
-			RenderSettings.ambientLight =  Color.white * intensity;
-			
+			RenderSettings.ambientLight =  new Color(Mathf.Lerp(1, 0.5f, _AmbientTint),1,1)  * intensity;
 		}
 
 		//Debug.DrawLine(LightTarget.position,_Transform.position );
@@ -146,5 +147,9 @@ public class DayNightSystem : MonoBehaviour {
 	{
 		OnDayTimeUpdate+=handler;
 	}
-
+	
+	static public void SetAmbientTint(float tint_intensity)
+	{
+		_AmbientTint = tint_intensity;
+	}
 }
