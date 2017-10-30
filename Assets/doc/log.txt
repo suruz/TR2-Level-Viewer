@@ -593,3 +593,16 @@ Problem Solved!
 
 Optimizing Water Effect controller by using it as singleton.... 
 Creating Water Effect prefav....
+
+30/10/2017
+
+planing transition while swmimming, surface water movement:
+During this state, 
+
+- player tilt is not allowed.
+- player can pull up her using nearby platform
+- player can dive in deep water
+- player can move to shallow water ( transition from treading to wadding)
+
+While in shallow water,
+- player can move to deep water surface ( transition from wadding to treading)
