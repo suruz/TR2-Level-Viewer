@@ -148,7 +148,7 @@ public class Level
                     mr.sharedMaterial.SetTexture("_MainTex", m_SharedMaterialWaterHolder.mainTexture);
                     mr.sharedMaterial.SetColor("_Color", m_SharedMaterialWaterHolder.color);
                     mr.sharedMaterial.SetFloat("_InSideWater", 0);
-
+                    m_InstancedMaterialWaterHolders.Add(mr.sharedMaterial);
 
 
                 }
