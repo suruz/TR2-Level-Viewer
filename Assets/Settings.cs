@@ -16,7 +16,7 @@ public class Settings  {
 													//Otherwise Unity Free features will be used.
 													//If you dont have unity pro set it to false
 	
-	public static float DayNightTimeSpeed = 1.0f;   //Must be >=0
+	public static float DayNightTimeSpeed = 0.1f;   //Must be >=0
 													//When 0 Day Night changes will not happen
 	public static float DayLightIntensity = 0.65f;  	//Controls amount of day light
 	

@@ -1,0 +1,1044 @@
+﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+
+/*15: Doberman
+		1: Walking
+		2: Running
+		3: Standing
+		4: Biting
+		5: Sitting on all fours
+		6: Standing and panting
+		7: Biting
+		8: Jumping and biting
+		9: Jumping and biting
+		10: Dying
+16: Masked goon (white mask, jacket)
+		1: Walking
+		2: Running
+		3: Standing and aiming gun
+		4: Standing and aiming gun
+		5: Standing and shaking head
+		6: Standing and aiming gun, bracing self
+		7: Firing gun, bracing self
+		9: Running while aiming gun
+		10: Standing and aiming gun
+		11: Firing gun
+		12: Dying
+		13: Dying
+17: Masked goon (white mask, vest)
+		0: Standing (animations recycled)
+		18: Masked goon (black mask)
+		0: Standing (animations recycled)
+				19: Knifethrower
+				1: Standing
+				2: Walking
+				3: Running
+				4: Throwing with right hand
+				5: Throwing with left hand
+				6: Throwing with left hand
+				7: Throwing with right hand
+				8: Throwing with both hands
+				9: Throwing with both hands
+				10: Dying
+				20: Shotgun goon
+				1: Standing, guns up
+				2: Standing, guns holstered
+				3: Walking, guns up
+				4: Running
+				5: Aiming right gun
+				6: Aiming left gun
+				7: Firing right gun
+				8: Firing left gun
+				9: Aiming both guns
+				10: Firing both guns
+				11: Dying
+				21: Rat
+				1: Running
+				2: Standing on all fours
+				3: Rearing up, biting?
+				4: Biting
+				5: Rearing up and biting
+				6: Dying
+				22: Dragon (front)
+				1: Walking
+				2: Walking, looking leftward
+				3: Walking, looking rightward
+				4: Rearing up
+				5: Breathing fire in reared-up position
+				6: Standing
+				7: Back to forward position
+				8: Walking
+				9: Raising left foot
+				10: Raising right foot
+				11: Dying
+				23: Dragon (back)
+				[various standing and walking states]
+				1:
+				2:
+				3:
+				6:
+				7:
+				8:
+				9:
+				10:
+				11: Dying
+				24: Gondola (Venetian boat)
+				[Seems to be static, as if animations were unused]
+				[Fragmentation probably hardcoded]
+				1:
+				2:
+				3:
+				4:
+				25: Shark
+				0: Standing still
+				1: Swimming
+				2: Swimming fast
+				3: Biting
+				4: Biting
+				5: Dying
+				6: Shaking victim in mouth
+				26: Yellow moray eel
+				1: Biting
+				2: Wiggling head
+				3: Dying
+				27: Black moray eel
+				1: Biting
+				2: Wiggling head
+				3: Dying
+				28: Barracuda / Whiskered Fish (white, yellow)
+				1: Standing still
+				2: Swimming
+				3: Swimming fast
+				4: Biting
+				5: Biting
+				6: Dying
+				29: Scuba diver
+				1: Swimming
+				2: Treading water
+				3: Swimming, wielding harpoon gun
+				4: Swimming, wielding harpoon gun
+				6: Treading water, wielding harpoon gun
+				7: Treading water, firing harpoon gun
+				9: Dying
+				30: Gun-wielding rig worker (khaki pants)
+				1: Walking
+				2: Standing
+				3: Standing with gun upward
+				4: Firing gun
+				5: Running
+				6: Grabbing gun
+				7: Dying
+				8: Aiming gun
+				9: Crouching and aiming gun
+				10: Crouching and firing gun
+				31: Gun-wielding rig worker (blue jeans)
+				1: Standing while wielding gun
+					2: Walking 324
+						3: Running
+						4: Standing with gun pointed downward
+						5: Firing gun
+						6: Running while firing gun
+							7: Dying
+								8: Aiming gun
+								9: Running and aiming gun
+								10: Crouching and aiming gun
+								11: Crouching and firing gun
+								32: Stick-wielding goon
+								1: Standing
+								2: Running
+								3: Big sideways hit
+								4: Hitting with stick
+								5: Standing, holding stick with both hands
+								6: Running, ready for big hit with stick
+									7: Standing, ready for big hit with stick
+										8: Making big hit with stick
+											9: Hitting with stick
+											10: Running, holding stick with both hands
+											11: Dying
+											12: Stepping up
+											13: Climbing up low ledge
+											14: Climbing up ledge
+											15: Jumping down from a ledge
+											33: Stick-wielding goon (can't climb)
+         1: Standing
+         2: Running
+         3: Big sideways hit
+         4: Hitting with stick
+         5: Standing, holding stick with both hands
+         6: Running, ready for big hit with stick
+         7: Standing, ready for big hit with stick
+         8: Making big hit with stick
+         9: Hitting with stick
+        10: Running, holding stick with both hands
+        11: Dying
+ 34: Flamethrower-wielding goon
+         1: Standing
+         2: Running
+         3: Running, holding nozzle horizontal
+         4: Standing, pointing nozzle downward
+         5: Firing
+         6: Firing while walking
+         7: Dying
+         8: Aiming
+         9: Aiming while running
+ 36: Spider
+         1: Standing
+         2: Crawling
+         3: Crawling
+         4: Biting
+         5: Jumping
+         6: Jumping
+         7: Dying
+ 37: Giant spider
+         1: Standing
+         2: Crawling
+         3: Crawling fast
+         4: Biting
+         7: Dying
+ 38: Crow
+         1: Flying
+         2: Flying in place
+         3: Flying
+         4: Dying
+         5: Dying
+         6: Pecking
+         7: Pecking
+39: Tiger / Snow leopard / White tiger
+         0: Dying
+         1: Standing
+         2: Walking
+         3: Leaping
+         5: Biting
+         6: Biting
+         7: Leaping and biting
+         8: Leaping and biting
+ 40: Marco Bartoli
+        [Only one state]
+ 41: Spear-wielding Xian Guard
+         1: Holding spears upward
+         2: Holding spears horizontal forward-right
+         3: Walking while pointing spears forward
+         4: Running while pointing spears forward
+         5: Picking up spears, pointing them backward
+         6: Pointing spears forward
+         7: Pointing spears downward and back
+         8: Pointing spears forward
+         9: Walking, moving right spear forward
+        10: Thrusting left spear forward
+        11: Walking, moving left spear forward
+        12: Thrusting right spear forward
+        13: Turning spears rightward
+        14: Turning spears leftward
+        15: Pulling up spears and pointing them back-downward
+        16: Twirling spears over head
+        18: Getting up from statue position
+        19: Spearing victim and tossing forward
+42: Spear-wielding Xian Guard statue
+        [Only one state]
+        [fragmenting probably hardcoded]
+43: Sword-wielding Xian Guard
+         1: Standing
+         2: Walking
+         3: Swinging sword back over head
+         4: Swinging sword forward over head
+         5: Swinging sword sideways to back
+         6: Swinging sword sideways to forward
+         7: Holding sword pointed downward
+         8: Flying while holding sword
+         9: Getting up from statue position
+        10: Moving sword back while walking (swing over shoulder / pull back)
+        11: Moving sword forward while walking (swing forward / thrust)
+44: Sword-wielding Xian Guard statue
+        [Only one state]
+        [fragmenting probably hardcoded]
+45: Yeti
+         1: Running
+         2: Standing
+         3: Walking
+         4: Punching
+         5: Reaching and swiping downward
+         6: Running and punching
+         7: Howling
+         8: Dying
+         9: Thumping chest
+        10: Stepping up
+        11: Climbing up a short ledge
+        12: Climbing up a ledge
+        13: Jumping down from a ledge
+        14: Holding victim and waving
+ 46: Bird monster (guards Talion)
+         1: Standing
+         2: Walking
+         3: Looking upward
+         4: Swiping downward
+         5: Getting ready to punch
+         6: Punching
+         7: Punching
+         8: Howling
+         9: Dying
+        10: Pulling arms out
+        11: Getting hands together in front
+ 47: Eagle
+         1: Flying
+         2: Perching?
+         3: Gliding
+         4: Dying
+         5: Dying
+         6: Pecking
+ 48: Mercenary
+         1: Standing
+         2: Walking
+         3: Running
+         4: Aiming gun
+         5: Firing gun
+         6: Aiming gun two-handed
+         7: Firing gun two-handed
+         8: Firing gun in a sweep
+         9: Firing gun in continued sweep
+        10: Aiming gun while walking
+        11: Aiming gun sideways
+        12: Aiming gun while walking
+        13: Dying
+        14: Firing gun while walking
+ 49: Mercenary (black ski mask, gray jacket)
+         1: Aiming gun while walking
+         2: Standing
+         3: Walking
+         4: Running
+         5: Aiming gun
+         6: Aiming gun two-handed
+         7: Firing gun
+         8: Aiming gun two-handed
+         9: Firing gun while walking
+        10: Firing gun while walking
+        11: Dying
+        12: Squatting and aiming
+        13: Squatting and firing
+ 50: Mercenary (black ski mask, brown jacket)
+        0: Standing (animations recycled)
+ 51: Black snowmobile (with guns)
+         1: Idle
+         2: Moving
+         3: Turning left
+         4: Turning right
+         5: Turning left
+         6: Turning right
+ 52: Mercenary snowmobile driver
+         1: Driving (idle)
+         2: Driving (moving)
+         3: Turning left
+         4: Turning right
+         5: Turning left
+         6: Turning right
+         7: Dying
+ 53: Monk with long stick
+         1: Standing and wielding stick
+         2: Walking
+         3: Running
+         4: Slicing with stick
+         5: Twirling stick and holding out hand
+         6: Stabbing forward with stick
+         7: Spearing with stick
+         8: Twirling stick overhead
+         9: Dying
+        10: Holding stick out and running
+        11: Holding stick and putting out hand
+ 54: Monk with knife-end stick
+         1: Standing and wielding stick
+         2: Walking
+         3: Running
+         4: Slicing with stick
+         5: Twirling stick and holding out hand
+         6: Stabbing forward with stick
+         7: Spearing with stick
+         8: Twirling stick to side and overhead
+         9: Dying
+        10: Holding stick out and running
+        11: Holding stick and putting out hand
+ 55: Collapsible floor
+         0: Stationary
+         1: Shaking
+         2: Falling
+         3: Settling down
+ 57: Loose boards
+         0: Stationary
+         1: Shaking
+         2: Falling
+         3: Settling down
+ 58: Swinging sandbag / spiky ball
+        [Only one state]
+ 59: Spikes / Glass shards
+        [Only one state]
+ 60: Boulder
+         0: Stationary
+         1: Rolling
+ 61: Disk (like dart)
+        [Only one state]
+ 62: Wall-mounted disk shooter (like dartgun)
+         0: Idle?
+         1: Firing?
+ 63: Drawbridge
+         0: Upward
+         1: On side
+ 64: Slamming door
+         0: Open
+         1: Closed
+ 65: Elevator
+         0: Doors closed
+         1: Doors open
+ 66: Minisub
+        [Only one state]
+ 67: Movable cubical block (pushable)
+         0: Stationary
+         1: Being pulled?
+         2: Being pushed?
+ 68: Movable cubical block (pushable)
+         0: Stationary
+         1: Being pulled?
+         2: Being pushed?
+ 69: Movable cubical block (pushable)
+         0: Stationary
+         1: Being pulled?
+         2: Being pushed?
+ 70: Movable cubical block (pushable)
+         0: Stationary
+         1: Being pulled?
+         2: Being pushed?
+ 71: Big bowl (Ice Palace)
+         0: Horizontal
+         1: Tipped
+ 72: Breakable window (can shoot out)
+        [Only one state]
+        [fragmenting probably hardcoded]
+ 73: Breakable window (must jump through)
+        [Only one state]
+        [fragmenting probably hardcoded]
+ 76: Airplane propeller
+         0: Spinning
+         1: Stopped
+ 77: Power saw
+         0: Spinning
+         1: Stopped
+ 78: Overhead pulley hook
+        [Only one state]
+ 79: Sandbag / Ceiling fragments
+         0: Stationary
+         1: Falling
+         2: Settling down
+ 80: Rolling spindle
+         1: Stationary
+         2: Rolling
+ 81: Wall-mounted knife blade
+         1: Extended
+         2: Pulled back
+ 82: Statue with knife blade
+         1: Pulled back
+         2: Extended
+ 83: Multiple boulders / snowballs
+         1: Rolling
+         2: Stopped
+ 84: Detachable icicles
+         1: Attached to ceiling
+         2: Falling
+         3: On ground
+ 85: Spiky movable wall
+        [Only one state]
+ 86: Bounce pad
+         0: Idle
+         1: Kicking upwards
+ 87: Spiky ceiling segment
+        [Only one state]
+ 88: Tibetan bell
+         0: Stationary
+         1: Swinging
+ 89: * Boat wake (Venice, Bartoli)
+ 90: * Snowmobile wake (Tibetan Foothills)
+ 91: Lara and a snowmobile
+        [Only one state]
+ 92: Wheel knob
+         0: Parent door closed
+         1: Parent door open
+ 93: Above-water switch
+         0: Off
+         1: On
+         [states may be reversed]
+ 94: Underwater propeller
+         0: Spinning
+         1: Stopped
+ 95: Air fan
+         0: Spinning
+         1: Stopped
+ 96: Swinging box / spiky ball
+        [Only one state]
+ 97: Gun-wielding rig worker / Marco Bartoli (unused?)
+ 98: Goon at the fancy door holding poison bottle / Gun-wielding rig worker
+ 99: Lara in cutscene
+100: * Frame (for indicator bars)
+101: Rolling storage drums
+         1: Rolling
+         2: Stopped
+102: Zipline handle
+         1: Moving
+         2: Settling down
+103: Above-water switch
+         0: Off
+         1: On
+         [states may be reversed]
+104: Above-water/underwater switch
+         0: Off
+         1: On
+         [states may be reversed]
+105: Underwater switch
+         0: Off
+         1: On
+         [states may be reversed]
+106: Door
+         0: Closed
+         1: Open
+107: Door
+         0: Closed
+         1: Open
+108: Door
+         0: Closed
+         1: Open
+109: Door
+         0: Closed
+         1: Open
+110: Door
+         0: Closed
+         1: Open
+111: Door (pulled upward in Temple of Xian)
+         0: Closed
+         1: Open
+112: Door (pulled upward in Temple of Xian)
+         0: Closed
+         1: Open
+113: Door (pulled upward)
+        0: Closed
+         1: Open
+114: Trapdoor (opens downward)
+         0: Closed
+         1: Open
+115: Trapdoor (opens downward)
+         0: Closed
+         1: Open
+116: Trapdoor (opens downward)
+         0: Closed
+         1: Open
+117: Bridge (flat)
+        [Only one state]
+118: Bridge (slope = 1)
+        [Only one state]
+119: Bridge (slope = 2)
+        [Only one state]
+120: Passport (opening up)
+        [Only one state]
+121: Stopwatch
+        [Only one state]
+122: Lara and butler picture
+        [Only one state]
+123: Goon at the fancy door / Monk
+124: Airplane cockpit / Marco Bartoli
+125: Fancy-door goon's gunflare / Crate lid / Minisub / Bartoli follower
+											                         126: Fancy-door goon's gun / Ceiling hook
+127: Fancy-door goon's gunflare / Marco Bartoli / Lara's boot (thrown) / Bartoli follower
+128: Laptop computer / Fabio / Marco Bartoli / Bartoli follower
+129: Crate / Bartoli follower
+130: Eros the Goon
+133: Passport (closed)
+        [Only one state]
+134: N-thingy (Playstation memory card?)
+        [Only one state]
+135: * Pistols
+136: * Shotgun
+137: * Auto pistols
+138: * Uzis
+139: * Harpoon gun
+140: * M16
+141: * Grenade launcher
+143: * Shotgun shells
+144: * Auto-pistol clips
+145: * Uzi clips
+146: * Harpoons
+147: * M16 clips
+148: * Grenades
+149: * Small medipack
+150: * Large medipack
+151: * Flares
+152: Flare
+        [Only one state]
+153: Sunglasses
+        [Only one state]
+154: Portable CD player
+        [Only one state]
+155: Direction keys
+        [Only one state]
+157: Pistol
+        [Only one state]
+158: Shotgun
+        [Only one state]
+159: Auto-pistol
+        [Only one state]
+160: Uzi
+        [Only one state]
+161: Harpoon gun
+        [Only one state]
+162: M16
+        [Only one state]
+163: Grenade launcher
+        [Only one state]
+164: Pistol ammo(?)
+        [Only one state]
+165: Shotgun ammo
+        [Only one state]
+166: Auto-pistol ammo
+        [Only one state]
+167: Uzi ammo
+        [Only one state]
+168: Harpoons
+        [Only one state]
+169: M16 ammo
+        [Only one state]
+170: Grenades
+        [Only one state]
+171: Small medipack
+        [Only one state]
+172: Large medipack
+        [Only one state]
+173: Flares (opening box)
+        [Only one state]
+174: * Puzzle 1
+175: * Puzzle 2
+176: * Puzzle 3 ? [unused]
+177: * Puzzle 4
+178: Puzzle 1
+        [Only one state]
+179: Puzzle 2
+        [Only one state]
+180: Puzzle 3 ? [unused]
+        [Only one state]
+181: Puzzle 4
+        [Only one state]
+182: Slot 1 empty
+        [Only one state]
+183: Slot 2 empty
+        [Only one state]
+184: Slot 3 empty ? [unused]
+        [Only one state]
+185: Slot 4 empty
+        [Only one state]
+186: Slot 1 full
+        [Only one state]
+187: Slot 2 full
+        [Only one state]
+188: Slot 3 full ? [unused]
+        [Only one state]
+189: Slot 4 full
+        [Only one state]
+190: * Dragon 1
+191: * Dragon 2
+192: * Dragon 3
+193: * Key 1
+194: * Key 2
+195: * Key 3
+196: * Key 4
+197: Key 1
+        [Only one state]
+198: Key 2
+        [Only one state]
+199: Key 3
+        [Only one state]
+200: Key 4
+        [Only one state]
+201: Lock 1
+        [Only one state]
+202: Lock 2
+        [Only one state]
+203: Lock 3
+        [Only one state]
+204: Lock 4
+        [Only one state]
+205: * Pickup 1
+206: * Pickup 2
+207: Pickup 1
+        [Only one state]
+208: Pickup 2
+        [Only one state]
+209: Dragon explosion effect (expanding netted bubble)
+        [Only one state]
+210: Dragon explosion effect (expanding netted bubble)
+        [Only one state]
+211: Dragon explosion effect (expanding solid bubble)
+        [Only one state]
+212: Lara's hips / Alarm
+											                         [Only one state]
+											                         213: Lara's hips
+        [Only one state]
+214: Tyrannosaur
+         1: Standing
+         2: Walking
+         3: Running
+         5: Dying
+         6: Bellowing
+         7: Biting
+         8: Shaking Head and Spitting Out
+215: Lara's hips
+											                         [Only one state]
+											                         216: Lara's hips
+        [Only one state]
+217: Lara's hips
+											                         [Only one state]
+											                         218: Dragon bones (front)
+											                         [Only one state]
+											                         219: Dragon bones (back)
+											                         [Only one state]
+											                         220: * Extra Fire (Ice Palace)
+											                         222: Aquatic Mine (Venice)
+											                         [Only one state]
+											                         223: Menu background (displayed when doing 3D-hardware rendering)
+											                         [Only one state]
+											                         224: * Gray disk
+											                         225: Gong-hammering animation
+											                         [Only one state]
+											                         226: Gong (Ice Palace)
+											                         [Only one state]
+											                         227: Detonator box
+											                         [Only one state]
+											                         228: Helicopter (Diving Area)
+											                         [Only one state]
+											                         229: * Grenade blast
+											                         230: * Splash
+											                         231: * Bubbles
+											                         233: * Blood splatter
+											                         234: * Green-white thing (Great Wall)
+											                         235: Flare burning?
+											                         [Only one state]
+											                         236: * Flash (looks like distant light)
+											                         238: * Bullet hit
+											                         239: * Sparkles (Floating Islands, Dragon's Lair)
+240: Gunflare
+        [Only one state]
+241: Gunflare (spiky)
+        [Only one state]
+243: Lara's hips
+											                 [Only one state]
+											                 244: Lara's hips
+        [Only one state]
+245: Rod?
+        [Only one state]
+246: * Flamethrower (repeat of grenade blast)
+247: Pointer?
+        [Only one state]
+248: Support?
+        [Only one state]
+249: Rod?
+        [Only one state]
+250: * Sprayed particles (Diving Area, Barkhang Monastery, Temple of Xian)
+252: * Fire
+253: Lara's hips
+											                 [Only one state]
+											                 254: Skybox
+											                 [Only one state]
+											                 255: * Standard symbols
+											                 256: Monk
+											                 [Only one state]
+											                 257: Lara's hips
+        [Only one state]
+259: Helicopter (The Great Wall)
+        [Only one state]
+260: The butler
+         1: Walking
+         2: Standing
+261: * Assault-course numerals and punctuation
+262: Lara's hips
+											                 [Only one state]
+											                 263: Shotgun
+											                 [Only one state]
+											                 264: Lara's hips
+        [Only one state]
+289: * Cellar artifact 1 (gold mask)
+290: * Cellar artifact 2 (rounded statue)
+291: * Cellar artifact 3 (flattened statue) 
+
+*/
+
+public class TigerStatePlayer : MonoBehaviour {
+
+	public Transform m_FollowTransform;
+	public Transform[] m_MateTransforms;
+
+	public List<TRAnimationClip> m_Clips = null;
+	public Parser.Tr2Item m_Tr2Item;
+
+	Animation m_Animation = null;
+	
+	State[] m_StateMap = null;
+	Action[] m_Actions = null;
+	Action m_CurrentAction = null;
+	State  m_CurrentState = null;
+	int m_PrevKeyState = 0;
+	int m_CurrentKeyState = 0;
+
+	public bool m_CrossFading = false;
+	public bool m_StateEnabled = true;
+	AnimationEvent m_AnimationEvent = null;
+	AnimationState m_CrossFadeState = null;
+	float m_CrossFadeTimeOut = 0.0f;
+
+	bool m_Collide = false;
+	float m_OnAirTime = 0.0f;
+	public bool m_OnAir = false;
+	float m_OnAirHeight = 0.0f;
+	bool m_FreeFall = false;
+	float m_FreeFallTime = 0.0f;
+	Vector3 m_FreePosition = Vector3.zero;
+	Vector3 m_JumpPosition = Vector3.zero;
+
+	float prevy = 0.0f;
+	float y = 0.0f;
+	
+	int Walk = 8;
+	int Jump = 3;
+	int Idle = 7;
+	int Run = 5;
+	int Attack = 4;
+
+	// Use this for initialization
+	void Start () 
+	{
+		//Tiger / Snow leopard / White tiger
+		//int Dying = 0;
+		//int Standing = 1;
+		//int Walking = 2;
+		//int Leaping = 3;
+		//int Biting0 = 5;
+		//int Biting1 = 6;
+		//int Leaping_biting0 = 7;
+		//int Leaping_biting1 = 8;
+
+		m_StateMap = new State[512];
+		m_Actions = new Action[512];
+
+		m_StateMap[Walk] = new State("Walk",m_Clips[Walk].stateid,Walk); 
+		m_StateMap[Walk].loop = true; 
+		m_StateMap[Walk].moving = true;  
+		m_StateMap[Walk].Speed = 2.0f;
+		m_Actions[Walk] = new Action("Walk"); 
+		m_Actions[Walk].AddState(m_StateMap[Walk],1,0); 
+
+		m_StateMap[Run] = new State("Run",m_Clips[Run].stateid,Run); 
+		m_StateMap[Run].loop = true; 
+		m_StateMap[Run].moving = true;  
+		m_StateMap[Run].Speed = 16.0f;
+		m_Actions[Run] = new Action("Run"); 
+		m_Actions[Run].AddState(m_StateMap[Run],1,0); 
+
+		m_StateMap[Idle] = new State("Idle",m_Clips[Idle].stateid,Idle);
+		m_StateMap[Idle].loop = true;
+		m_Actions[Idle] = new Action("Idle");
+		m_Actions[Idle].AddState(m_StateMap[Idle],1,0);
+
+		m_StateMap[Attack] = new State("Attack",m_Clips[Attack].stateid,Attack);
+		m_StateMap[Attack].loop = true;
+		m_Actions[Attack] = new Action("Attack");
+		m_Actions[Attack].AddState(m_StateMap[Attack],1,0);
+
+
+		m_Animation = GetComponent<Animation>();
+		m_PrevKeyState = m_CurrentKeyState = Walk;
+		m_CurrentAction = m_Actions[Walk];
+		m_CurrentState = m_Actions[Walk].state[0];
+		m_Animation.Play("" + m_CurrentState.AnimationID);
+		m_Animation.wrapMode = WrapMode.Loop;
+		m_CurrentAction.time = Time.time;
+		m_CrossFading = false;
+		m_StateEnabled = true;
+
+	}
+	
+	// Update is called once per frame
+	void Update () 
+	{
+		transform.forward = (m_FollowTransform.position - transform.position).normalized;
+		float dist = (m_FollowTransform.position - transform.position).magnitude;
+		if(dist > 1024)
+		{
+
+			if(m_CurrentState.moving  && !m_FreeFall)
+			{
+				Vector3 dir =   transform.forward;
+				transform.position = Vector3.Lerp(transform.position ,m_FollowTransform.position,Time.deltaTime);
+				//transform.position =  transform.position + dir * m_CurrentState.Speed * m_Clips[m_CurrentState.AnimationID].framerate ; 
+			}
+		
+			m_CurrentKeyState = Run;
+		}
+		else
+		{
+			m_CurrentKeyState = Attack;
+		}
+
+	
+		AnimationUpdate();
+	}
+
+
+	void AnimationUpdate()
+	{
+		if(!m_CrossFading && m_StateEnabled)
+		{
+			if(m_CurrentAction!= null && m_CurrentState!=null && m_CurrentState.AnimationID != -1 && !m_Collide)
+			{
+				//m_Animation.Play("" + m_CurrentState.AnimationID);
+				AnimationState animstate = m_Animation["" + m_CurrentState.AnimationID];
+				animstate.time = Time.time - m_CurrentAction.time;
+				//Debug.Log(animstate.speed);
+				if(Time.time - m_CurrentAction.time > animstate.length * 0.1f)
+				{
+					HandleState(animstate);
+				}
+				else if(Time.time - m_CurrentAction.time > animstate.length)
+				{
+					m_CurrentAction.time = Time.time;
+				}
+			}
+		}
+	}
+	
+	void HandleState(AnimationState animstate)
+	{
+		//if(m_CurrentKeyState == Idle)
+		
+		if(m_PrevKeyState != m_CurrentKeyState && m_OnAir == false)
+		{
+			//Debug.Log("["+ Time.time + "]" + " m_CurrentKeyState:" + m_CurrentKeyState + " m_PrevKeyState: "+ m_PrevKeyState);
+			GotoState(m_CurrentKeyState);
+			
+		}
+		else
+		{
+			/*if(m_CurrentAction!= null && m_CurrentState!=null && m_CurrentState.AnimationID != -1)
+			{
+				if(m_CurrentState.loop)
+				{
+					//m_CurrentState= m_CurrentAction.GetNextState();
+					StateCrossFade(m_CurrentState, m_CurrentAction.GetNextState());
+				}
+			}*/
+			
+		}
+		
+		
+	}
+	
+	void GotoState(int state)
+	{
+		/*if(state == Idle)
+		{
+			KeyMapper.reset = true;	
+		}*/
+		
+		m_PrevKeyState = state;
+		InitAction(state,Time.time);
+	}
+	
+	void InitAction(int keystate, float time )
+	{
+		if(m_Actions[keystate] != null)
+		{
+			m_CurrentAction.Reset();
+			State fromstate = m_CurrentAction.state[0];
+			State tostate = m_Actions[keystate].state[0];
+			m_CurrentAction = m_Actions[keystate];
+			m_CurrentAction.Reset();
+			m_CurrentKeyState = keystate;
+			m_PrevKeyState = keystate;
+			StateCrossFade(fromstate, tostate);
+		}
+	}
+
+	public static TRAnimStateChange gunitystatechange = null;
+	public static int animdispatchcount = 0;
+	
+	void StateCrossFade(State from, State to)
+	{
+		if(from!=null && from.StateID !=-1  && to!=null && to.StateID!= -1)
+		{
+			//Debug.Log("Cross fade");
+			//Debug.Log("Cross fade from: " + from.name + " to:" + to.name );
+			int nstatechange = 	m_Clips[from.AnimationID].statechanges.Count;
+			for(int statechangeid = 0; statechangeid < nstatechange; statechangeid++)
+			{	
+				TRAnimStateChange unitystatechange = m_Clips[from.AnimationID].statechanges[statechangeid];
+				if(unitystatechange.stateid == to.StateID)
+				{
+					gunitystatechange = unitystatechange;
+					animdispatchcount = 0;
+					m_CrossFading = true;
+					m_Animation.Stop();
+					m_CurrentState = to;
+					
+					//if(from == m_StateMap[Run])
+					//Debug.Log("Cross fade from: " + from.name + " to:" + to.name + " nstatechange: "+ nstatechange );
+					CrossFadeHandler();
+					return;
+					
+				}
+			}
+			
+			//if(from == m_StateMap[Jump])
+			//Debug.Log("Failed to Cross fade from: " + from.name + " to:" + to.name);
+			PlayCurrentState(to);
+			//if( from.StateID == Idle)
+			//{
+			//m_CurrentKeyState = Idle;
+			//}
+		}
+	}
+	
+	void CrossFadeHandler()
+	{
+		if(animdispatchcount < gunitystatechange.dispatchers.Count)
+		{
+			TRAnimDispatcher unityanimdispacher = gunitystatechange.dispatchers[animdispatchcount];
+			m_Animation.Play("" + unityanimdispacher.info.NextAnimation);
+			m_Animation.wrapMode = WrapMode.Once;
+			Invoke("CrossFadeHandler", m_Clips[unityanimdispacher.info.NextAnimation].endtime);
+			animdispatchcount = gunitystatechange.dispatchers.Count;
+		}
+		else
+		{
+			PlayCurrentState(m_CurrentState);
+		}
+	}
+
+	void PlayCurrentState(State state)
+	{
+		m_CrossFading = false;
+		if(m_CurrentAction!= null && state!=null && state.AnimationID != -1)
+		{
+			m_Animation.Play("" + state.AnimationID);
+			if(state.loop)
+			{
+				m_Animation.wrapMode = WrapMode.Loop;
+			}
+			else
+			{
+				m_Animation.wrapMode = WrapMode.Once;
+			}
+			m_CurrentAction.time = Time.time;
+			m_StateEnabled = true;
+			//m_OnAir = state.OnAir;
+			
+			/*if(m_OnAir)
+			{
+				m_OnAirHeight = 0.0f;
+				m_OnAirTime = Time.time;
+				m_JumpPosition = thistransform.position;
+				Vector3 jumpdir = thistransform.rotation * state.movedir;
+				physics.CalculateCurve(thistransform.position, (jumpdir + thistransform.up * 0.35f) * 2048, transform.rotation, (state.movedir.x + state.movedir.z)  );
+			}*/
+		}
+	}
+}
