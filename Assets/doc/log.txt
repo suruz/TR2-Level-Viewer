@@ -606,3 +606,205 @@ During this state,
 
 While in shallow water,
 - player can move to deep water surface ( transition from wadding to treading)
+
+2/11/2017
+
+ Devloping shader for underwater caustic effect.
+ shader works by taking center point of the room and modifing
+ vertex according to distance of vertex from center. 
+ generates spherical uv coord by normalizing vertex, generate lat-long
+ values using normalized vertex.
+
+ Adding new method RoomEx.GetCenterPoint() to support vertex modulation in
+ shader.
+ 
+ Calculating center point in  RoomEx.Init()
+
+ Note: Vertex shader input data provide vertex stream in model space...
+
+ 9/11/2017
+ 
+ modified under water vertex normals using world space vertex distance from world center, thus avoided
+ need to model space center per under water mesh. now it is also possible to use shared material for
+ underwater mesh.
+
+ conditional vertex modification... based on _InSideWater shader property.
+ During creation of level _InSideWater is set to 0
+
+ RoomEx.GetCenterPoint() now provide room center position in world space. It helps to determine
+ water plane Y position. Used this value for vertex modification bellow/over water surface. 
+
+ThirdPersonCam.CheckCameraInWater() determines _InSideWater value, Also added Level.GetWaterHolderMaterial() 
+for easy access of shared under water surface material.
+
+10/11/2017
+
+Refactored room bound calculation in ThirdPersonCam.CheckCameraInWater()
+
+Added method OnDestroy() in Player.cs to fix event handler access exception on destroy
+player.
+
+
+11/11/2017
+
+Swim state layering is done inside LaraStatePlayer based on original movement state + m_SwimState,
+In early version Player.cs was modified input state-code for layering, which was kinda hack!
+
+
+11/13/2017
+
+Removed  call back PrimaryAction of LaraStatePlayer. this call back lets player.cs return proxy state code
+to LaraStatePlayer. Instead of originating this call back in LaraStatePlayer and then handling in player.cs,
+PrimaryAction call is wraped in  player.cs on StateCodeHandler.
+
+Fixed pull up height calculation bug due to Lara's pivot position change in different swimming event
+(e.g, pivot on head during water surface movement)
+
+TODO:
+
+- define Wall hit test variable 
+
+- use Wall hit test flag to make system wait for end of existing state excution
+
+- variable for raycast length
+- wrap primary action handler for primary action in different swim state
+- add offset in LaraStateMap defination array, instead of hard coded array for better code reusibility
+
+
+possible issue could be OnStandingUp() ->  FlickerPos = new Vector3(t.position.x, PullUpTarget.y + m_JumpHeight, t.position.z);
+
+Use common wrapper method for raising custom state code. but problem is  m_AnimStatePlayer.StateCodeHandler is not easily customizable
+    void FireStateCode(int keystate, int otherkey, float time)
+    {
+        if (m_AnimStatePlayer != null)
+        {
+            m_AnimStatePlayer.StateCodeHandler(keystate, otherkey, time);
+        }
+    }
+
+
+Renamed Player.JumpTarget as JumpVector for better meanning
+
+Added Common movement checker method Player.IsInMovement()
+
+  bool IsInMovement()
+    {
+        return   (m_bJumping || m_bPullingUp || m_bWalkingUp || m_bStandingUp) ;
+    }
+
+
+11/14/2017
+
+Considering while in water player have to go through different water layer. How to handle that?
+
+
+      /*
+             * TODO:
+             * Extension: check here for possible room change ( e.g dive in water room)
+             * 
+             * */
+
+11/15/2017
+
+Noticed unexpected cross level effect due to 
+
+static float DayNightSystem:: _AmbientTint ;
+static SwimmingState LaraStatePlayer:: m_SwimState;
+
+m_SwimState carried swimming state from one level to another,
+_AmbientTint  carried water color tint  from one level to another.
+
+Even after scene unload.
+
+static is a power tool. But use it carefully. Use static only in singleton use case.
+
+11/19/2017
+
+Used instanced waterholder material to handle vertex modulation bellow water surface for
+water holders with different water level. Added method in Level.SetInstancedWaterHolderMaterials(int inwater)
+
+Remapped KeyMapper.cs to allow more actions (e.g. free fall, diving into water)
+
+Fixed free fall physics Update()
+
+found interesting typo in Player.InputUpdate()
+
+intended syntax 
+
+if(condition)
+{
+	return;
+}
+
+actually written
+
+ if (condition) return;
+ {
+
+ }
+
+
+	public void InputUpdate()
+    {
+        if (m_bFreeFall || IsInMovement()) return; // intended to return, but not intended to include rest of the code, but still it works! guess why? 
+
+        {
+            m_PlayerYaw += mouse_dx * 0.5f;
+            mouse_dx = 0;
+            //Debug.Log("m_PlayerYaw " + m_PlayerYaw);
+
+            if (m_SwimState == SwimmingState.InDeepWater)
+            {
+                m_PlayerTilt -= mouse_dy;
+                mouse_dy = 0;
+            }
+            else //dont tilt up in water surface or on land
+            {
+                m_PlayerTilt = 0;
+            }
+          
+            transform.rotation = Quaternion.Euler(m_PlayerTilt, m_PlayerYaw, 0.0f);
+
+        }
+    }
+
+
+	20/11/2017
+
+	Remapped KeyMapper.cs to allow more actions (e.g. free fall, diving into water)
+	TODO:
+	- Compose jump physics using normal jump and free fall ( another word detect falling part of jump physics)
+	- Change falling animation depending on current fall displacement
+
+	Devloping diving state machine....
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
