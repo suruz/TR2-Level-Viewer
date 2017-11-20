@@ -65,8 +65,9 @@ Shader "WaterEffect" {
 		   {
 			   if (vertex.y < _CenterY)
 			   {
-				   //distance = length(mul(unity_ObjectToWorld, v.vertex));
-				   v.vertex += fixed4(0.01, 0.1, 0.01, 0) * sin(rad * 0.01)  * 0.5;
+				   distance = length(vertex);
+				   float sinrad = sin(3.14 * distance * _Time.y * 0.01) * 2;
+				   v.vertex += fixed4(0.01, 0.02, 0.01, 0) * sinrad;
 			   }
 		   }
       }
