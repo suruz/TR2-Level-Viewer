@@ -7,7 +7,7 @@ public class Settings  {
 	// These IDs are useful for detecting
 	// individual tr2 movable item.
 	
-	public static bool ForceOpenAllDoors = false;    //Force open all doors in level
+	public static bool ForceOpenAllDoors = true;    //Force open all doors in level
 	public static bool ForceDisableAllBoulder = false;  //Force disable all boulder in level
 	
 	public static bool EnableIndoorShadow = false; 	//If enabled indoor objects will cast shadow
