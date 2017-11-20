@@ -869,7 +869,10 @@ public class Player : ObjectExt
 		}
         PlayerCollisionHandler.ResizeNormalCollider();
 		m_HipHeightAdjust = -0.1f;
-        physics.SetFreeFallSpeed(1f);
+        if (physics != null)
+        {
+            physics.SetFreeFallSpeed(1f);
+        }
     }
 
     void SetSwimStateDiving()
@@ -882,7 +885,10 @@ public class Player : ObjectExt
         }
         PlayerCollisionHandler.ResizeSwimmCollider();
         m_HipHeightAdjust = 0.0f;
-        physics.SetFreeFallSpeed(0.085f);
+        if (physics != null)
+        {
+            physics.SetFreeFallSpeed(0.085f);
+        }
     }
 
     void OnDestroy()
