@@ -19,7 +19,7 @@ public class AICallBackHandler : MonoBehaviour {
 
 		bool retval = false;
         //TEST: if(ObjectID == 32 || ObjectID == 15 ) return false;
-
+ 
 
         if (ObjectID == 15)
 		{
