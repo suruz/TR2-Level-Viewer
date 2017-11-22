@@ -10,6 +10,7 @@ public class MeshBuilder  {
         byte[] is_water_vertex = null;
         if (tr2room.RoomData.NumVertices > 0)
         {
+            int LightMode = tr2room.LightMode;
             int NumVertices = tr2room.RoomData.NumVertices; // optimized for field access
             Parser.Tr2VertexRoom[] Vertices = tr2room.RoomData.Vertices;
             sharedVertices = new Vector3[NumVertices];
@@ -32,167 +33,200 @@ public class MeshBuilder  {
                     has_water = true;
                 }
             }
+
+
+            //warning: avariable lengh array in a structure can cause access violence
+
+
+            //if(tr2room.RoomData.NumRectangles > 0)
+            //{
+
+            //selected_texObjectIdx = tr2room.RoomData.Rectangles[0].Texture;
+            //selected_texObj =  leveldata.ObjectTextures[selected_texObjectIdx];
+            //selected_texTileIdx = selected_texObj.Tile;
+            int NumRectangles = tr2room.RoomData.NumRectangles; // optimized for field access
+            int strideVertIdx = (NumRectangles * 4);
+            int strideTriIdx = (NumRectangles * 3 * 2);
+
+            int numNonsharedVertices = strideVertIdx + (tr2room.RoomData.NumTriangles * 3);
+            int numNonsharedTris = strideTriIdx + (tr2room.RoomData.NumTriangles * 3);
+
+            Vector3[] nonSharedVertices = new Vector3[numNonsharedVertices];
+            Vector2[] nonSharedUVs = new Vector2[numNonsharedVertices];
+            Vector2[] nonSharedUV2s = new Vector2[numNonsharedVertices];
+            Color[] nonSharedColor = new Color[numNonsharedVertices];
+
+            int[] nonSharedTris = new int[numNonsharedTris];
+
+            //triangles = new int[num_rectangles * 3 * 2];
+            Parser.Tr2Face4[] Rectangles = tr2room.RoomData.Rectangles; // optimized for field access
+            for (int rectCount = 0; rectCount < NumRectangles; rectCount++)
+            {
+
+                int Idx0 = Rectangles[rectCount].Vertices0;
+                int Idx1 = Rectangles[rectCount].Vertices1;
+                int Idx2 = Rectangles[rectCount].Vertices2;
+                int Idx3 = Rectangles[rectCount].Vertices3;
+
+                ////print ("idx0 - Idx1 - Idx2 - Idx3:" + Idx0 + " " + Idx1 + " " + Idx2 +" " + Idx3);
+
+
+                int vertOrUVIdx0 = rectCount * 4 + 0;
+                int vertOrUVIdx1 = rectCount * 4 + 1;
+                int vertOrUVIdx2 = rectCount * 4 + 2;
+                int vertOrUVIdx3 = rectCount * 4 + 3;
+                if (is_water_vertex[Idx0] == 1 &&  //if all vertices are in water
+                    is_water_vertex[Idx1] == 1 &&
+                    is_water_vertex[Idx2] == 1 &&
+                    is_water_vertex[Idx3] == 1
+                    ) continue;
+
+                nonSharedVertices[vertOrUVIdx0] = sharedVertices[Idx0];
+                nonSharedVertices[vertOrUVIdx1] = sharedVertices[Idx1];
+                nonSharedVertices[vertOrUVIdx2] = sharedVertices[Idx2];
+                nonSharedVertices[vertOrUVIdx3] = sharedVertices[Idx3];
+
+                if (has_water)
+                {
+                    //Added vertex color for lighting effect
+                    //Debug.Log("Light Atrrib0" + (Vertices[Idx0].Attributes & 0x1f));
+                    //Debug.Log("Light Atrrib1" + (Vertices[Idx1].Attributes & 0x1f));
+                    //Debug.Log("Light Atrrib2" + (Vertices[Idx2].Attributes & 0x1f));
+                }
+
+                //Added vertex color for lighting effect
+                nonSharedColor[vertOrUVIdx0] = Color.white * (1 - Vertices[Idx0].Lighting2 * 1.220852154804053e-4f);// ((0.5f - ((float)(Vertices[Idx0].Attributes & 0x1f) / 32f)) + 0.5f);
+                nonSharedColor[vertOrUVIdx1] = Color.white * (1 - Vertices[Idx1].Lighting2 * 1.220852154804053e-4f);// ((0.5f - ((float)(Vertices[Idx1].Attributes & 0x1f) / 32f)) + 0.5f);
+                nonSharedColor[vertOrUVIdx2] = Color.white * (1 - Vertices[Idx2].Lighting2 * 1.220852154804053e-4f);// ((0.5f - ((float)(Vertices[Idx2].Attributes & 0x1f) / 32f)) + 0.5f);
+                nonSharedColor[vertOrUVIdx3] = Color.white * (1 - Vertices[Idx3].Lighting2 * 1.220852154804053e-4f);// ((0.5f - ((float)(Vertices[Idx3].Attributes & 0x1f) / 32f)) + 0.5f);
+
+                ushort texObjectIdx = Rectangles[rectCount].Texture;
+                Parser.Tr2ObjectTexture texObj = leveldata.ObjectTextures[texObjectIdx];
+                ushort texTileIdx = texObj.Tile;  //bind this textile in material?
+
+                //if(texTileIdx != prevTexture)
+                //{
+                //newMatCount +=1;
+                //prevTexture = texTileIdx;
+                ////print("newMatCount:"+ newMatCount);
+                //}
+
+                SetFaceUVs(nonSharedUVs, vertOrUVIdx0, vertOrUVIdx1, vertOrUVIdx2, vertOrUVIdx3, texObj);
+
+                ////print("uv[Idx0]"+ uv[Idx0].x + " " + uv[Idx0].y);
+                ////print("uv[Idx1]"+ uv[Idx1].x + " " + uv[Idx1].y);
+
+
+                //ushort opacity = texObj.TransparencyFlags;  //isItOpacq
+
+                nonSharedTris[rectCount * 6 + 0] = vertOrUVIdx0;
+                nonSharedTris[rectCount * 6 + 1] = vertOrUVIdx1;
+                nonSharedTris[rectCount * 6 + 2] = vertOrUVIdx2;
+
+                nonSharedTris[rectCount * 6 + 3] = vertOrUVIdx2;
+                nonSharedTris[rectCount * 6 + 4] = vertOrUVIdx3;
+                nonSharedTris[rectCount * 6 + 5] = vertOrUVIdx0;
+
+            }
+
+            Parser.Tr2Face3[] Triangles = tr2room.RoomData.Triangles; // optimized for field access
+            int NumTriangles = tr2room.RoomData.NumTriangles;
+            for (int triCount = 0; triCount < NumTriangles; triCount++)
+            {
+
+                ////print("tr2room.RoomData.NumTriangles"+ tr2room.RoomData.NumTriangles);
+
+                int Idx0 = Triangles[triCount].Vertices0;
+                int Idx1 = Triangles[triCount].Vertices1;
+                int Idx2 = Triangles[triCount].Vertices2;
+
+                ////print ("idx0 - Idx1 - Idx2:" + Idx0 + " " + Idx1 + " " + Idx2);
+                //[][][][]+[][][]
+                int vertOrUVIdx0 = triCount * 3 + 0;
+                int vertOrUVIdx1 = triCount * 3 + 1;
+                int vertOrUVIdx2 = triCount * 3 + 2;
+                if (is_water_vertex[Idx0] == 1 &&  //if all vertices are in water
+                    is_water_vertex[Idx1] == 1 &&
+                    is_water_vertex[Idx2] == 1
+                    ) continue;
+
+                nonSharedVertices[strideVertIdx + vertOrUVIdx0] = sharedVertices[Idx0];
+                nonSharedVertices[strideVertIdx + vertOrUVIdx1] = sharedVertices[Idx1];
+                nonSharedVertices[strideVertIdx + vertOrUVIdx2] = sharedVertices[Idx2];
+
+                if (has_water)
+                {
+                    //Added vertex color for lighting effect
+                    //Debug.Log("Light Atrrib0" + (Vertices[Idx0].Attributes & 0x1f));
+                    //Debug.Log("Light Atrrib1" + (Vertices[Idx1].Attributes & 0x1f));
+                    //Debug.Log("Light Atrrib2" + (Vertices[Idx2].Attributes & 0x1f));
+                }
+
+                nonSharedColor[strideVertIdx + vertOrUVIdx0] = Color.white * (1 - Vertices[Idx0].Lighting2 * 1.220852154804053e-4f);////Color.white * ((0.5f - ((float)(Vertices[Idx0].Attributes & 0x1f) / 32f)) + 0.5f);
+                nonSharedColor[strideVertIdx + vertOrUVIdx1] = Color.white * (1 - Vertices[Idx1].Lighting2 * 1.220852154804053e-4f);////Color.white * ((0.5f - ((float)(Vertices[Idx1].Attributes & 0x1f) / 32f)) + 0.5f);
+                nonSharedColor[strideVertIdx + vertOrUVIdx2] = Color.white * (1 - Vertices[Idx2].Lighting2 * 1.220852154804053e-4f);////Color.white * ((0.5f - ((float)(Vertices[Idx2].Attributes & 0x1f) / 32f)) + 0.5f);
+
+
+                ushort texObjectIdx = Triangles[triCount].Texture;
+                Parser.Tr2ObjectTexture texObj = leveldata.ObjectTextures[texObjectIdx];
+
+                //if(texTileIdx != prevTexture)
+                //{
+                //newMatCount +=1;
+                //prevTexture = texTileIdx;
+                ////print("newMatCount:"+ newMatCount);
+                //}
+
+                SetFaceUVs(nonSharedUVs, strideVertIdx + vertOrUVIdx0, strideVertIdx + vertOrUVIdx1, strideVertIdx + vertOrUVIdx2, texObj);
+
+
+                ////print("uv[Idx0]"+ uv[Idx0].x + " " + uv[Idx0].y);
+                ////print("uv[Idx1]"+ uv[Idx1].x + " " + uv[Idx1].y);
+
+                //ushort opacity = texObj.TransparencyFlags;  //isItOpacq
+
+                nonSharedTris[strideTriIdx + vertOrUVIdx0] = strideVertIdx + vertOrUVIdx0;
+                nonSharedTris[strideTriIdx + vertOrUVIdx1] = strideVertIdx + vertOrUVIdx1;
+                nonSharedTris[strideTriIdx + vertOrUVIdx2] = strideVertIdx + vertOrUVIdx2;
+
+                ////print ("idx0 - Idx1 - Idx2:" + nonSharedTris[strideTriIdx + vertOrUVIdx0]  + " " + 	nonSharedTris[strideTriIdx + vertOrUVIdx1]  + " " + nonSharedTris[strideTriIdx + vertOrUVIdx2] );
+            }
+
+            ////print("leveldata.Rooms[5].RoomData.NumRectangles:"+ tr2room.RoomData.NumRectangles);
+            //SetTriangles (triangles : int[], submesh : int) : void
+            //generate secondary uv set
+
+            for (int i = 0; i < nonSharedVertices.Length; i++) { nonSharedVertices[i] = nonSharedVertices[i] * Settings.SceneScaling; }
+            Mesh mesh = new Mesh();
+            mesh.Clear();
+            mesh.vertices = nonSharedVertices;
+            mesh.uv = nonSharedUVs;
+            mesh.uv2 = nonSharedUVs;
+            mesh.colors = nonSharedColor;
+            mesh.triangles = nonSharedTris;
+            //mesh.Optimize();
+            mesh.RecalculateNormals();
+#if UNITY_EDITOR
+            Vector4[] tangents = new Vector4[mesh.vertices.Length];
+            computeTangentsAndBinormals(nonSharedVertices, mesh.normals, nonSharedUVs, nonSharedTris, tangents);
+            mesh.tangents = tangents;
+            tangents = null;
+#endif
+            //free some memory
+            nonSharedVertices = null;
+            nonSharedUVs = null;
+            nonSharedUV2s = null;
+            nonSharedTris = null;
+            nonSharedColor = null;
+
+
+
+            //}
+
+            return mesh;
         }
 
-        //warning: avariable lengh array in a structure can cause access violence
-
-
-        //if(tr2room.RoomData.NumRectangles > 0)
-        //{
-
-        //selected_texObjectIdx = tr2room.RoomData.Rectangles[0].Texture;
-        //selected_texObj =  leveldata.ObjectTextures[selected_texObjectIdx];
-        //selected_texTileIdx = selected_texObj.Tile;
-        int NumRectangles = tr2room.RoomData.NumRectangles; // optimized for field access
-        int strideVertIdx = (NumRectangles * 4);
-		int strideTriIdx = (NumRectangles * 3 * 2) ;
-		
-		int numNonsharedVertices = strideVertIdx + (tr2room.RoomData.NumTriangles * 3) ;
-		int numNonsharedTris = strideTriIdx + (tr2room.RoomData.NumTriangles  * 3) ;
-		
-		Vector3[] nonSharedVertices = new Vector3[numNonsharedVertices]; 
-		Vector2[] nonSharedUVs = new Vector2[numNonsharedVertices]; 
-		Vector2[] nonSharedUV2s = new Vector2[numNonsharedVertices]; 
-		int[] nonSharedTris = new int[numNonsharedTris];
-
-        //triangles = new int[num_rectangles * 3 * 2];
-        Parser.Tr2Face4[] Rectangles = tr2room.RoomData.Rectangles; // optimized for field access
-        for (int rectCount = 0; rectCount < NumRectangles; rectCount++)
-		{
-			
-			int Idx0 = Rectangles[rectCount].Vertices0;
-			int Idx1 = Rectangles[rectCount].Vertices1;	
-			int Idx2 = Rectangles[rectCount].Vertices2;
-			int Idx3 = Rectangles[rectCount].Vertices3;
-			
-			////print ("idx0 - Idx1 - Idx2 - Idx3:" + Idx0 + " " + Idx1 + " " + Idx2 +" " + Idx3);
-			
-			
-			int vertOrUVIdx0 = rectCount * 4 + 0;
-			int vertOrUVIdx1 = rectCount * 4 + 1;
-			int vertOrUVIdx2 = rectCount * 4 + 2;
-			int vertOrUVIdx3 = rectCount * 4 + 3;
-            if (is_water_vertex[Idx0] == 1 &&  //if all vertices are in water
-                is_water_vertex[Idx1] == 1 &&
-                is_water_vertex[Idx2] == 1 &&
-                is_water_vertex[Idx3] == 1 
-                ) continue;
-
-            nonSharedVertices[vertOrUVIdx0] = sharedVertices[Idx0];
-			nonSharedVertices[vertOrUVIdx1] = sharedVertices[Idx1];
-			nonSharedVertices[vertOrUVIdx2] = sharedVertices[Idx2];
-			nonSharedVertices[vertOrUVIdx3] = sharedVertices[Idx3];
-			
-			ushort texObjectIdx = Rectangles[rectCount].Texture;
-			Parser.Tr2ObjectTexture texObj =  leveldata.ObjectTextures[texObjectIdx];
-			ushort texTileIdx = texObj.Tile;  //bind this textile in material?
-			
-			//if(texTileIdx != prevTexture)
-			//{
-			//newMatCount +=1;
-			//prevTexture = texTileIdx;
-			////print("newMatCount:"+ newMatCount);
-			//}
-			
-			SetFaceUVs(nonSharedUVs, vertOrUVIdx0, vertOrUVIdx1, vertOrUVIdx2,vertOrUVIdx3, texObj);
-					
-			////print("uv[Idx0]"+ uv[Idx0].x + " " + uv[Idx0].y);
-			////print("uv[Idx1]"+ uv[Idx1].x + " " + uv[Idx1].y);
-			
-			
-			//ushort opacity = texObj.TransparencyFlags;  //isItOpacq
-			
-			nonSharedTris[rectCount * 6 + 0] = vertOrUVIdx0;
-			nonSharedTris[rectCount * 6 + 1] = vertOrUVIdx1;
-			nonSharedTris[rectCount * 6 + 2] = vertOrUVIdx2;
-			
-			nonSharedTris[rectCount * 6 + 3] = vertOrUVIdx2;
-			nonSharedTris[rectCount * 6 + 4] = vertOrUVIdx3;
-			nonSharedTris[rectCount * 6 + 5] = vertOrUVIdx0;	
-			
-		}
-
-        Parser.Tr2Face3[] Triangles = tr2room.RoomData.Triangles; // optimized for field access
-        int NumTriangles = tr2room.RoomData.NumTriangles;
-        for (int triCount = 0; triCount < NumTriangles; triCount++)
-		{
-			
-			////print("tr2room.RoomData.NumTriangles"+ tr2room.RoomData.NumTriangles);
-			
-			int Idx0 = Triangles[triCount].Vertices0;
-			int Idx1 = Triangles[triCount].Vertices1;	
-			int Idx2 = Triangles[triCount].Vertices2;
-			
-			////print ("idx0 - Idx1 - Idx2:" + Idx0 + " " + Idx1 + " " + Idx2);
-			//[][][][]+[][][]
-			int vertOrUVIdx0 = triCount * 3+ 0;
-			int vertOrUVIdx1 = triCount * 3+ 1;
-			int vertOrUVIdx2 = triCount * 3+ 2;
-            if (is_water_vertex[Idx0] == 1 &&  //if all vertices are in water
-                is_water_vertex[Idx1] == 1 &&
-                is_water_vertex[Idx2] == 1
-                ) continue;
-
-            nonSharedVertices[strideVertIdx + vertOrUVIdx0] = sharedVertices[Idx0];
-			nonSharedVertices[strideVertIdx + vertOrUVIdx1] = sharedVertices[Idx1];
-			nonSharedVertices[strideVertIdx + vertOrUVIdx2] = sharedVertices[Idx2];
-			
-			
-			ushort texObjectIdx = Triangles[triCount].Texture;
-			Parser.Tr2ObjectTexture texObj =  leveldata.ObjectTextures[texObjectIdx];
-			
-			//if(texTileIdx != prevTexture)
-			//{
-			//newMatCount +=1;
-			//prevTexture = texTileIdx;
-			////print("newMatCount:"+ newMatCount);
-			//}
-			
-			SetFaceUVs(nonSharedUVs,strideVertIdx + vertOrUVIdx0, strideVertIdx + vertOrUVIdx1,strideVertIdx + vertOrUVIdx2, texObj);
-			
-			
-			////print("uv[Idx0]"+ uv[Idx0].x + " " + uv[Idx0].y);
-			////print("uv[Idx1]"+ uv[Idx1].x + " " + uv[Idx1].y);
-			
-			//ushort opacity = texObj.TransparencyFlags;  //isItOpacq
-			
-			nonSharedTris[strideTriIdx + vertOrUVIdx0] = strideVertIdx + vertOrUVIdx0;
-			nonSharedTris[strideTriIdx + vertOrUVIdx1] = strideVertIdx + vertOrUVIdx1;
-			nonSharedTris[strideTriIdx + vertOrUVIdx2] = strideVertIdx + vertOrUVIdx2;
-			
-			////print ("idx0 - Idx1 - Idx2:" + nonSharedTris[strideTriIdx + vertOrUVIdx0]  + " " + 	nonSharedTris[strideTriIdx + vertOrUVIdx1]  + " " + nonSharedTris[strideTriIdx + vertOrUVIdx2] );
-		}
-		
-		////print("leveldata.Rooms[5].RoomData.NumRectangles:"+ tr2room.RoomData.NumRectangles);
-		//SetTriangles (triangles : int[], submesh : int) : void
-		//generate secondary uv set
-		
-        for (int i = 0; i < nonSharedVertices.Length; i++) { nonSharedVertices[i] = nonSharedVertices[i] * Settings.SceneScaling; }
-        Mesh mesh  = new Mesh();
-		mesh.Clear();
-		mesh.vertices = nonSharedVertices;
-		mesh.uv = nonSharedUVs;
-		mesh.uv2= nonSharedUVs;
-		mesh.triangles = nonSharedTris;
-		//mesh.Optimize();
-		mesh.RecalculateNormals();
-#if UNITY_EDITOR
-		Vector4[] tangents = new Vector4[mesh.vertices.Length];
-		computeTangentsAndBinormals(nonSharedVertices,mesh.normals,nonSharedUVs, nonSharedTris ,tangents);
-		mesh.tangents = tangents;
-		tangents = null;
-#endif
-		//free some memory
-		nonSharedVertices = null;
-		nonSharedUVs = null;
-		nonSharedUV2s = null;
-		nonSharedTris = null;
-		
-		
-
-		//}
-
-		return mesh;
+        return new Mesh(); //empty mesh
 	}
 
     public static Mesh CreateRoomWaterMesh(Parser.Tr2Room tr2room, Parser.Tr2Level leveldata)
@@ -716,8 +750,28 @@ public class MeshBuilder  {
 		nonSharedUVs[vertOrUVIdx2].y = (float) TextureUV.AdjustTextureCoordinateY((byte)Vertices[2].Ypixel,(sbyte)Vertices[2].Ycoordinate,texTileIdx);
 			
 	}
-	
-	static int GetAnimatedTextureIndex(short[] AnimatedTextures, int NumAnimatedTextures, ushort SearchIndex)
+
+    static void SetFaceColors(Color[] colors, int vertOrUVIdx0, int vertOrUVIdx1, int vertOrUVIdx2, int vertOrUVIdx3, Parser.Tr2VertexRoom[] Vertices)
+    {
+        //set lighting effect modifier through color
+        colors[vertOrUVIdx0] = new Color(0, 0, 0, 1);
+        colors[vertOrUVIdx1] = new Color(0, 0, 0, 1);
+        colors[vertOrUVIdx2] = new Color(0, 0, 0, 1);
+        colors[vertOrUVIdx3] = new Color(0, 0, 0, 1);
+    }
+
+    static void SetFaceColors(Color[] colors, int vertOrUVIdx0, int vertOrUVIdx1, int vertOrUVIdx2, Parser.Tr2ObjectTexture texObj)
+    {
+        ushort texTileIdx = texObj.Tile;  //bind this textile in material?
+        Parser.Tr2ObjectTextureVertex[] Vertices = texObj.Vertices;
+
+        colors[vertOrUVIdx0] = new Color(0, 0, 0, 1);
+        colors[vertOrUVIdx1] = new Color(0, 0, 0, 1);
+        colors[vertOrUVIdx2] = new Color(0, 0, 0, 1);
+ 
+    }
+
+    static int GetAnimatedTextureIndex(short[] AnimatedTextures, int NumAnimatedTextures, ushort SearchIndex)
 	{
 		//AnimatedTextures is variable length record
 		

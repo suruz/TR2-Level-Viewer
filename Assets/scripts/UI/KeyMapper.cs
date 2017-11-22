@@ -9,19 +9,19 @@ public enum function
 {
 	Idle = 0,
 	//Direction key
-	Run ,   		
-	Back,      		
-	Left,      		
-	Right,
+	Run = 1,   		
+	Back =2,      		
+	Left =3,      		
+	Right=4,
 
     //movement key
-    Jump,
-    Walk,			
+    Jump=5,
+    Walk=6,			
 
 	//Action key
-	Action,			
-	DrawWeapon,		
-	Roll
+	Action=7,			
+	DrawWeapon=8,		
+	Roll=9
    		
 }
 
@@ -42,7 +42,7 @@ public class KeyMap
 public class KeyMapper : MonoBehaviour {
 	
 	public static KeyCode[] defaultkeycodes ={
-		
+	
 		KeyCode.Escape,
 		//Direction key
 		KeyCode.UpArrow,
@@ -124,7 +124,12 @@ public class KeyMapper : MonoBehaviour {
 	
 	bool GetKeyCode(function f)
 	{
-		return Input.GetKey(Keys[(int)f].key);
+        int ikey = (int)f;
+        if(ikey >= Keys.Length) //fixed indexing bug
+        {
+            ikey = 0;
+        }
+        return Input.GetKey(Keys[ikey].key);
 	}
 	
 	bool GetKeyUpCode(function f)
@@ -225,7 +230,7 @@ public class KeyMapper : MonoBehaviour {
 	{
 		if(dpad != 0)
 		{
-			for(int i = 1; i <= 4; i++)
+			for(int i = 1; i <= 4; ++i)
 			{
 				function func = (function) i;
 				if(GetKeyUpCode(func) )
@@ -240,7 +245,7 @@ public class KeyMapper : MonoBehaviour {
 		
 		if(keypadmovement != 0)
 		{
-			for(int i = 5; i <=6; i++)
+			for(int i = 5; i <=6; ++i)
 			{
 				function func = (function) i;
 				if(GetKeyUpCode(func) )
@@ -256,7 +261,7 @@ public class KeyMapper : MonoBehaviour {
 		
 		if(keypadaction != 0)
 		{
-			for(int i = 7 ; i <= 9; i++)
+			for(int i = 7 ; i <= 9; ++i)
 			{
 				function func = (function) i;
 				if(GetKeyCode(func) )
@@ -289,7 +294,7 @@ public class KeyMapper : MonoBehaviour {
 		
 		if(dpad == 0) //if not pressed
 		{
-			for(int i = 1; i <= 4; i++)
+			for(int i = 1; i <= 4; ++i)
 			{
 				function func = (function) i;
 				if(GetKeyCode(func) )
@@ -304,7 +309,7 @@ public class KeyMapper : MonoBehaviour {
 		
 		if(keypadmovement == 0)
 		{
-			for(int i = 5; i <= 6; i++)
+			for(int i = 5; i <= 6; ++i)
 			{
 				function func = (function) i;
 				if(GetKeyCode(func) )
@@ -319,7 +324,7 @@ public class KeyMapper : MonoBehaviour {
 		
 		if(keypadaction == 0)
 		{
-			for(int i = 7 ; i <= 9; i++)
+			for(int i = 7 ; i <= 9; ++i)
 			{
 				function func = (function) i;
 				if(GetKeyCode(func) )

@@ -35,7 +35,7 @@ public class CrowStatePlayer :FollowerAI {
         m_FollowEndDistance = (4096 * Settings.SceneScaling);
         m_AttackingDistance = (256 * Settings.SceneScaling);
         m_CurrentKeyState = Idle;
-        m_AllowAxis = new Vector3(1, 0, 1); //move horizontally 
+        m_AllowAxis = new Vector3(1, 1, 1); //move freely
     }
 
     void UpdateDayNight(bool isday)

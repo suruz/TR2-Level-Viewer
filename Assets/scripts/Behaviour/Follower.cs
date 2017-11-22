@@ -27,7 +27,7 @@ public class FollowerAI : MonoBehaviour {
 
     Vector3 m_StartPos = Vector3.zero;
     Vector3 m_TargetPos = Vector3.zero;
-
+    Vector3 m_CurrentPos = Vector3.zero;
     int m_PrevKeyState = 0;
     protected int m_CurrentKeyState = 0;
     Animation m_Animation = null;
@@ -60,10 +60,8 @@ public class FollowerAI : MonoBehaviour {
 
         if (m_FollowTransform != null)
         {
-            Vector3 follow = (m_FollowTransform.position - m_StartPos);
-            follow = new Vector3(m_AllowAxis.x * follow.x, m_AllowAxis.y * follow.y, m_AllowAxis.z * follow.z);
+            Vector3 follow = ScaleVector((m_FollowTransform.position - m_StartPos), m_AllowAxis);
             float dist = follow.magnitude;
-
             if (dist > m_FollowStartDistance && dist < m_FollowEndDistance)
             {
                 m_TargetPos = m_FollowTransform.position - follow.normalized * 512 * Settings.SceneScaling;
@@ -76,7 +74,9 @@ public class FollowerAI : MonoBehaviour {
                 Vector3 fwrd = (m_FollowTransform.position - m_Transform.position).normalized;
                 fwrd.y = 0;
                 m_Transform.forward = fwrd;
-                m_Transform.position = Vector3.Lerp(m_Transform.position, m_TargetPos, Time.deltaTime);
+                m_CurrentPos = ScaleVector(Vector3.Lerp(m_Transform.position, m_TargetPos, Time.deltaTime), m_AllowAxis);
+       
+                m_Transform.position = m_CurrentPos;
             }
             else if ((m_Transform.position - m_StartPos).magnitude < (256 * Settings.SceneScaling))
             {
@@ -90,7 +90,8 @@ public class FollowerAI : MonoBehaviour {
                 Vector3 fwrd = (m_TargetPos - m_Transform.position).normalized;
                 fwrd.y = 0;
                 m_Transform.forward = fwrd;
-                m_Transform.position = Vector3.Lerp(m_Transform.position, m_TargetPos, Time.deltaTime * 0.25f);
+                m_CurrentPos = ScaleVector(Vector3.Lerp(m_Transform.position, m_TargetPos, Time.deltaTime * 0.25f), m_AllowAxis);
+                m_Transform.position = m_CurrentPos;
             }
 
         }
@@ -125,7 +126,12 @@ public class FollowerAI : MonoBehaviour {
 
     virtual protected void InitAI()
     {
+     
+    }
 
+    Vector3 ScaleVector(Vector3 a, Vector3 b)
+    {
+        return new Vector3(a.x * b.x, a.y * b.y, a.z * b.z);
     }
 
 }

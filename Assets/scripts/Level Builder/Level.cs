@@ -131,11 +131,11 @@ public class Level
 					MeshRenderer mr = go.GetComponent<MeshRenderer>();
 					mr.sharedMaterial = m_SharedMaterialWaterHolder;
 				}
-				else if(leveldata.Rooms[i].Flags == 65) //Is room water holder
+				else if((leveldata.Rooms[i].Flags == 65) || (leveldata.Rooms[i].Flags == 585)) //Is room water holder
 				{
                     //override water holder material
-                    MeshFilter mf = go.GetComponent<MeshFilter>();
-                    mf.mesh = MeshModifier.VertexWeild(mf.mesh);
+                    //MeshFilter mf = go.GetComponent<MeshFilter>();
+                    //mf.mesh = MeshModifier.VertexWeild(mf.mesh);
 
 					MeshRenderer mr = go.GetComponent<MeshRenderer>();
                     mr.sharedMaterial =  new Material(waterEffectShader); // Generate material instances for water holder using m_SharedMaterialWaterHolder
@@ -495,13 +495,18 @@ public class Level
 
         return objects;
     }
-
+    int m_bPlayerInstanceCount = 0;  //flag to disable multiple player instances
     void InitialiseInstance(Parser.Tr2Item tr2item)
     {
         GameObject go = tr2item.UnityObject;
         go.name += " " + tr2item.ObjectID;
         if (tr2item.ObjectID == 0)
         {
+            if(m_bPlayerInstanceCount == 1)
+            {
+                GameObject.Destroy(tr2item.UnityObject);
+                return;
+            }
             //playable character found!
             m_Player = go;
             m_Player.layer = UnityLayer.Player;
@@ -562,6 +567,7 @@ public class Level
 			light.intensity = 0.3f;
 			light.gameObject.AddComponent<LaraLightStatePlayer>();
 
+            m_bPlayerInstanceCount = 1;
         }
         //check if we have any custom behabiour  script for object
         else if (m_OnAttachBehabiourScript != null && !m_OnAttachBehabiourScript(tr2item.UnityObject, tr2item.ObjectID, m_Player, tr2item))

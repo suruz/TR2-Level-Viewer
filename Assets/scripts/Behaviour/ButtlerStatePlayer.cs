@@ -42,12 +42,17 @@ public class ButtlerStatePlayer : MonoBehaviour {
 		if(m_FollowTransform!=null)
 		{
 			m_TargetPos = m_FollowTransform.position;
-            m_Transform.forward = (m_TargetPos - m_Transform.position).normalized;
-			float dist = (m_FollowTransform.position - m_Transform.position).magnitude;
-			if(dist > (1024 * Settings.SceneScaling) )
+            Vector3 direction = (m_TargetPos - m_Transform.position);
+            direction.y = 0;
+            m_Transform.forward = direction.normalized;
+        
+      
+			if(direction.magnitude > (2024 * Settings.SceneScaling) )
 			{
 				m_CurrentKeyState = Walk;
-                m_Transform.position = Vector3.Lerp(m_Transform.position ,m_TargetPos,Time.deltaTime * 0.15f);
+                Vector3 pos = Vector3.Lerp(m_Transform.position, m_TargetPos, Time.deltaTime * 0.15f);
+                pos.y = 0;
+                m_Transform.position = pos;
 			}
 			else
 			{

@@ -182,5 +182,5 @@ public class DayNightSystem : MonoBehaviour {
 	
 	static float _DayTimeFogDensity = 0.00025f;
 	static float _NightTimeFogDensity = 0.00025f;
-	static float _UnderWaterFogDensity = 0.12f;
+	static float _UnderWaterFogDensity = 0.08f;
 }

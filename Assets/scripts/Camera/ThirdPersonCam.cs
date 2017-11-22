@@ -21,17 +21,19 @@ public class ThirdPersonCam : MonoBehaviour {
 	
 	float mouse_dx = 0;
 	float mouse_dy = 0;
-	
+    Transform m_Transform;
 
 	
 	// Use this for initialization
 	void Start () 
 	{
-		Camera camera = GetComponent<Camera>();
+ 
+        Camera camera = GetComponent<Camera>();
 		fieldofview = camera.fieldOfView;
 		Mouse.m_OnMouseMove += OnMouseMove; 
 		camera.near *= 10.24f * Settings.SceneScaling;
-	}
+        m_Transform = transform;
+    }
 	
 	void OnMouseMove(float dx, float dy)
 	{
@@ -59,7 +61,7 @@ public class ThirdPersonCam : MonoBehaviour {
 					
 		if(!binit)
 		{
-			transform.position = target.position + (target.position - transform.position).normalized * 2048 * Settings.SceneScaling;
+            m_Transform.position = target.position + (target.position - m_Transform.position).normalized * 2048 * Settings.SceneScaling;
 			anim = target.GetComponent<LaraStatePlayer>();
 			
 			player = target.GetComponent<Player>();
@@ -98,13 +100,13 @@ public class ThirdPersonCam : MonoBehaviour {
 		
 		if(anim!=null && anim.OnAir)
 		{
-			/*transform.position = position - forward * distance;
+            /*transform.position = position - forward * distance;
 			forward = (target.position - transform.position).normalized;
 			transform.forward = Vector3.Lerp(transform.forward ,forward,Time.deltaTime * 0.5f);*/
-			
-			transform.forward = Vector3.Lerp(transform.forward , target.forward,Time.deltaTime * 5.0f);
+
+            m_Transform.forward = Vector3.Lerp(m_Transform.forward , target.forward,Time.deltaTime * 5.0f);
 			Vector3 pos = target.position - forward * distance;
-			transform.position = Vector3.Lerp(transform.position,new Vector3(pos.x,pos.y + 700 *Settings.SceneScaling, pos.z),Time.deltaTime * 2.0f);
+            m_Transform.position = Vector3.Lerp(m_Transform.position,new Vector3(pos.x,pos.y + 700 *Settings.SceneScaling, pos.z),Time.deltaTime * 2.0f);
 
 		
 			//Debug.Log(camrot);
@@ -115,17 +117,17 @@ public class ThirdPersonCam : MonoBehaviour {
 			{
 				lookup = 0f;
 				mouse_dy = 0;
-				transform.forward = Vector3.Lerp(transform.forward , target.forward + Vector3.up * lookup,Time.deltaTime * 5.0f) ;
+                m_Transform.forward = Vector3.Lerp(m_Transform.forward , target.forward + Vector3.up * lookup,Time.deltaTime * 5.0f) ;
 				Vector3 pos = target_hip.position - forward * distance;
-				transform.position = Vector3.Lerp(transform.position,new Vector3(pos.x,pos.y + 128 * Settings.SceneScaling, pos.z),Time.deltaTime * 2.0f);
+                m_Transform.position = Vector3.Lerp(m_Transform.position,new Vector3(pos.x,pos.y + 128 * Settings.SceneScaling, pos.z),Time.deltaTime * 2.0f);
 			}
 			else
 			{
 				lookup += mouse_dy * 0.01f;
 				mouse_dy = 0;
-				transform.forward = Vector3.Lerp(transform.forward , target.forward + Vector3.up * lookup,Time.deltaTime * 5.0f) ;
+                m_Transform.forward = Vector3.Lerp(m_Transform.forward , target.forward + Vector3.up * lookup,Time.deltaTime * 5.0f) ;
 				Vector3 pos = target_hip.position - forward * distance;
-				transform.position = Vector3.Lerp(transform.position,new Vector3(pos.x,pos.y + 400 * Settings.SceneScaling, pos.z),Time.deltaTime * 2.0f);
+                m_Transform.position = Vector3.Lerp(m_Transform.position,new Vector3(pos.x,pos.y + 400 * Settings.SceneScaling, pos.z),Time.deltaTime * 2.0f);
 			}
 			
 		}
@@ -146,7 +148,7 @@ public class ThirdPersonCam : MonoBehaviour {
             //Color water_color =  WaterEffect.GetWaterMaterial().color * 10;
 
       
-            if (b.Contains(transform.position))
+            if (b.Contains(m_Transform.position))
 			{
 				//Debug.Log("Camera In Water");
 				//if(room_mat.color != water_color)
@@ -165,7 +167,7 @@ public class ThirdPersonCam : MonoBehaviour {
 
             }
 			
-			if(transform.position.y > water_level)
+			if(m_Transform.position.y > water_level)
 			{
 				//if(room_mat.color != Color.white)
 				//{

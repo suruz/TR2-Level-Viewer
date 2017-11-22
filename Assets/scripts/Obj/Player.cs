@@ -56,6 +56,7 @@ public class Player : ObjectExt
     bool m_bWallHitTest = false;
 	Transform m_LarasHeap;
 	float m_HipHeightAdjust = -0.1f;
+    Transform m_LarasHead;
 	
 	float m_WaterLevel = 0;
     bool m_bDivingIntoWater = false; //to handle diving transions from water surface. if enabled,let finish it;
@@ -74,7 +75,7 @@ public class Player : ObjectExt
         KeyMapper.OnKeyIdle += IdleStateHandler;
         Mouse.m_OnMouseMove += OnMouseMove;
 
-        physics = new Physic3D(transform.position);
+        physics = new Physic3D(m_Transform.position);
         physics.g = 5000 * Settings.SceneScaling;
         //prevy = thistransform.position.y;
         LaraStatePlayer.OnJump += JumpHandler;
@@ -82,12 +83,13 @@ public class Player : ObjectExt
         LaraStatePlayer.OnMovement += MovementHandler;
         //LaraStatePlayer.OnPrimaryAction += PrimaryActionHandler; //this callback is not needed anymore
 
-        //m_FreePosition = transform.position;
+        //m_FreePosition = m_Transform.position;
         //m_PrevPlayPos = m_Transform.position;
-        //m_GroundHeight = transform.position.y;
+        //m_GroundHeight = m_Transform.position.y;
 		m_LarasHeap = m_Transform.Find("objPart:0");
-		//m_LarasHeapPosition = m_LarasHeap.position - Vector3.up * 0.25f;
-        SetInitialPosition(transform.position, transform.forward);
+        m_LarasHead = m_LarasHeap.Find("objPart:7").Find("objPart:14");
+                                                  //m_LarasHeapPosition = m_LarasHeap.position - Vector3.up * 0.25f;
+        SetInitialPosition(m_Transform.position, transform.forward);
     }
 
     void SetInitialPosition(Vector3 pos, Vector3 dir)
@@ -96,7 +98,7 @@ public class Player : ObjectExt
         m_FreePosition = pos;
         m_PrevPlayPos = pos;
         m_GroundHeight = pos.y;
-        transform.position = pos;
+        m_Transform.position = pos;
         PositionChanged(pos);
     }
 
@@ -126,19 +128,19 @@ public class Player : ObjectExt
            // simple height fixing
              if (m_SwimState == SwimmingState.None)
              {
-                   float h = Mathf.Lerp(transform.position.y, m_GroundHeight, Time.deltaTime * 10.0f);// + 0.1f;
-                   transform.position = new Vector3(transform.position.x, h, transform.position.z);
+                   float h = Mathf.Lerp(m_Transform.position.y, m_GroundHeight, Time.deltaTime * 10.0f);// + 0.1f;
+                   m_Transform.position = new Vector3(m_Transform.position.x, h, m_Transform.position.z);
              }
 		}
        //update freefall physics. update should be continueous, freefall update should not be event drivent
        if (m_bFreeFall)
        {
-           transform.position = physics.UpdateFreeFall(Time.time - m_FreeFallStartTime);
+           m_Transform.position = physics.UpdateFreeFall(Time.time - m_FreeFallStartTime);
 
-           if (m_GroundHeight > transform.position.y)
+           if (m_GroundHeight > m_Transform.position.y)
            {
                m_bFreeFall = false;
-               transform.position = new Vector3(transform.position.x, m_GroundHeight, transform.position.z);
+               m_Transform.position = new Vector3(m_Transform.position.x, m_GroundHeight, m_Transform.position.z);
            }
        }
 
@@ -184,7 +186,7 @@ public class Player : ObjectExt
                         if (room != null) //All hit objects need not to be a room
                         {
                             m_Room = room;
-                            //Debug.Log("m_Room" + m_Room.name + "room flag " + m_Room.m_Tr2Room.Flags );
+                            Debug.Log("m_Room" + m_Room.name + "room flag " + m_Room.m_Tr2Room.Flags );
                         }
                     }
                 }
@@ -249,26 +251,28 @@ public class Player : ObjectExt
                 Vector3 ep0 = m_Room.transform.TransformPoint(horizontal_edeges[i].PointA);
                 Vector3 ep1 = m_Room.transform.TransformPoint(horizontal_edeges[i].PointB);
                 Vector3 edge = ep1 - ep0;
-                Vector3 toplayer = transform.position - ep0;
+                Vector3 toplayer = m_Transform.position - ep0;
 
-                float pullupheight = ep0.y - transform.position.y;
+                float pullupheight = ep0.y - m_Transform.position.y;
                 m_PullUpHeight = pullupheight;
 
                 if (pullupheight > this.m_Height && pullupheight < this.m_Height * 3.5f)
                 {
                     JumpVector = Vector3.up * (pullupheight - m_JumpHeight); //Jump controlled by JumpVector. If length of JumpVector > 0 m_bPullingUp will be true  
-                    PullUpTarget = transform.position + JumpVector; // Move animated Lara upto this position
+                    PullUpTarget = m_Transform.position + JumpVector; // Move animated Lara upto this position
                     retval = KeyMapper.Jump;
-                }
 
+                    Debug.Log("pulling up high");
+                }
                 else if (pullupheight < this.m_Height) // walkup height in normal condition, or,  bellow water surface in swimstate
                 {
                     Debug.Log("pulling  up");
-                    PullUpTarget = transform.position; // Move animated Lara upto this position
+                    PullUpTarget = m_Transform.position; // Move animated Lara upto this position
 
                     if (((this.m_Height - pullupheight) < (100 * Settings.SceneScaling)) && (m_SwimState == SwimmingState.None))
                     {
-                        ResetJump(); 
+                        ResetJump();
+                        m_bPullingUp = false; //we dont need pull her in this height
                         m_bStandingUp = true;
                         retval = KeyMapper.PullUpHigh;
 
@@ -277,6 +281,7 @@ public class Player : ObjectExt
                     else if (m_SwimState == SwimmingState.InWaterSurface)
                     {
                         ResetJump();
+                        m_bPullingUp = false; //we dont need pull her in this height
                         m_bStandingUp = true;
                         retval = KeyMapper.PullUpHigh;
 
@@ -285,6 +290,7 @@ public class Player : ObjectExt
                     else if ((m_SwimState == SwimmingState.None) ||(m_SwimState == SwimmingState.InShallowWater))
                     {
                         ResetJump();
+                        m_bPullingUp = false; //we dont need pull her in this height
                         m_bWalkingUp = true;
                         retval = KeyMapper.WalkUp; //consider under water
                         Debug.Log("walking  up");
@@ -294,14 +300,14 @@ public class Player : ObjectExt
                 /*
                  * bool inside_edge = (Vector3.Dot (edge.normalized, toplayer.normalized ) > 0);
 				//bool facing = (Vector3.Dot (edge.normalized, toplayer.normalized ) > 0);
-				//if(ep0.y > transform.position.y)
+				//if(ep0.y > m_Transform.position.y)
 				//{
 					facing_edeges.Add(horizontal_edeges[i]);
 					//hasGrabableEdge = true;
 					//break;
 				//}
 				
-				if((ep0.y - transform.position.y) > this.m_Height )
+				if((ep0.y - m_Transform.position.y) > this.m_Height )
 				{
 					hasGrabableEdge = true;
 
@@ -309,6 +315,11 @@ public class Player : ObjectExt
 				}*/
 
             }
+        }
+
+        if(retval == KeyMapper.Idle)
+        {
+            Debug.Log("Too high!!!");
         }
 
         return retval;
@@ -328,11 +339,11 @@ public class Player : ObjectExt
 		
 		if(m_GroundHeight != m_GroundHeightLast) // ground height changed. Time to check if we call free fall
 		{
-			if (!m_bFreeFall && ((transform.position.y - m_GroundHeight > m_FreeFallStartHeight)) )  //m_bJumping check is not needed. Its already checked by  IsAvoidingFall();
+			if (!m_bFreeFall && ((m_Transform.position.y - m_GroundHeight > m_FreeFallStartHeight)) )  //m_bJumping check is not needed. Its already checked by  IsAvoidingFall();
             {
                 //try free fall
                 m_bFreeFall = true;
-                physics.StartFreeFall(transform.position);
+                physics.StartFreeFall(m_Transform.position);
                 m_FreeFallStartTime = Time.time;
                 Debug.Log("Start Free Fall");
                 
@@ -344,12 +355,12 @@ public class Player : ObjectExt
         //if movement stops, free fall will stop as well, this is not intended, move following code to unity Update()
         /*if (m_bFreeFall)
 		{
-			transform.position = physics.UpdateFreeFall(Time.time - m_FreeFallStartTime);
+			m_Transform.position = physics.UpdateFreeFall(Time.time - m_FreeFallStartTime);
       
-        	if (m_GroundHeight > transform.position.y)
+        	if (m_GroundHeight > m_Transform.position.y)
         	{
              	m_bFreeFall = false;
-             	transform.position = new Vector3(transform.position.x, m_GroundHeight, transform.position.z);
+             	m_Transform.position = new Vector3(m_Transform.position.x, m_GroundHeight, m_Transform.position.z);
         	}
 		}*/
 		
@@ -370,6 +381,9 @@ public class Player : ObjectExt
 
     void JumpHandler(Vector3 From, Vector3 To, Quaternion rot, float sign)
     {
+
+        if (SeekRoof() != null) return;
+
         m_JumpStartTime = Time.time;
 
         //JumpVector
@@ -383,50 +397,41 @@ public class Player : ObjectExt
         {
             m_bJumping = physics.CalculateCurve(From, To, rot, sign);
         }
-		if(m_bJumping)
+
+        Debug.Log("Jump Physics Handler" + m_bJumping);
+        if (m_bJumping)
 		{
 			InitialiseGround();
 		}
 		
-        Debug.Log("Jump Physics Handler" + m_bJumping);
     }
 	
 	//This is commissioned event fired by LaraStatePlayer, it is not conditioned be this.m_bJumping
 	//This can only be stoped by LaraStatePlayer. Using stoping condition here is useless
     void JumpingHandler(Vector3 dir)
     {
-	
-			SeekGround();  //Keep a eye on ground height changes
-		
-	
-            RaycastHit hit2 = new RaycastHit();
-#if (UNITY_5_3_OR_NEWER || UNITY_5_3)
-            int mask = Physics.DefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
-#else
-		int mask = Physics.kDefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
-#endif
-            bool roof_collision = Physics.Raycast(transform.position + Vector3.up * (400 * Settings.SceneScaling), dir, out hit2, m_minUpRayLength, mask);
-
-            if (roof_collision)
-            {
-                StopImmediate(hit2.collider);
-                transform.position = m_FreePosition;
-                m_GroundHeight = m_GroundHeight + 0.1f; //force freefall handler to check ground...if ground not changed since last jump
-                ResetJump();
-            }
-            else if (transform.position.y < m_GroundHeight) //landed
-            {
-                StopImmediate(hit2.collider);
-                transform.position = new Vector3(transform.position.x, m_GroundHeight, transform.position.z);
-                ResetJump();
+		SeekGround();  //Keep a eye on ground height changes
+        Collider roof = SeekRoof();
+        if (roof!=null)
+        {
+            Debug.LogWarning("Head Collision With: ");
+            StopImmediate(roof);
+            m_Transform.position = m_FreePosition;
+            m_GroundHeight = m_GroundHeight + 0.1f; //force freefall handler to check ground...if ground not changed since last jump
+            ResetJump();
+        }
+        else if (m_Transform.position.y < m_GroundHeight) //landed
+        {
+            StopImmediate(null);
+            m_Transform.position = new Vector3(m_Transform.position.x, m_GroundHeight, m_Transform.position.z);
+            ResetJump();
         }
 		
 		    //update jump physics
-           transform.position = physics.UpdateJump(Time.time - m_JumpStartTime);
+           m_Transform.position = physics.UpdateJump(Time.time - m_JumpStartTime);
            RecordFreePosition(); // record unconditional free position           
        
         //Debug.Log("Jumping");
-        //Debug.DrawRay(transform.position + Vector3.up * 400, dir * 150);
     }
 
     void OnReachPullUpTarget()
@@ -445,8 +450,8 @@ public class Player : ObjectExt
         if (m_bJumping)
         {
             //check for hip displacement from ground
-            float diff = (transform.position - PullUpTarget).magnitude;
-            Debug.Log("Pullig UP" + diff);
+            float diff = (m_Transform.position - PullUpTarget).magnitude;
+            //Debug.Log("Pullig UP" + diff);
             if (diff < 1f * Settings.SceneScaling)
             {
                 ResetJump();
@@ -544,7 +549,7 @@ public class Player : ObjectExt
 
     void MovementHandler(Vector3 dir, float speed)
     {
-        transform.position = transform.position + dir * speed * Settings.SceneScaling;
+        m_Transform.position = m_Transform.position + dir * speed * Settings.SceneScaling;
         
        	RaycastHit hit2 = new RaycastHit();
 #if (UNITY_5_3_OR_NEWER || UNITY_5_3)
@@ -558,7 +563,7 @@ public class Player : ObjectExt
         if (collision)
         {
             StopImmediate(hit2.collider);
-            transform.position = m_FreePosition;
+            m_Transform.position = m_FreePosition;
             m_bWallHitTest = true;
         }
             
@@ -573,8 +578,15 @@ public class Player : ObjectExt
         if (IsAvoidingFall() || IsDiving()) return;
         if (m_AnimStatePlayer != null)
         {
+
             //try initiate pullup satecode due to hitting wall except primary action (e.g. pull switch)
-            if (keystate == KeyMapper.Run && keystate != KeyMapper.PrimaryAction)
+            /*
+             * folloing condition is useless: if (keystate == KeyMapper.Run) true, then (keystate != KeyMapper.PrimaryAction)  also true
+             * if (keystate == KeyMapper.Run && keystate != KeyMapper.PrimaryAction) { }
+             * 
+             */
+
+            if (keystate == KeyMapper.Run /*&& keystate != KeyMapper.PrimaryAction*/) 
             {
                 if (m_bWallHitTest)
                 {
@@ -612,7 +624,7 @@ public class Player : ObjectExt
 
     public void IdleStateHandler(int keystate, float time)
     {
-        //m_FreePosition = transform.position;
+        //m_FreePosition = m_Transform.position;
         if (IsAvoidingFall()) return;
         if (m_AnimStatePlayer != null)
         {
@@ -672,9 +684,12 @@ public class Player : ObjectExt
     public void SetSwimState(RoomEx room)
     {
 		//return;
-        if (m_bPullingUp || m_bStandingUp) //dont pull into swimming state when trying to getout of water
+        if (IsAvoidingFall()) //dont pull into swimming state when trying to getout of water
         {
-            Debug.Log("Getting outof water");
+            if (m_SwimState == SwimmingState.InWaterSurface)
+            {
+                Debug.Log("Getting outof water");
+            }
             return;
         }
 
@@ -751,7 +766,7 @@ public class Player : ObjectExt
                 }
             }
 
-            /*if((surface - transform.position.y) >  0.35f  && (m_SwimState == SwimmingState.None))
+            /*if((surface - m_Transform.position.y) >  0.35f  && (m_SwimState == SwimmingState.None))
 			{
 				SetSwimStateShallowWater();
 			}*/
@@ -871,7 +886,7 @@ public class Player : ObjectExt
 		m_HipHeightAdjust = -0.1f;
         if (physics != null)
         {
-            physics.SetFreeFallSpeed(1f);
+            physics.SetFreeFallSpeed(2.5f);
         }
     }
 
@@ -924,10 +939,17 @@ public class Player : ObjectExt
     {
         m_bJumping = false;
         JumpVector = Vector3.zero;
-        m_bPullingUp = false;
+
+        /*
+         * following is a bug. ResetJump does not mean we have to stop pull up. Rather m_bPullingUp can be used post jump action
+         * disable m_bPullingUp where it needs
+         * 
+         * m_bPullingUp = false;
+         * */
+
     }
-	
-	void SeekGround()
+
+    void SeekGround()
 	{
 		#if (UNITY_5_3_OR_NEWER || UNITY_5_3)
         int mask = Physics.DefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
@@ -955,8 +977,40 @@ public class Player : ObjectExt
 		
 		//return -1;
 	}
-	
-	bool StopFalling()
+
+    Collider SeekRoof()
+    {
+        RaycastHit hit2 = new RaycastHit();
+#if (UNITY_5_3_OR_NEWER || UNITY_5_3)
+        int mask = Physics.DefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
+#else
+		int mask = Physics.kDefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
+#endif
+        Vector3 ray_origin = GetHeadPositon() - Vector3.forward * m_maxForwardRayLength * 0.25f;
+        Physics.Raycast(ray_origin, Vector3.up, out hit2, m_minUpRayLength, mask);
+        Debug.DrawRay(ray_origin, Vector3.up * m_minUpRayLength , Color.red);
+        return hit2.collider;
+    }
+
+    bool SeekRoof(ref Collider roof)
+    {
+        RaycastHit hit2 = new RaycastHit();
+#if (UNITY_5_3_OR_NEWER || UNITY_5_3)
+        int mask = Physics.DefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
+#else
+		int mask = Physics.kDefaultRaycastLayers & ~(MaskedLayer.Switch | MaskedLayer.Player);
+#endif
+        Vector3 ray_origin = GetHeadPositon() - Vector3.forward * m_maxForwardRayLength * 0.25f;
+        bool collision = Physics.Raycast(ray_origin, Vector3.up, out hit2, m_minUpRayLength, mask);
+        roof = hit2.collider;
+        Debug.DrawRay(ray_origin, Vector3.up * m_minUpRayLength, Color.red);
+
+        return collision;
+
+ 
+    }
+
+    bool StopFalling()
 	{
 		return (m_SwimState == SwimmingState.InDeepWater) || (m_SwimState == SwimmingState.InWaterSurface);
 	}
@@ -980,12 +1034,17 @@ public class Player : ObjectExt
 	void RecordFreePosition()
 	{
 		 // bug fix: unconditional record of m_FreePosition
-         m_FreePosition = transform.position;
+         m_FreePosition = m_Transform.position;
 	}
 	
 	Vector3 GetHipPosition()
 	{
 		return m_LarasHeap.position + Vector3.up * m_HipHeightAdjust;
 	}
+
+    Vector3 GetHeadPositon()
+    {
+        return m_LarasHead.position;
+    }
 
 }
