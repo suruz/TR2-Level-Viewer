@@ -64,7 +64,8 @@ public class FollowerAI : MonoBehaviour {
             float dist = follow.magnitude;
             if (dist > m_FollowStartDistance && dist < m_FollowEndDistance)
             {
-                m_TargetPos = m_FollowTransform.position - follow.normalized * 512 * Settings.SceneScaling;
+                m_TargetPos = m_StartPos + follow - follow.normalized * 512 * Settings.SceneScaling;
+              
                 OnStartFollow();
                 if ((m_Transform.position - m_TargetPos).magnitude < m_AttackingDistance )
                 {
@@ -74,9 +75,7 @@ public class FollowerAI : MonoBehaviour {
                 Vector3 fwrd = (m_FollowTransform.position - m_Transform.position).normalized;
                 fwrd.y = 0;
                 m_Transform.forward = fwrd;
-                m_CurrentPos = ScaleVector(Vector3.Lerp(m_Transform.position, m_TargetPos, Time.deltaTime), m_AllowAxis);
-       
-                m_Transform.position = m_CurrentPos;
+                m_Transform.position = Vector3.Lerp(m_Transform.position, m_TargetPos, Time.deltaTime);
             }
             else if ((m_Transform.position - m_StartPos).magnitude < (256 * Settings.SceneScaling))
             {
@@ -90,8 +89,7 @@ public class FollowerAI : MonoBehaviour {
                 Vector3 fwrd = (m_TargetPos - m_Transform.position).normalized;
                 fwrd.y = 0;
                 m_Transform.forward = fwrd;
-                m_CurrentPos = ScaleVector(Vector3.Lerp(m_Transform.position, m_TargetPos, Time.deltaTime * 0.25f), m_AllowAxis);
-                m_Transform.position = m_CurrentPos;
+                m_Transform.position = Vector3.Lerp(m_Transform.position, m_TargetPos, Time.deltaTime * 0.25f);
             }
 
         }

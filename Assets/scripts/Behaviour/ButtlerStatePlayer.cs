@@ -51,7 +51,7 @@ public class ButtlerStatePlayer : MonoBehaviour {
 			{
 				m_CurrentKeyState = Walk;
                 Vector3 pos = Vector3.Lerp(m_Transform.position, m_TargetPos, Time.deltaTime * 0.15f);
-                pos.y = 0;
+                pos.y = m_TargetPos.y;
                 m_Transform.position = pos;
 			}
 			else
