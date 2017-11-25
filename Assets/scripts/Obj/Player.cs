@@ -715,7 +715,7 @@ public class Player : ObjectExt
 			Bounds room_bound = room.GetBound();
 			float min_fall_height = room_bound.min.y + room_bound.size.y * 0.25f;
 			
-			if ((m_Transform.position.y < (m_WaterLevel - m_Height * 0.5f)) && (type == RoomEx.RoomType.DeepWater))  //enter swimming state machine
+			if ((m_Transform.position.y < (m_WaterLevel - m_Height * 0.3f)) && (type == RoomEx.RoomType.DeepWater))  //enter swimming state machine
             {
                     SetSwimStateDeepWater();
                     StopImmediate(null);

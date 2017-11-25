@@ -10,7 +10,7 @@ public class KeyFrameData
     public int startoffset;   // Key frame start offset for an animation in global key frames array
     public int framesize;     // key frame size in short
     public int numkeyframe;   // number key frame in animation
-    public float framerate;   // animation frame rate
+    public float time_per_frame;   // animation frame rate
     public bool endofanimation = false;
     public bool bplayer = false;
 }
@@ -247,9 +247,9 @@ public class Animator
                             curvRelY.AddKey(0, -ItemAnimY);
                             curvRelZ.AddKey(0, ItemAnimZ);
 
-                            curvRelX.AddKey(1 * keyframeinfo.framerate, ItemAnimX);
-                            curvRelY.AddKey(1 * keyframeinfo.framerate, -ItemAnimY);
-                            curvRelZ.AddKey(1 * keyframeinfo.framerate, ItemAnimZ);
+                            curvRelX.AddKey(1 * keyframeinfo.time_per_frame, ItemAnimX);
+                            curvRelY.AddKey(1 * keyframeinfo.time_per_frame, -ItemAnimY);
+                            curvRelZ.AddKey(1 * keyframeinfo.time_per_frame, ItemAnimZ);
                         }
                         else
                         {
@@ -257,9 +257,9 @@ public class Animator
                             if (keylength > 0)
                             {
 
-                                Keyframe kx = new Keyframe(keylength * keyframeinfo.framerate, ItemAnimX, Mathf.Infinity, Mathf.Infinity);
-                                Keyframe ky = new Keyframe(keylength * keyframeinfo.framerate, -ItemAnimY, Mathf.Infinity, Mathf.Infinity);
-                                Keyframe kz = new Keyframe(keylength * keyframeinfo.framerate, ItemAnimZ, Mathf.Infinity, Mathf.Infinity);
+                                Keyframe kx = new Keyframe(keylength * keyframeinfo.time_per_frame, ItemAnimX, Mathf.Infinity, Mathf.Infinity);
+                                Keyframe ky = new Keyframe(keylength * keyframeinfo.time_per_frame, -ItemAnimY, Mathf.Infinity, Mathf.Infinity);
+                                Keyframe kz = new Keyframe(keylength * keyframeinfo.time_per_frame, ItemAnimZ, Mathf.Infinity, Mathf.Infinity);
                                 curvRelX.AddKey(kx);
                                 curvRelY.AddKey(ky);
                                 curvRelZ.AddKey(kz);
@@ -290,10 +290,10 @@ public class Animator
                         curvRelRotZ[transformId].AddKey(0, finalrot.z);
                         curvRelRotW[transformId].AddKey(0, finalrot.w);
 
-                        curvRelRotX[transformId].AddKey(keyframeinfo.framerate, finalrot.x);
-                        curvRelRotY[transformId].AddKey(keyframeinfo.framerate, finalrot.y);
-                        curvRelRotZ[transformId].AddKey(keyframeinfo.framerate, finalrot.z);
-                        curvRelRotW[transformId].AddKey(keyframeinfo.framerate, finalrot.w);
+                        curvRelRotX[transformId].AddKey(keyframeinfo.time_per_frame, finalrot.x);
+                        curvRelRotY[transformId].AddKey(keyframeinfo.time_per_frame, finalrot.y);
+                        curvRelRotZ[transformId].AddKey(keyframeinfo.time_per_frame, finalrot.z);
+                        curvRelRotW[transformId].AddKey(keyframeinfo.time_per_frame, finalrot.w);
                     }
                     else
                     {
@@ -301,10 +301,10 @@ public class Animator
                         if (keylength > 0)
                         {
                             //FIX: set outTangent and inTangent to Mathf.Infinity
-                            Keyframe kfrotx = new Keyframe(keylength * keyframeinfo.framerate, finalrot.x, Mathf.Infinity, Mathf.Infinity);
-                            Keyframe kfroty = new Keyframe(keylength * keyframeinfo.framerate, finalrot.y, Mathf.Infinity, Mathf.Infinity);
-                            Keyframe kfrotz = new Keyframe(keylength * keyframeinfo.framerate, finalrot.z, Mathf.Infinity, Mathf.Infinity);
-                            Keyframe kfrotw = new Keyframe(keylength * keyframeinfo.framerate, finalrot.w, Mathf.Infinity, Mathf.Infinity);
+                            Keyframe kfrotx = new Keyframe(keylength * keyframeinfo.time_per_frame, finalrot.x, Mathf.Infinity, Mathf.Infinity);
+                            Keyframe kfroty = new Keyframe(keylength * keyframeinfo.time_per_frame, finalrot.y, Mathf.Infinity, Mathf.Infinity);
+                            Keyframe kfrotz = new Keyframe(keylength * keyframeinfo.time_per_frame, finalrot.z, Mathf.Infinity, Mathf.Infinity);
+                            Keyframe kfrotw = new Keyframe(keylength * keyframeinfo.time_per_frame, finalrot.w, Mathf.Infinity, Mathf.Infinity);
 
                             curvRelRotX[transformId].AddKey(kfrotx);
                             curvRelRotY[transformId].AddKey(kfroty);
@@ -374,8 +374,8 @@ public class Animator
 
             TRAnimationClip tranimclip = new TRAnimationClip(animClip, leveldata.Animations[clipid].StateID);
             tranimclip.starttime = 0.0f;
-            tranimclip.endtime = keyframeinfo.numkeyframe * keyframeinfo.framerate;
-            tranimclip.framerate = (7.0f - tr2animation.FrameRate);
+            tranimclip.endtime = keyframeinfo.numkeyframe * keyframeinfo.time_per_frame;
+            tranimclip.framerate = 7 - tr2animation.FrameRate;// 1f / keyframeinfo.time_per_frame;
             tranimclip.index = clipid;
             tranimclips.Add(tranimclip);
             //goto next clip
@@ -427,7 +427,7 @@ public class Animator
         tr2framedata.data = leveldata.Frames;
         tr2framedata.startoffset = (int)tr2animation.FrameOffset / 2;
         tr2framedata.framesize = (int)tr2animation.FrameSize;  // num shorts of this frame step
-        tr2framedata.framerate = 1.0f / ((7.0f - tr2animation.FrameRate) * 4.0f);
+        tr2framedata.time_per_frame = (float)tr2animation.FrameRate / 30f;
 
         if (animid < (int)leveldata.NumAnimations - 1)
         {
