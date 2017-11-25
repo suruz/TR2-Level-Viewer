@@ -414,7 +414,7 @@ public class Player : ObjectExt
         Collider roof = SeekRoof();
         if (roof!=null)
         {
-            Debug.LogWarning("Head Collision With: ");
+            Debug.LogWarning("Head Collision With: " + roof.name);
             StopImmediate(roof);
             m_Transform.position = m_FreePosition;
             m_GroundHeight = m_GroundHeight + 0.1f; //force freefall handler to check ground...if ground not changed since last jump
@@ -684,7 +684,7 @@ public class Player : ObjectExt
     public void SetSwimState(RoomEx room)
     {
 		//return;
-        if (IsAvoidingFall()) //dont pull into swimming state when trying to getout of water
+        if (IsAvoidingFall() &&/*bugfix: except jump*/ (m_bJumping == false)) //dont pull into swimming state when trying to getout of water
         {
             if (m_SwimState == SwimmingState.InWaterSurface)
             {
@@ -709,7 +709,7 @@ public class Player : ObjectExt
         {
             RoomEx.RoomType type = room.GetRoomType();
 			m_WaterLevel = room.GetCenterPoint().y;
-            //Debug.Log("Room Type:" + type);
+            Debug.Log("Room Type:" + type);
 			Vector3 heappos = GetHipPosition();
 			
 			Bounds room_bound = room.GetBound();
