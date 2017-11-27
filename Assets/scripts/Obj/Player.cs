@@ -393,14 +393,16 @@ public class Player : ObjectExt
         {
             m_bPullingUp = true;
             m_bJumping = physics.CalculateCurve(From, JumpVector, rot, sign);
+            Debug.Log("Jump Physics Handler" + "pulling up");
 
         }
         else
         {
             m_bJumping = physics.CalculateCurve(From, To, rot, sign);
+            Debug.Log("Jump Physics Handler" + "Normal Jump");
         }
 
-        Debug.Log("Jump Physics Handler" + m_bJumping);
+        
         if (m_bJumping)
 		{
 			InitialiseGround();
@@ -412,7 +414,8 @@ public class Player : ObjectExt
 	//This can only be stoped by LaraStatePlayer. Using stoping condition here is useless
     void JumpingHandler(Vector3 dir)
     {
-		SeekGround();  //Keep a eye on ground height changes
+        //Debug.Log("JumpingHandler");
+
         Collider roof = SeekRoof();
         if (roof!=null)
         {
@@ -424,6 +427,7 @@ public class Player : ObjectExt
         }
         else if (m_Transform.position.y < m_GroundHeight) //landed
         {
+            Debug.Log("Landed");
             StopImmediate(null);
             m_Transform.position = new Vector3(m_Transform.position.x, m_GroundHeight, m_Transform.position.z);
             ResetJump();
@@ -431,9 +435,11 @@ public class Player : ObjectExt
 		
 		    //update jump physics
            m_Transform.position = physics.UpdateJump(Time.time - m_JumpStartTime);
-           RecordFreePosition(); // record unconditional free position           
-       
-        //Debug.Log("Jumping");
+           RecordFreePosition(); // record unconditional free position        
+
+        SeekGround();  //Keep a eye on ground height changes   
+
+
     }
 
     void OnReachPullUpTarget()

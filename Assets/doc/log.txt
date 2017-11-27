@@ -778,6 +778,47 @@ actually written
 
 	Devloping diving state machine....
 
+	156-158 (will dive)
+	153 (diving)
+	152 (did dive)
+	87 (did dive)
+
+
+	23/11/2017
+
+	Fixed double instances of Lara in some TRLE level. This casued movement speed issue while updating player.
+
+
+	25/11/2017
+
+	Fixed diving into water bug due to early return of Player.SetSwimState() while checking m_bJumping == true
+	Dont goto swimming state again while worling against gravity (e.g trying to getout of water), except case, jumping into water.
+
+	Fixed animation frame rate using original engine time per frame.
+
+	27/11/2017
+
+	Entity relative frames are sum of frames  in all animation clips in Entity (e.g. Lara)
+
+	Added method LaraStatePlayer.SelectDispatcher() to select proper dispatcher for state change based on
+	entity relative frame index. current unity animation clip frame index is converted to entity relative 
+	frame index.
+
+	Updated TRAnimationClip class to support clip space frame index to entity space frame index
+
+	Fixed: jump tumble bug by performing post ground seeking in Player.JumpingHandler(), pre ground
+	seeking causing bug due to the fact that, seeked ground level is higher than player's y positon
+	player will not jump;
+
+
+
+
+
+
+
+
+
+
 
 
 

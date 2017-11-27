@@ -662,7 +662,7 @@ public class LaraStatePlayer: MonoBehaviour {
 		if(from!=null && from.StateID !=-1  && to!=null && to.StateID!= -1)
 		{
 			//Debug.Log("Cross fade");
-			//Debug.Log("Cross fade from: " + from.name + " to:" + to.name );
+			Debug.Log("Cross fade from: " + from.name + " to:" + to.name );
 			int nstatechange = 	tranimations[from.AnimationID].statechanges.Count;
 			for(int statechangeid = 0; statechangeid < nstatechange; statechangeid++)
 			{	
