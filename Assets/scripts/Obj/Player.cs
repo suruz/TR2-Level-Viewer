@@ -90,6 +90,8 @@ public class Player : ObjectExt
         m_LarasHead = m_LarasHeap.Find("objPart:7").Find("objPart:14");
                                                   //m_LarasHeapPosition = m_LarasHeap.position - Vector3.up * 0.25f;
         SetInitialPosition(m_Transform.position, transform.forward);
+
+        physics.OnReachedMaximumHeight += DidReachedMaxJumpHeight;
     }
 
     void SetInitialPosition(Vector3 pos, Vector3 dir)
@@ -709,7 +711,7 @@ public class Player : ObjectExt
         {
             RoomEx.RoomType type = room.GetRoomType();
 			m_WaterLevel = room.GetCenterPoint().y;
-            Debug.Log("Room Type:" + type);
+            //Debug.Log("Room Type:" + type);
 			Vector3 heappos = GetHipPosition();
 			
 			Bounds room_bound = room.GetBound();
@@ -1045,6 +1047,27 @@ public class Player : ObjectExt
     Vector3 GetHeadPositon()
     {
         return m_LarasHead.position;
+    }
+
+    void DidReachedMaxJumpHeight()
+    {
+        Debug.Log("Reached Max Height");
+        //Time to check we are diving in water!
+
+        if (m_Room != null)
+        {
+            RoomEx.RoomType type = m_Room.GetRoomType();
+            Debug.Log("Are we diving in :" + type);
+
+            if(type == RoomEx.RoomType.DeepWater)
+            {
+                //change animation state dive
+                if(m_AnimStatePlayer != null)
+                {
+                    m_AnimStatePlayer.Dive();
+                }
+            }
+        }
     }
 
 }

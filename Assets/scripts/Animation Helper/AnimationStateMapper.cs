@@ -25,10 +25,11 @@ public class AnimationStateMapper {
 				for(int dispatchid = 0; dispatchid < ndispatch; dispatchid++)
 				{
 					Parser.Tr2AnimDispatch animdispatch = leveldata.AnimDispatches[offsetdispatch + dispatchid];
-					TRAnimDispatcher unityanimdispacher = new TRAnimDispatcher();
-					unityanimdispacher.NextAnimation = animdispatch.NextAnimation;
-					unitystatechange.dispatchers.Add(unityanimdispacher);
-				}
+					//TRAnimDispatcher unityanimdispacher = new TRAnimDispatcher();
+					//unityanimdispacher.NextAnimation = animdispatch.NextAnimation;
+					//unitystatechange.dispatchers.Add(unityanimdispacher);
+                    unitystatechange.tr2dispatchers.Add(animdispatch);
+                }
 				clips[clipid].statechanges.Add(unitystatechange);
 			}
 			

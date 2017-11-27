@@ -123,6 +123,7 @@ public class LaraStatePlayer: MonoBehaviour {
 	public bool OnAir = false;
 	public bool crossfading = false;
 	public bool busy = false;
+    public bool diving = false;
 
 	AudioSource SfxSource = null;
 	//These are events that handled elsewhere. Events are generated from this class
@@ -132,6 +133,7 @@ public class LaraStatePlayer: MonoBehaviour {
 
 	//flags for swimming staatee
 	public SwimmingState m_SwimState = SwimmingState.None;
+    float m_CurrentAnimationFrameTime = 0;
 	
 	// Use this for initialization
 	void Start () {
@@ -398,6 +400,14 @@ public class LaraStatePlayer: MonoBehaviour {
         actions[KeyMapper.Jump + swimstate].AddState(statemap[KeyMapper.Jump + swimstate], 1, 0);
 
 
+
+        //state map for dive in air
+        statemap[KeyMapper.DiveInAir] = new State("Dive Air", 52, 156);
+
+        actions[KeyMapper.DiveInAir] = new Action("Dive in air");
+        actions[KeyMapper.DiveInAir].AddState(statemap[KeyMapper.DiveInAir], 1, 0);
+
+
         thistransform = transform;
 		SfxSource = gameObject.AddComponent<AudioSource>();
 		SfxSource.volume = 0.35f;
@@ -477,19 +487,20 @@ public class LaraStatePlayer: MonoBehaviour {
 				if(current_state.AnimationID>= rootanim.GetClipCount()) return;
 				//rootanim.Play("" + current_state.AnimationID);
 				AnimationState animstate = rootanim["" + current_state.AnimationID];
-				animstate.time = Time.time - current_action.time;
+                m_CurrentAnimationFrameTime = Time.time - current_action.time;
+                animstate.time = m_CurrentAnimationFrameTime;
 				//Debug.Log(animstate.speed);
-				if(Time.time - current_action.time > animstate.length )
+				if(m_CurrentAnimationFrameTime > animstate.length )
 				{
 					HandleSFX(currentkeystate);
 				}
 
-				if(Time.time - current_action.time > animstate.length * 0.1f)
+				if(m_CurrentAnimationFrameTime > 0)  //custom animation event
 				{
 					busy = true;
 					HandleState(animstate);
 				}
-				else if(Time.time - current_action.time > animstate.length)
+				else if(m_CurrentAnimationFrameTime > animstate.length)
 				{
 					busy = false;
 					current_action.time = Time.time;
@@ -501,6 +512,7 @@ public class LaraStatePlayer: MonoBehaviour {
 	void HandleState(AnimationState animstate)
 	{
 	
+        //Check state change
 		if(prevkeystate != currentkeystate && OnAir == false)
 		{
 			//Debug.Log("["+ Time.time + "]" + " currentkeystate:" + currentkeystate + " prevkeystate: "+ prevkeystate);
@@ -546,13 +558,22 @@ public class LaraStatePlayer: MonoBehaviour {
 		GotoState(KeyMapper.Idle + (int)m_SwimState);
 		
 		Debug.Log("OnCollision:" + m_SwimState);
-	}
+        diving = false;
+
+    }
 
 	public void OnPullUp(int statecode)
 	{
 		OnAir = false;
 		currentkeystate = statecode + (int)m_SwimState;
 	}
+
+    public void Dive()
+    {
+        diving = true;
+        GotoState(KeyMapper.DiveInAir + (int)m_SwimState);
+    }
+
 
 	/*public void OnExitCollision(Collider other)
 	{
@@ -566,6 +587,7 @@ public class LaraStatePlayer: MonoBehaviour {
 
 	public void StateCodeHandler(int keystate, int otherkey, float time)
 	{
+        if (diving) return;
 		//if(keystate == jumpBack) return;
 		if(OnAir || collide) return;
 		//if(busy) return;
@@ -600,6 +622,7 @@ public class LaraStatePlayer: MonoBehaviour {
 
 	public void IdleStateHandler(int keystate , float time)
 	{
+        if (diving) return;
 		if(OnAir) return;
 		//if(busy) return;
 		currentkeystate = keystate + (int)m_SwimState;
@@ -629,10 +652,12 @@ public class LaraStatePlayer: MonoBehaviour {
 	}
 
 
-	public static TRAnimStateChange gunitystatechange = null;
-	public static int animdispatchcount = 0;
-	
-	void StateCrossFade(State from, State to)
+	static TRAnimStateChange gunitystatechange = null;
+	static int animdispatchcount = 0;
+    static State from_state = null;
+    static Parser.Tr2AnimDispatch dispatcher = null;
+
+    void StateCrossFade(State from, State to)
 	{
 		if(from!=null && from.StateID !=-1  && to!=null && to.StateID!= -1)
 		{
@@ -649,22 +674,24 @@ public class LaraStatePlayer: MonoBehaviour {
 					crossfading = true;
 					rootanim.Stop();
 					current_state = to;
-					
-					if(from == statemap[KeyMapper.Idle + (int)m_SwimState])
+                    from_state = from;
+
+                    if (from == statemap[KeyMapper.Idle + (int)m_SwimState])
 					{
                         int nextanim = -1;
-                        if (gunitystatechange.dispatchers.Count > 0)
+                        if (gunitystatechange.tr2dispatchers.Count > 0)
                         {
-                            TRAnimDispatcher unityanimdispacher = gunitystatechange.dispatchers[animdispatchcount];
+                            Parser.Tr2AnimDispatch unityanimdispacher = gunitystatechange.tr2dispatchers[animdispatchcount];
                             nextanim = unityanimdispacher.NextAnimation;
                         }
 
-                        Debug.Log("Cross fade from: " + from.AnimationID + " to: " + nextanim + "where state id" + unitystatechange.stateid + "Number of sequence" + gunitystatechange.dispatchers.Count);
+                        Debug.Log("Cross fade from: " + from.AnimationID + " to: " + nextanim + "where state id" + unitystatechange.stateid + "Number of sequence" + gunitystatechange.tr2dispatchers.Count);
 
                         if (nextanim == 190 && m_SwimState == SwimmingState.InWaterSurface) break;
 
                     }
-					CrossFadeHandler();
+                    dispatcher = SelectDispatcher(gunitystatechange, from_state.AnimationID, m_CurrentAnimationFrameTime);
+                    CrossFadeHandler();
 					return;
 				}
 			}
@@ -680,21 +707,42 @@ public class LaraStatePlayer: MonoBehaviour {
 	
 	void CrossFadeHandler()
 	{
-		if(animdispatchcount < gunitystatechange.dispatchers.Count)
-		{
-			TRAnimDispatcher unityanimdispacher = gunitystatechange.dispatchers[animdispatchcount];
-			rootanim.Play("" + unityanimdispacher.NextAnimation);
-			rootanim.wrapMode = WrapMode.Once;
-			Invoke("CrossFadeHandler", tranimations[unityanimdispacher.NextAnimation].endtime);
-			animdispatchcount = gunitystatechange.dispatchers.Count;
-		}
-		else
-		{
-			PlayCurrentState(current_state);
-		}
+        if(dispatcher != null)
+        {
+            rootanim.Play("" + dispatcher.NextAnimation);
+            //dispatcher.NextFrame
+            rootanim.wrapMode = WrapMode.Once;
+            Invoke("CrossFadeHandler", tranimations[dispatcher.NextAnimation].endtime);
+            dispatcher = null;
+        }
+        else
+        {
+            PlayCurrentState(current_state);
+        }
 	}
 
-	void PlayCurrentState(State state)
+    Parser.Tr2AnimDispatch SelectDispatcher(TRAnimStateChange target_statechange,int current_anim_id, float current_frame_time)
+    {
+
+        if (target_statechange == null) return null;
+
+        //Calculate Animation Frame Index relative to Entity (Lara)
+
+        int frame_offset = (int)(current_frame_time / tranimations[current_anim_id].time_per_frame);
+        int current_frame_index = tranimations[current_anim_id].start_animation_frame_index + frame_offset;
+
+        for (int i = 0; i < target_statechange.tr2dispatchers.Count; i++ )
+        {
+            Parser.Tr2AnimDispatch dispatcher = target_statechange.tr2dispatchers[i];
+            if (current_frame_index >= dispatcher.Low && current_frame_index <= dispatcher.High)
+            {
+                return dispatcher;
+            }
+        }
+        return null;
+    }
+
+    void PlayCurrentState(State state)
 	{
 		crossfading = false;
 		if(current_action!= null && state!=null && state.AnimationID != -1)
@@ -709,14 +757,19 @@ public class LaraStatePlayer: MonoBehaviour {
 				rootanim.wrapMode = WrapMode.Once;
 			}
  			current_action.time = Time.time;
-			OnAir = state.OnAir;
-			
-			if(OnAir)
-			{
-				Vector3 jumpdir = thistransform.rotation * state.movedir;
-				//Notify Jump Physics Handler
-				if(OnJump != null) OnJump (thistransform.position, jumpdir * 2048 * Settings.SceneScaling , transform.rotation, (state.movedir.x + state.movedir.z));
-			}
+
+            //setup animation events
+            if (!diving)
+            {
+                OnAir = state.OnAir;
+
+                if (OnAir)
+                {
+                    Vector3 jumpdir = thistransform.rotation * state.movedir;
+                    //Notify Jump Physics Handler
+                    if (OnJump != null) OnJump(thistransform.position, jumpdir * 2048 * Settings.SceneScaling, transform.rotation, (state.movedir.x + state.movedir.z));
+                }
+            }
 		}
 	}
 	

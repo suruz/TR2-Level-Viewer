@@ -7,7 +7,8 @@ public class KeyFrameData
     public ushort[] data;
     public int numshorts;
 
-    public int startoffset;   // Key frame start offset for an animation in global key frames array
+    public int start_animation_frame_index = 0;
+    public int startoffset;   // Key frame start offset (in number of short) for an animation in global key frames array
     public int framesize;     // key frame size in short
     public int numkeyframe;   // number key frame in animation
     public float time_per_frame;   // animation frame rate
@@ -25,11 +26,11 @@ public class TRAnimDispatcher
 [System.Serializable]
 public class TRAnimStateChange
 {
-    public List<TRAnimDispatcher> dispatchers = null;
+    public List<Parser.Tr2AnimDispatch> tr2dispatchers = null;
     public int stateid = -1;
     public TRAnimStateChange()
     {
-        dispatchers = new List<TRAnimDispatcher>();
+        tr2dispatchers = new List<Parser.Tr2AnimDispatch>();
     }
 }
 [System.Serializable]
@@ -44,6 +45,8 @@ public class TRAnimationClip
     public float starttime = 0.0f;
     public float endtime = 0.0f;
     public float framerate = 1.0f;
+    public float time_per_frame = 0;
+    public int start_animation_frame_index = 0;
 
     public TRAnimationClip(AnimationClip clip, int forsate)
     {
@@ -55,13 +58,7 @@ public class TRAnimationClip
     //Get time of key frame time
 	public float GetAnimationFrameTime(int frame)
 	{
-		float retval = 0;
-		if (clip != null) 
-		{
-			retval = frame * clip.frameRate;
-		}
-
-		return retval;
+		return frame * time_per_frame;
 	}
 }
 
@@ -83,8 +80,9 @@ public class Animator
         //each frame chunk contain sequential  data [key] for all of the transform of this object
         //Now question is how many animation clips there are ? 
 
-        KeyFrameData keyframeinfo = CalculateAnimationKeyFrameData(trclipoffset, leveldata);
-        bool shortanimation = false;
+        //KeyFrameData keyframeinfo = CalculateAnimationKeyFrameData(trclipoffset, leveldata);
+
+        /*bool shortanimation = false;
         if (keyframeinfo.numkeyframe < 15)
         {
             shortanimation = true;
@@ -99,14 +97,14 @@ public class Animator
         }
 
         //Debug.Log("ID: " + tr2movable.ObjectID + " trclipoffset: " + trclipoffset);
+        */
 
 
-        //[0][0][0][0][0][0][0][0][0][0]
         for (int clipid = 0; clipid < tr2movable.NumClips; clipid++)
         {
             //if(shortanimation && clipid > 5) break;
 
-            keyframeinfo = CalculateAnimationKeyFrameData(trclipoffset, leveldata);
+            KeyFrameData keyframeinfo = CalculateAnimationKeyFrameData(trclipoffset, leveldata);
             Parser.Tr2Animation tr2animation = leveldata.Animations[trclipoffset];
 
             AnimationCurve curvRelX = null;
@@ -373,10 +371,12 @@ public class Animator
             }
 
             TRAnimationClip tranimclip = new TRAnimationClip(animClip, leveldata.Animations[clipid].StateID);
+            tranimclip.time_per_frame = keyframeinfo.time_per_frame;
             tranimclip.starttime = 0.0f;
-            tranimclip.endtime = keyframeinfo.numkeyframe * keyframeinfo.time_per_frame;
-            tranimclip.framerate = 7 - tr2animation.FrameRate;// 1f / keyframeinfo.time_per_frame;
+            tranimclip.endtime = keyframeinfo.numkeyframe * tranimclip.time_per_frame;
+            tranimclip.framerate = 7 - tr2animation.FrameRate;// 1f / tranimclip.time_per_frame ;
             tranimclip.index = clipid;
+            tranimclip.start_animation_frame_index = keyframeinfo.start_animation_frame_index;
             tranimclips.Add(tranimclip);
             //goto next clip
             trclipoffset++;
@@ -448,6 +448,10 @@ public class Animator
         {
             tr2framedata.numkeyframe = 0;
         }
+
+        tr2framedata.start_animation_frame_index = tr2animation.FrameStart;// tr2animation (int)tr2framedata.startoffset / tr2framedata.framesize;
+
+       // tr2framedata.numkeyframe = (tr2animation.FrameEnd - tr2animation.FrameStart) + 1;
 
         //if(tr2framedata.numkeyframe > 15)
         //Debug.Log("numkeyframe: " + tr2framedata.numkeyframe + " NextAnimation:" + tr2animation.NextAnimation);

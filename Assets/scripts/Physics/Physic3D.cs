@@ -15,8 +15,10 @@ public class Physic3D {
 	Vector3 Start = Vector3.zero; //Jump start position
 	bool HasValidCurve = false;
 	float FreefallSpeed = 1f;
-
-	public Physic3D(Vector3 startpos)
+    public delegate void DidReachedMaxHeight();
+    public event DidReachedMaxHeight OnReachedMaximumHeight;
+    bool ReachedMaximumHeight = false;
+    public Physic3D(Vector3 startpos)
 	{
 		Start = startpos;
 	}
@@ -33,6 +35,16 @@ public class Physic3D {
 		float dx = deltatime * Hv ;
 		float dy = Vv * deltatime - (0.5f * g * deltatime * deltatime);
 		Vector3 posvec = new Vector3(0.0f,dy,dx);
+
+        if(dy > (Vd * 0.8f))
+        {
+          
+            if(OnReachedMaximumHeight != null && !ReachedMaximumHeight)
+            {
+                OnReachedMaximumHeight();
+                ReachedMaximumHeight = true;
+            }
+        }
 		//Debug.Log("Physic3D: Jump ");
 		return Start + rotation * posvec;
   	}		
@@ -75,9 +87,12 @@ public class Physic3D {
 		{		
 			HasValidCurve = false;
 			
-		}		
+		}
 
-		return HasValidCurve;
+        ReachedMaximumHeight = false;
+
+
+        return HasValidCurve;
 		
 	}
 	
