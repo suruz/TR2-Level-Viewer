@@ -144,10 +144,7 @@ public class ThirdPersonCam : MonoBehaviour {
             float water_level = player.m_Room.GetCenterPoint().y;
             Bounds b = player.m_Room.GetBound();
             Material room_mat = LevelManager.GetSharedMaterial();
-            Material water_storage_mat = LevelManager.GetWaterHolderMaterial();
-            //Color water_color =  WaterEffect.GetWaterMaterial().color * 10;
 
-      
             if (b.Contains(m_Transform.position))
 			{
 				//Debug.Log("Camera In Water");

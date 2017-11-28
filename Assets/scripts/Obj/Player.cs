@@ -498,8 +498,15 @@ public class Player : ObjectExt
 				StandedUp = true;
 				m_bStandingUp = false;
 			    FlickerPos = new Vector3(m_LarasHeap.position.x, PullUpTarget.y, m_LarasHeap.position.z);
-			}
-		}
+               
+            }
+
+            if (m_AnimStatePlayer != null && diff < 0.01)
+            {
+                m_AnimStatePlayer.PlayPullUpSFX();
+            }
+
+        }
 		
 		if(StandedUp)
 		{
@@ -529,7 +536,7 @@ public class Player : ObjectExt
             {
                mr.enabled = false;
             }
-
+            m_AnimStatePlayer.PlayWalkUpSFX();
             FlickerPos = new Vector3(m_LarasHeap.position.x, PullUpTarget.y + m_PullUpHeight, m_LarasHeap.position.z);
             Invoke("Flickring", 0.05f);
             
@@ -547,10 +554,10 @@ public class Player : ObjectExt
 
         m_Transform.position = FlickerPos;
         SetInitialPosition(m_Transform.position, m_Transform.forward);
-		
-		//if (m_SwimState == SwimmingState.InWaterSurface)
+
+        //if (m_SwimState == SwimmingState.InWaterSurface)
         //{
-            SetSwimStateNone();
+        SetSwimStateNone();
            //Grab ledge and get outof water
         //}
 		Debug.Log("Post pull up stoping");
@@ -730,21 +737,30 @@ public class Player : ObjectExt
 			
 			if ((m_Transform.position.y < (m_WaterLevel - m_Height * 0.3f)) && (type == RoomEx.RoomType.DeepWater))  //enter swimming state machine
             {
-                    SetSwimStateDeepWater();
-                    StopImmediate(null);
+                if (m_AnimStatePlayer != null)
+                {
+                    m_AnimStatePlayer.PlayDiveSFX(SwimmingState.InDeepWater);
+                }
+                SetSwimStateDeepWater();
+                StopImmediate(null);
             }
             else if ((m_Transform.position.y < min_fall_height) && (type == RoomEx.RoomType.ShalloWater))
             {
-					if(heappos.y  < m_WaterLevel) //hip is inside water
-					{
-                    	SetSwimStateShallowWater();
-						StopImmediate(null);
-					}
-					else
-					{
-					
-					
-					}
+                if (heappos.y < m_WaterLevel) //hip is inside water
+                {
+                    if (m_AnimStatePlayer != null)
+                    {
+                        m_AnimStatePlayer.PlayDiveSFX(SwimmingState.InShallowWater);
+                    }
+
+                    SetSwimStateShallowWater();
+                    StopImmediate(null);
+                }
+                else
+                {
+
+
+                }
                     
              }
 			
