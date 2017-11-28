@@ -135,21 +135,6 @@ public class TextureUV  {
 		tex.name = "texAtlas";
 		tex.hideFlags = 0;
 			
-#if UNITY_WEBPLAYER
-				//do nothing. casue web player can not access disk
-#elif UNITY_EDITOR
-		
-		if(!Settings.LoadLevelFileFromUrl)
-		{
-			if(!Directory.Exists(Application.dataPath + "/Level Texture/"))
-			{
-				Directory.CreateDirectory(Application.dataPath + "/Level Texture/");
-			}
-			//if(!File.Exists(Application.dataPath + "/Level Texture/" + Level.m_LevelName + ".png"))
-			File.WriteAllBytes(Application.dataPath + "/Level Texture/" + Level.m_LevelName + ".png",tex.EncodeToPNG());
-		}
-#endif
-		
 		return tex;
 	}
 	
