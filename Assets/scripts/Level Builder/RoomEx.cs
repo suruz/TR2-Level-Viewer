@@ -9,16 +9,16 @@ public class RoomEx: MonoBehaviour  {
 	Vector3[] m_RoomVertices;
 	public Transform m_Transform;
 	int ID = 0;
-	public int[] m_SharedTriangles = null;
+	int[] m_SharedTriangles = null;
 	List<Edge> m_RoomEdges = null;
 	public float m_CeilingHeight = -Mathf.Infinity;
 	public float m_FloorHeight = Mathf.Infinity;
 	public List<GameObject> m_StaticObjects = null;
-	Material m_Material;
-	Parser.Tr2Level m_leveldata = null;
+	public Material m_Material;
+	//Parser.Tr2Level m_leveldata = null;
     Vector3 m_CenterPoint = Vector3.zero;
     Bounds m_RoomBound;
-
+    public short Flags = 0;
 
     public enum RoomType
     {
@@ -29,7 +29,7 @@ public class RoomEx: MonoBehaviour  {
         Ice
     }
 
-    RoomType m_RoomType = RoomType.Land;
+    public RoomType m_RoomType = RoomType.Land;
 
     void Start()
 	{
@@ -47,8 +47,7 @@ public class RoomEx: MonoBehaviour  {
 
 	public void  InitRoom(Parser.Tr2Room room, List<GameObject> objects)
 	{
-		m_leveldata = Level.m_leveldata;
-
+	
 #if UNITY_EDITOR
 		m_Mesh = GetComponent<MeshFilter>().sharedMesh;
 #else
@@ -81,6 +80,7 @@ public class RoomEx: MonoBehaviour  {
         m_RoomBound.SetMinMax(new Vector3(x, bottom, z), new Vector3(x + room_width, surface, z + room_depth));
 
         m_RoomType = DetectRoomType(room, m_RoomBound);
+        Flags = m_Tr2Room.Flags;
     }
 
 	public void DebugRoomSurface()

@@ -6,10 +6,10 @@ using System.IO;
 public class Level
 {
     static RoomEx[] m_RoomExs = null;
-    static GameObject m_LevelRoot = null;
+    static Transform m_LevelRoot = null;
     static Texture2D m_LevelTextureTile = null;
-    static public Parser.Tr2Level m_leveldata = null;
-    static public string m_LevelName;
+    Parser.Tr2Level m_leveldata = null;
+    static string m_LevelName;
 
     //resources
     static List<Tr2Moveable> m_DynamicPrefabs = null;
@@ -31,10 +31,10 @@ public class Level
 
     public delegate bool AttachBehaviourScript(GameObject AI, int ObjectID, GameObject player, Parser.Tr2Item tr2item);
     public static AttachBehaviourScript m_OnAttachBehabiourScript = AICallBackHandler.OnAttachingBehaviourToObject;
-    public static Material m_SharedMaterial;
-	public static Material m_SharedMaterialWater;
-	public static Material m_SharedMaterialWaterHolder;
-    public static List<Material> m_InstancedMaterialWaterHolders = new List<Material>();
+    public  Material m_SharedMaterial;
+	public  Material m_SharedMaterialWater;
+	public  Material m_SharedMaterialWaterHolder;
+    public  List<Material> m_InstancedMaterialWaterHolders = new List<Material>();
 
     public enum FloorAttribute{
 		Water,
@@ -43,14 +43,11 @@ public class Level
 		Solid
 	}
 
-    public Level(Parser.Tr2Level leveldata)
+    public Level(Parser.Tr2Level leveldata, Material sharedmaterial, Transform roottransform)
     {
+        m_LevelRoot = roottransform;
         m_leveldata = leveldata;
-        m_LevelRoot = new GameObject("Level " + m_LevelName);
-        //m_LevelRoot.AddComponent(typeof (MeshFilter));
-        //m_LevelRoot.AddComponent(typeof (MeshRenderer));
-
-        if (m_leveldata != null && m_leveldata.NumRooms > 0)
+        //if (m_leveldata != null && m_leveldata.NumRooms > 0)
         {
             //TextureUV.GenerateTextureTile ismoved to Loader.cs for better responsibility managment 
             //Trying to set assigned render material property, marks shared material as instance.
@@ -59,6 +56,7 @@ public class Level
 			m_SharedMaterialWaterHolder = Resources.Load("water_holder", typeof(Material)) as Material;
             Shader waterEffectShader = Resources.Load("WaterEffect", typeof(Shader)) as Shader;
             //init materials
+            m_SharedMaterial = sharedmaterial;
             m_SharedMaterial.color = new Color(1f, 1f, 1f, 1.0f);
             m_SharedMaterial.SetFloat("_InSideWater", 0);
             m_SharedMaterial.SetFloat("_WaterPlaneY", 0);
@@ -71,8 +69,11 @@ public class Level
 
             m_RoomExs = new RoomEx[m_leveldata.NumRooms];
 
-            m_DynamicPrefabs = BuildDynamicPrefabObjects();
-            m_StaticPrefabs = BuildStaticPrefabObjects();
+            Transform PrefavContainer = new GameObject("PrefavContainer").transform;
+            PrefavContainer.parent = m_LevelRoot;
+
+            m_DynamicPrefabs = BuildDynamicPrefabObjects(PrefavContainer);
+            m_StaticPrefabs = BuildStaticPrefabObjects(PrefavContainer);
 
             //determine animation clip size for each movable object
             for (int i = 0; i < m_DynamicPrefabs.Count - 1; i++)
@@ -111,6 +112,13 @@ public class Level
             }
 
             //build rooms
+            //container for water go
+            Transform WaterContainer = new GameObject("WaterContainer").transform;
+            WaterContainer.parent = m_LevelRoot;
+
+            Transform RoomContainer = new GameObject("RoomContainer").transform;
+            RoomContainer.parent = m_LevelRoot;
+
             for (int i = 0; i < m_leveldata.NumRooms; i++)
             {
                 Parser.Tr2Room tr2room = leveldata.Rooms[i];
@@ -118,10 +126,10 @@ public class Level
                 Mesh roommesh = MeshBuilder.CreateRoomMesh(tr2room, m_leveldata, ref has_water);
                 Vector3 position = new Vector3(m_leveldata.Rooms[i].info.x, 0, m_leveldata.Rooms[i].info.z);
                 GameObject go = CreateRoom(roommesh, position * Settings.SceneScaling, i, m_SharedMaterial,FloorAttribute.Solid);
-                go.transform.parent = m_LevelRoot.transform;
+                go.transform.parent = RoomContainer;
                 m_RoomExs[i] = go.AddComponent<RoomEx>();
                 //build room object
-                List<GameObject> objects = InstantiateStaticObjects(tr2room, i);
+                List<GameObject> objects = InstantiateStaticObjects(tr2room, i, go.transform);
                 m_RoomExs[i].InitRoom(tr2room, objects);
 				
 				
@@ -164,12 +172,16 @@ public class Level
                      roommesh = MeshBuilder.CreateRoomWaterMesh(tr2room, m_leveldata);
                      go = CreateRoom(roommesh, position * Settings.SceneScaling, i, m_SharedMaterialWater,FloorAttribute.Water);
                      go.name = "water_" + i;
+                     go.transform.parent = WaterContainer;
                 }
 				
 				
             }
 
-            m_MovableInstances = InstantiateDynamicObjects();
+            Transform ObjectContainer = new GameObject("ObjectContainer").transform;
+            ObjectContainer.parent = m_LevelRoot;
+
+            m_MovableInstances = InstantiateDynamicObjects(ObjectContainer);
             SetupTrigers();
             //attach components to m_MovableInstances
             for (int i = 0; i < m_MovableInstances.Count; i++)
@@ -278,7 +290,7 @@ public class Level
         return parts;
     }
 
-    List<Parser.Tr2StaticMesh> BuildStaticPrefabObjects()
+    List<Parser.Tr2StaticMesh> BuildStaticPrefabObjects(Transform owner)
     {
         List<Parser.Tr2StaticMesh> objects = new List<Parser.Tr2StaticMesh>();
 
@@ -288,17 +300,18 @@ public class Level
             int itemIdx = (int)tr2staticmesh.StartingMesh;
 
             //m_leveldata.StaticMeshes[k]
-            tr2staticmesh.UnityObject = CreateObjectWithID(itemIdx, Vector3.zero, Quaternion.identity, "__staticBase" + k);
-            tr2staticmesh.UnityObject.transform.parent = m_LevelRoot.transform;
-            tr2staticmesh.UnityObject.AddComponent<MeshCollider>();
-            AICondition.SetActive(tr2staticmesh.UnityObject,false);
+            GameObject go = CreateObjectWithID(itemIdx, Vector3.zero, Quaternion.identity, "__staticBase" + k);
+            go.transform.parent = owner;
+            go.AddComponent<MeshCollider>();
+            AICondition.SetActive(go, false);
 
+            tr2staticmesh.UnityObject = go;
             objects.Add(tr2staticmesh);
         }
         return objects;
     }
 
-    List<Tr2Moveable> BuildDynamicPrefabObjects()
+    List<Tr2Moveable> BuildDynamicPrefabObjects(Transform container)
     {
         List<Tr2Moveable> objects = new List<Tr2Moveable>();
 
@@ -322,7 +335,7 @@ public class Level
             //creat a place holder gameObject and make it root transform ;
             tr2movable.UnityObject = new GameObject("prefab type:" + MovableObjectIdx);
             GameObject objRoot = tr2movable.UnityObject;
-            objRoot.transform.parent = m_LevelRoot.transform;
+            objRoot.transform.parent = container;
             objRoot.transform.Translate(Vector3.zero);
             objRoot.transform.Rotate(Vector3.zero);
 
@@ -405,7 +418,7 @@ public class Level
     }
 
 
-    List<GameObject> InstantiateStaticObjects(Parser.Tr2Room tr2room, int roomidx)
+    List<GameObject> InstantiateStaticObjects(Parser.Tr2Room tr2room, int roomidx, Transform owner)
     {
         List<GameObject> objects = new List<GameObject>();
 
@@ -430,7 +443,7 @@ public class Level
 
                     GameObject go = (GameObject)GameObject.Instantiate(m_StaticPrefabs[k].UnityObject, meshPos * Settings.SceneScaling, Quaternion.Euler(rot));
                     go.name = "room" + roomidx + "__staticBase" + k + "__meshBase" + itemIdx;
-                    go.transform.parent = m_LevelRoot.transform;
+                    go.transform.parent = owner;
                     AICondition.SetActive(go,true);
                     objects.Add(go);
                 }
@@ -439,7 +452,7 @@ public class Level
         return objects;
     }
 
-    List<Parser.Tr2Item> InstantiateDynamicObjects()
+    List<Parser.Tr2Item> InstantiateDynamicObjects(Transform owner)
     {
         List<Parser.Tr2Item> objects = new List<Parser.Tr2Item>();
 
@@ -478,7 +491,7 @@ public class Level
 
                 GameObject movableItem = (GameObject)GameObject.Instantiate(m_DynamicPrefabs[i].UnityObject);
                 movableItem.name = "Object";
-                movableItem.transform.parent = m_LevelRoot.transform;
+                movableItem.transform.parent = owner;
                 movableItem.transform.position = new Vector3(m_leveldata.Items[j].x, -m_leveldata.Items[j].y, m_leveldata.Items[j].z) * Settings.SceneScaling;
                 float rot = ((m_leveldata.Items[j].Angle >> 14) & 0x03) * 90;
                 movableItem.transform.rotation = Quaternion.Euler(0, rot, 0);
@@ -511,7 +524,7 @@ public class Level
             m_Player = go;
             m_Player.layer = UnityLayer.Player;
             m_PrevPlayPos = m_Player.transform.position;
-            m_Player.transform.parent = null;
+            m_Player.transform.parent = m_LevelRoot;
 
             if (m_leveldata.Camera != null)
             {
@@ -644,8 +657,14 @@ public class Level
 
     void SetupTrigers()
     {
-		GameObject DieZoneContainer = new GameObject("Die Zones");
-		GameObject ClimbZoneContainer = new GameObject("Climb Zones");
+		Transform DieZoneContainer = new GameObject("Die Zones").transform;
+        Transform ClimbZoneContainer = new GameObject("Climb Zones").transform;
+        Transform SwitchContainer = new GameObject("Switch Container").transform;
+        Transform LockContainer = new GameObject("Lock Container").transform;
+        DieZoneContainer.parent = m_LevelRoot;
+        ClimbZoneContainer.parent = m_LevelRoot;
+        SwitchContainer.parent = m_LevelRoot;
+        LockContainer.parent = m_LevelRoot;
 
         if (m_leveldata.Rooms.Length > 0 && m_Player != null)
         {
@@ -712,6 +731,7 @@ public class Level
                                     triger_item_index = (int)(fdlist0 & 0x03FF);    //FDfunction Operand (bits 0..9): Item index 
                                                                                     //Debug.Log("Switch ID " + m_leveldata.Items[triger_item_index].ObjectID);
                                     m_leveldata.Items[triger_item_index].UnityObject.name = "Switch";
+                                    m_leveldata.Items[triger_item_index].UnityObject.transform.parent = SwitchContainer;
                                 }
 
                                 //get trigger target
@@ -724,6 +744,7 @@ public class Level
                                     m_leveldata.Items[target_item_index].UnityObject.name = "Target";
                                     m_leveldata.Items[triger_item_index].ActivateObject = m_leveldata.Items[target_item_index].UnityObject;
                                     m_leveldata.Items[triger_item_index].UnityObject.name += "[T" + m_leveldata.Items[target_item_index].ObjectID + "]";
+                                    m_leveldata.Items[triger_item_index].UnityObject.transform.parent = LockContainer;
                                     AddTrigger(m_leveldata.Items[triger_item_index].UnityObject);
                                 }
                                 
@@ -755,7 +776,7 @@ public class Level
                                     GameObject diezone = MeshBuilder.CreateZone("Die Zone");
                                     diezone.transform.position = sector_world_position;
                                     diezone.transform.localScale = new Vector3(1024, 1024, 1024) * Settings.SceneScaling;
-                                    diezone.transform.parent = DieZoneContainer.transform;
+                                    diezone.transform.parent = DieZoneContainer;
 
                                     break;
 
@@ -767,7 +788,7 @@ public class Level
                                     GameObject climbzone = MeshBuilder.CreateZone("Climb Zone");
                                     climbzone.transform.position = sector_world_position;
                                     climbzone.transform.localScale = new Vector3(1024, 1024, 1024) * Settings.SceneScaling;
-                                    climbzone.transform.parent = ClimbZoneContainer.transform;
+                                    climbzone.transform.parent = ClimbZoneContainer;
 
                                     break;
                             }
@@ -796,22 +817,24 @@ public class Level
     }
 
 
-    static public Material GetSharedMaterial()
+     public Material GetSharedMaterial()
     {
         return m_SharedMaterial;
     }
 
-    static public Material GetWaterHolderMaterial()
+    Material GetWaterHolderMaterial()
     {
         return m_SharedMaterialWaterHolder;
     }
 
-    static public void UpdateWaterHolderMaterials(float inwater)
+    public Material GetSharedWaterMaterial()
     {
-        foreach( Material mat in m_InstancedMaterialWaterHolders)
-        {
-            mat.SetFloat("_InSideWater", inwater);
-        }
+        return m_SharedMaterialWater;
+    }
+
+     public List<Material> GetInstancedWaterHolderMaterials()
+    {
+        return m_InstancedMaterialWaterHolders;
     }
 
 }

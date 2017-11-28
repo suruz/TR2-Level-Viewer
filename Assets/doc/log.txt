@@ -810,6 +810,25 @@ actually written
 	seeking causing bug due to the fact that, seeked ground level is higher than player's y positon
 	player will not jump;
 
+	28/11/2017
+	
+	Added method Loader.BuildLevel....
+
+	Added class LevelManager to manage serialized level data (e.g Materials),
+	Initially I tried to serialize public data inside LevelManager through
+	a static method. but static variables in monoderived class can not be serialized,
+
+	So I took object based approch, I created a level manager game object with component
+	<LevelManager> in Loader.BuildLevel, then initialized (or serialized)  LevelManager's 
+	public variables.
+
+
+
+
+	From now on all material data will be access through LevelManager
+
+	Now room data is accessible through inspector (e.g room type)
+
 
 
 

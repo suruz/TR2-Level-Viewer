@@ -188,7 +188,10 @@ public class Player : ObjectExt
                         if (room != null) //All hit objects need not to be a room
                         {
                             m_Room = room;
-                            Debug.Log("m_Room" + m_Room.name + "room flag " + m_Room.m_Tr2Room.Flags );
+                            if (m_Room.m_Tr2Room != null)
+                            {
+                                Debug.Log("m_Room" + m_Room.name + "room flag " + m_Room.Flags);
+                            }
                         }
                     }
                 }
@@ -701,7 +704,9 @@ public class Player : ObjectExt
             return;
         }
 
-		if(room != null )
+        if (room == null) return;
+
+        if (room != null )
 		{
 			float surface = room.GetCenterPoint().y;
 			if(surface < m_WaterLevel)
@@ -717,7 +722,7 @@ public class Player : ObjectExt
         {
             RoomEx.RoomType type = room.GetRoomType();
 			m_WaterLevel = room.GetCenterPoint().y;
-            //Debug.Log("Room Type:" + type);
+            Debug.Log("Room Type:" + type);
 			Vector3 heappos = GetHipPosition();
 			
 			Bounds room_bound = room.GetBound();
@@ -748,11 +753,11 @@ public class Player : ObjectExt
 		
 		
         
-		if (room != null && (room.m_Tr2Room.Flags == 0x0001))//check if room filled with watere
+		if (room != null && (room.Flags == 0x0001))//check if room filled with watere
         {
           SetSwimStateDeepWater();
         }
-        else if (room != null && (room.m_Tr2Room.Flags == 65))
+        else if (room != null && (room.Flags == 65))
         {
             /*if(m_SwimState != SwimmingState.InShallowWater)
 			{

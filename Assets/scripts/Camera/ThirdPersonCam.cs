@@ -143,8 +143,8 @@ public class ThirdPersonCam : MonoBehaviour {
 
             float water_level = player.m_Room.GetCenterPoint().y;
             Bounds b = player.m_Room.GetBound();
-            Material room_mat = Level.GetSharedMaterial();
-            Material water_storage_mat = Level.GetWaterHolderMaterial();
+            Material room_mat = LevelManager.GetSharedMaterial();
+            Material water_storage_mat = LevelManager.GetWaterHolderMaterial();
             //Color water_color =  WaterEffect.GetWaterMaterial().color * 10;
 
       
@@ -162,7 +162,7 @@ public class ThirdPersonCam : MonoBehaviour {
                 room_mat.SetFloat("_InSideWater", 1);
                 room_mat.SetFloat("_WaterPlaneY", water_level);
 
-                Level.UpdateWaterHolderMaterials(1);
+                LevelManager.UpdateWaterHolderMaterials(1);
                 
 
             }
@@ -178,7 +178,7 @@ public class ThirdPersonCam : MonoBehaviour {
 
                 //do following shader update on exiting water
                 room_mat.SetFloat("_InSideWater", 0);
-                Level.UpdateWaterHolderMaterials(0);
+                LevelManager.UpdateWaterHolderMaterials(0);
             }
 		}
 	}

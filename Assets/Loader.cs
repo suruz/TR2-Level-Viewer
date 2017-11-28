@@ -13,7 +13,8 @@ public class Loader :MonoBehaviour {
 	//public TextMesh m_Text3D = null;
     public Material m_SharedMaterial;
 	static Level m_Level = null;
-	public static byte[] m_RawFileData = null;
+    static string m_LevelName = "Level";
+    public static byte[] m_RawFileData = null;
 	WWW m_www = null;
 	
 	//used in editor only
@@ -55,7 +56,7 @@ public class Loader :MonoBehaviour {
 				}
 				//if(!File.Exists(Application.dataPath + "/Level Texture/" + Level.m_LevelName + ".png"))
 				//File.WriteAllBytes(Application.dataPath + m_SharedTexturePath + Level.m_LevelName + ".png",shared_texture.EncodeToPNG());
-				FileStream fstream = File.Open(Application.dataPath + m_SharedTexturePath + Level.m_LevelName + ".png",FileMode.OpenOrCreate,FileAccess.ReadWrite);
+				FileStream fstream = File.Open(Application.dataPath + m_SharedTexturePath + m_LevelName + ".png",FileMode.OpenOrCreate,FileAccess.ReadWrite);
 				BinaryWriter bw = new BinaryWriter(fstream);
 				bw.Write(shared_texture.EncodeToPNG());
 				bw.Close();
@@ -64,10 +65,10 @@ public class Loader :MonoBehaviour {
 				//Refresh assete database for newly created texture
 				AssetDatabase.Refresh();
 
-				TextureImporter teximp = TextureImporter.GetAtPath("Assets" + m_SharedTexturePath + Level.m_LevelName + ".png") as TextureImporter;
+				TextureImporter teximp = TextureImporter.GetAtPath("Assets" + m_SharedTexturePath + m_LevelName + ".png") as TextureImporter;
 				if(teximp == null)
 				{
-					EditorUtility.DisplayDialog("Error", "Assets" + m_SharedTexturePath + Level.m_LevelName + ".png" + " is not found in Assets ", "OK");
+					EditorUtility.DisplayDialog("Error", "Assets" + m_SharedTexturePath + m_LevelName + ".png" + " is not found in Assets ", "OK");
 					return;
 				}
 				else
@@ -95,7 +96,7 @@ public class Loader :MonoBehaviour {
 				//refresh assets to apply changes 
 				AssetDatabase.Refresh();
 				//reimport is need after import setting modification
-				AssetDatabase.ImportAsset("Assets" + m_SharedTexturePath + Level.m_LevelName + ".png");
+				AssetDatabase.ImportAsset("Assets" + m_SharedTexturePath + m_LevelName + ".png");
 					
 				//load shared material
 				Material shared_material = (Material )AssetDatabase.LoadAssetAtPath("Assets" + m_SharedMaterialPath, typeof(Material));
@@ -106,9 +107,8 @@ public class Loader :MonoBehaviour {
 					return;
 				}
 				
-				shared_material.mainTexture = (Texture) AssetDatabase.LoadAssetAtPath("Assets" + m_SharedTexturePath + Level.m_LevelName + ".png", typeof(Texture));
-				Level.m_SharedMaterial = shared_material;
-				m_Level = new Level(leveldata);
+				shared_material.mainTexture = (Texture) AssetDatabase.LoadAssetAtPath("Assets" + m_SharedTexturePath + m_LevelName + ".png", typeof(Texture));
+				m_Level = BuildLevel(leveldata, shared_material, m_LevelName);
 			}
 		}
 	}
@@ -129,7 +129,7 @@ public class Loader :MonoBehaviour {
 			else                    //download data
 			{
 				Debug.Log("Init load level from url: " + Settings.LevelFileUrl);
-				Level.m_LevelName = Path.GetFileNameWithoutExtension(Settings.LevelFileUrl);
+				m_LevelName = Path.GetFileNameWithoutExtension(Settings.LevelFileUrl);
 				m_www = new WWW(Settings.LevelFileUrl);
 			}
 		}
@@ -145,8 +145,7 @@ public class Loader :MonoBehaviour {
             if (m_SharedMaterial != null)
             {
 				m_SharedMaterial.mainTexture = TextureUV.GenerateTextureTile(leveldata);
-                Level.m_SharedMaterial = m_SharedMaterial;
-                m_Level = new Level(leveldata);
+                m_Level = BuildLevel(leveldata, m_SharedMaterial, m_LevelName);
             }
             else
             {
@@ -193,8 +192,8 @@ public class Loader :MonoBehaviour {
 			}
 				
 			leveldata = Parser.Parse(m_RawFileData);
-			Level.m_LevelName = Path.GetFileNameWithoutExtension(path);
-			Debug.Log("LoadLevelFromFile: " + Level.m_LevelName);
+			m_LevelName = Path.GetFileNameWithoutExtension(path);
+			Debug.Log("LoadLevelFromFile: " + m_LevelName);
 			#endif
 			
 		}
@@ -212,8 +211,7 @@ public class Loader :MonoBehaviour {
             if (m_SharedMaterial != null)
             {
 				m_SharedMaterial.mainTexture = TextureUV.GenerateTextureTile(leveldata);
-                Level.m_SharedMaterial = m_SharedMaterial;
-                m_Level = new Level(leveldata);
+                m_Level = BuildLevel(leveldata, m_SharedMaterial, m_LevelName);
             }
             else
             {
@@ -243,5 +241,23 @@ public class Loader :MonoBehaviour {
 			}
 		}
 	}
+
+    public static Level  BuildLevel(Parser.Tr2Level leveldata, Material sharedmaterial, string levelname)
+    {
+        GameObject m_LevelRoot = new GameObject("Level " + levelname);
+        LevelManager manager = m_LevelRoot.AddComponent<LevelManager>();
+
+        if (leveldata == null)
+        {
+            Debug.Log(" leveldata not initialized!");
+        }
+
+        Level level = new Level(leveldata, sharedmaterial, m_LevelRoot.transform);
+        manager.SharedMaterial = level.GetSharedMaterial();
+        manager.InstancedMaterialWaterHolders = level.GetInstancedWaterHolderMaterials();
+        manager.SharedMaterialWater = level.GetSharedWaterMaterial();
+
+        return level;
+    }
 	
 }
