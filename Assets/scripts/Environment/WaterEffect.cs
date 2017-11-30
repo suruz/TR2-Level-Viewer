@@ -48,7 +48,11 @@ public class WaterEffect : MonoBehaviour {
     // camera will just work!
     public void _OnWillRenderObject()
     {
-       /* if (!enabled || !GetComponent<Renderer>() || !GetComponent<Renderer>().sharedMaterial || !GetComponent<Renderer>().enabled)
+
+        return;// This is experimental effect
+        
+        
+        /* if (!enabled || !GetComponent<Renderer>() || !GetComponent<Renderer>().sharedMaterial || !GetComponent<Renderer>().enabled)
         {
             return;
         }*/

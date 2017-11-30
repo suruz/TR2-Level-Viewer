@@ -245,17 +245,36 @@ public class Loader :MonoBehaviour {
     public static Level  BuildLevel(Parser.Tr2Level leveldata, Material sharedmaterial, string levelname)
     {
         GameObject m_LevelRoot = new GameObject("Level " + levelname);
-        LevelManager manager = m_LevelRoot.AddComponent<LevelManager>();
 
-        if (leveldata == null)
+        SoundMananger sound_manager = null;
+        if (Camera.main != null)
         {
-            Debug.Log(" leveldata not initialized!");
+            sound_manager = Camera.main.gameObject.AddComponent<SoundMananger>();
+        }
+        else
+        {
+            sound_manager = m_LevelRoot.AddComponent<SoundMananger>();
+            Debug.LogError("No Camera Found!");
+
         }
 
+        //creat level
         Level level = new Level(leveldata, sharedmaterial, m_LevelRoot.transform);
+        if (leveldata == null)
+        {
+            Debug.LogError(" leveldata not initialized!");
+            return null;
+        }
+
+        //creat level manager
+
+        LevelManager manager = m_LevelRoot.AddComponent<LevelManager>();
         manager.SharedMaterial = level.GetSharedMaterial();
         manager.InstancedMaterialWaterHolders = level.GetInstancedWaterHolderMaterials();
         manager.SharedMaterialWater = level.GetSharedWaterMaterial();
+        manager.SetPlayer(Level.m_Player.GetComponent<Player>());
+        manager.SetFollowCamera(Camera.main.transform);
+        manager.SetSoundManager(sound_manager);
 
         return level;
     }

@@ -236,8 +236,8 @@ public class Level
 		}
 		else
 		{
-			go.AddComponent<WaterEffect>();
-		}
+            //go.AddComponent<WaterEffect>(); //no need to WaterEffect.cs for each water surface. use a global Water Effect Controller instead 
+        }
 
         /*Rigidbody rb = go.AddComponent<Rigidbody>();
 		rb.isKinematic = true;

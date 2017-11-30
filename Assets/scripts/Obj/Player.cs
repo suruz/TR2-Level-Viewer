@@ -188,7 +188,7 @@ public class Player : ObjectExt
                         if (room != null) //All hit objects need not to be a room
                         {
                             m_Room = room;
-                            if (m_Room.m_Tr2Room != null)
+                            if (m_Room != null)
                             {
                                 Debug.Log("m_Room" + m_Room.name + "room flag " + m_Room.Flags);
                             }
@@ -423,7 +423,7 @@ public class Player : ObjectExt
         if (roof!=null)
         {
             Debug.LogWarning("Head Collision With: " + roof.name);
-            StopImmediate(roof);
+            StopImmediate(roof.gameObject);
             m_Transform.position = m_FreePosition;
             m_GroundHeight = m_GroundHeight + 0.1f; //force freefall handler to check ground...if ground not changed since last jump
             ResetJump();
@@ -431,7 +431,7 @@ public class Player : ObjectExt
         else if (m_Transform.position.y < m_GroundHeight) //landed
         {
             Debug.Log("Landed");
-            StopImmediate(null);
+            StopImmediate(m_Room.gameObject);
             m_Transform.position = new Vector3(m_Transform.position.x, m_GroundHeight, m_Transform.position.z);
             ResetJump();
         }
@@ -488,7 +488,12 @@ public class Player : ObjectExt
 				m_bStandingUp = false;
 				FlickerPos = new Vector3(m_LarasHeap.position.x, PullUpTarget.y + m_JumpHeight, m_LarasHeap.position.z);
 			}
-		}
+
+            if (m_AnimStatePlayer != null && diff < 0.01)
+            {
+                m_AnimStatePlayer.PlayPullUpSFX();
+            }
+        }
 		
  		if (m_SwimState == SwimmingState.InWaterSurface)
 		{
@@ -580,7 +585,7 @@ public class Player : ObjectExt
         bool collision = Physics.Raycast(heappos, dir, out hit2, m_maxForwardRayLength, mask);
         if (collision)
         {
-            StopImmediate(hit2.collider);
+            StopImmediate(hit2.collider.gameObject);
             m_Transform.position = m_FreePosition;
             m_bWallHitTest = true;
         }
@@ -733,13 +738,13 @@ public class Player : ObjectExt
 			Vector3 heappos = GetHipPosition();
 			
 			Bounds room_bound = room.GetBound();
-			float min_fall_height = room_bound.min.y + room_bound.size.y * 0.25f;
+			float min_fall_height = room_bound.min.y + room_bound.size.y * 0.1f;
 			
 			if ((m_Transform.position.y < (m_WaterLevel - m_Height * 0.3f)) && (type == RoomEx.RoomType.DeepWater))  //enter swimming state machine
             {
                 if (m_AnimStatePlayer != null)
                 {
-                    m_AnimStatePlayer.PlayDiveSFX(SwimmingState.InDeepWater);
+                    m_AnimStatePlayer.PlayDiveSFX();
                 }
                 SetSwimStateDeepWater();
                 StopImmediate(null);
@@ -750,7 +755,7 @@ public class Player : ObjectExt
                 {
                     if (m_AnimStatePlayer != null)
                     {
-                        m_AnimStatePlayer.PlayDiveSFX(SwimmingState.InShallowWater);
+                        m_AnimStatePlayer.PlayDiveSFX();
                     }
 
                     SetSwimStateShallowWater();
@@ -1044,7 +1049,7 @@ public class Player : ObjectExt
 		return (m_SwimState == SwimmingState.InDeepWater) || (m_SwimState == SwimmingState.InWaterSurface);
 	}
 	
-	void StopImmediate(Collider other)
+	void StopImmediate(GameObject other)
 	{
         ResetJump();
         if (m_AnimStatePlayer != null)

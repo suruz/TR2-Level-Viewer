@@ -830,6 +830,21 @@ actually written
 	Now room data is accessible through inspector (e.g room type)
 
 
+	30/11/2017
+
+	Moved underwater camera check method ThirdPersonCam.CheckCameraInWater()  to LevelManager.CheckCameraInWater()...
+	Also CheckCameraInWater is done depending on a flag m_bCameraInWater, instead of continueous checking for performance...
+	Removed component WaterEffect from water surfaces while level build, instead a global Water Effect Controller is used for performance...
+	
+	Added class SoundMananger to manage SFX and ambient background sound...
+	Added Component SoundMananger to Main Camera, which addes Audio source to camera to handle distance independent sfx.
+	
+	Used main camera as sfx aduio source for distance independent sfx
+
+	RoomEx.m_RoomBound is made public for serialization of room bound in case of edit mode level build...
+
+
+
 
 
 

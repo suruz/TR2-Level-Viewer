@@ -3,21 +3,21 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class RoomEx: MonoBehaviour  {
-	public SurfaceAnalyzer m_RoomAnalyzer;
-	public Parser.Tr2Room m_Tr2Room;
-	public Mesh m_Mesh;
+	SurfaceAnalyzer m_RoomAnalyzer;
+	Parser.Tr2Room m_Tr2Room;
+    Mesh m_Mesh;
 	Vector3[] m_RoomVertices;
 	public Transform m_Transform;
 	int ID = 0;
 	int[] m_SharedTriangles = null;
 	List<Edge> m_RoomEdges = null;
-	public float m_CeilingHeight = -Mathf.Infinity;
-	public float m_FloorHeight = Mathf.Infinity;
+	float m_CeilingHeight = -Mathf.Infinity;
+	float m_FloorHeight = Mathf.Infinity;
 	public List<GameObject> m_StaticObjects = null;
 	public Material m_Material;
-	//Parser.Tr2Level m_leveldata = null;
-    Vector3 m_CenterPoint = Vector3.zero;
-    Bounds m_RoomBound;
+    //Parser.Tr2Level m_leveldata = null;
+    public Vector3 m_CenterPoint = Vector3.zero;
+    public Bounds m_RoomBound; // made public for serialization
     public short Flags = 0;
 
     public enum RoomType
@@ -33,7 +33,8 @@ public class RoomEx: MonoBehaviour  {
 
     void Start()
 	{
-		m_RoomVertices = m_Mesh.vertices;
+        m_Mesh = GetComponent<MeshFilter>().mesh;
+        m_RoomVertices = m_Mesh.vertices;
 		m_SharedTriangles = MeshModifier.GetSharedTriangles(m_Mesh);
 		m_RoomAnalyzer = new SurfaceAnalyzer(m_Mesh);
 		m_RoomEdges = m_RoomAnalyzer.Analyze(m_RoomVertices, m_SharedTriangles,null);
