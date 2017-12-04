@@ -29,7 +29,7 @@ void vert(inout appdata_full v) {
 
 	if (_InSideWater == 1)
 	{
-		float4 vertex = mul(unity_ObjectToWorld, v.vertex);
+		float4 vertex = mul(_Object2World, v.vertex);
 		if (vertex.y > _WaterPlaneY)
 		{
 			float distance = length(vertex);
