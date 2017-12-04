@@ -94,11 +94,17 @@ public class WaterEffect : MonoBehaviour {
 
 
         Vector4 clipPlane = CameraSpacePlane(m_RefractionCamera, pos, normal, -1.0f);
+		
+#if UNITY_5_3_OR_NEWER
         m_RefractionCamera.projectionMatrix = cam.CalculateObliqueMatrix(clipPlane);
-
-        // Set custom culling matrix from the current camera
+		 // Set custom culling matrix from the current camera
         m_RefractionCamera.cullingMatrix = cam.projectionMatrix * cam.worldToCameraMatrix;
 
+#else
+	//TODO: Calculate Oblique Matrix
+#endif
+		
+       
 
         m_RefractionCamera.targetTexture = m_RefractionTexture;
         m_RefractionCamera.Render();
