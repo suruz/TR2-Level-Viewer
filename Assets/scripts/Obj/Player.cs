@@ -242,6 +242,11 @@ public class Player : ObjectExt
 
         bool hasGrabableEdge = false;
         Vector3 heappos = GetHipPosition();
+        if (m_Room == null)
+        {
+            Debug.LogError("Player room is not set");
+            return retval;
+        }
         List<Edge> horizontal_edeges = m_Room.RayCast(heappos, transform.forward, m_maxForwardRayLength * 2);  // ray length must be larger than minimum collision length m_maxCollisionRayLength
 
         if (horizontal_edeges.Count > 0)
