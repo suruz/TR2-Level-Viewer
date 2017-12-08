@@ -87,9 +87,9 @@ public class GUIManager : MonoBehaviour {
 		else
 		{
 			m_Helptext =
-			"Run - Up arrow\n" +
+			"Run/Swim - Up arrow\n" +
 			"Walk - Num 5\n" +
-			"Jump - Right mouse button\n" +
+			"Jump/Dive - Right mouse button\n" +
 			"Look around - Move mouse while pressing left mouse button.\n" +
 			"Long Jump - Press jump while you are running.\n" +
 			"Short Jump - Press up arrow + jump same time.\n" +
