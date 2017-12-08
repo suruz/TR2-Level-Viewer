@@ -182,7 +182,16 @@ public class Level
             ObjectContainer.parent = m_LevelRoot;
 
             m_MovableInstances = InstantiateDynamicObjects(ObjectContainer);
-            SetupTrigers();
+            try //
+            {
+                SetupTrigers();
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError(e.Message);
+
+            }
+
             //attach components to m_MovableInstances
             for (int i = 0; i < m_MovableInstances.Count; i++)
             {
