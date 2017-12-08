@@ -48,23 +48,16 @@ public class Mouse : MonoBehaviour {
         {
             // Get the mouse delta. This is not in the range -1...1
 
+            if(Input.mousePosition.x < 0 || Input.mousePosition.x > Screen.width || Input.mousePosition.y < 0 || Input.mousePosition.y > Screen.height)
+            {
+                return;
+            }
+
             float x = Input.GetAxis("Mouse X") * 8;
             float y = Input.GetAxis("Mouse Y");
-
-#if (UNITY_5_3_OR_NEWER || UNITY_5_3)
-
-            if (Application.platform == RuntimePlatform.WebGLPlayer)
-            {
-                if (m_OnMouseMove != null) m_OnMouseMove(x, 0);
-            }
-            else
-            {
-                if (m_OnMouseMove != null) m_OnMouseMove(x, y);
-            }
-#else
-           
             if (m_OnMouseMove != null) m_OnMouseMove(x, y);
-#endif
+
+
         }
 
 
