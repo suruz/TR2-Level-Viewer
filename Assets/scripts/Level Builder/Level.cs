@@ -125,28 +125,28 @@ public class Level
                 bool has_water = false;
                 Mesh roommesh = MeshBuilder.CreateRoomMesh(tr2room, m_leveldata, ref has_water);
                 Vector3 position = new Vector3(m_leveldata.Rooms[i].info.x, 0, m_leveldata.Rooms[i].info.z);
-                GameObject go = CreateRoom(roommesh, position * Settings.SceneScaling, i, m_SharedMaterial,FloorAttribute.Solid);
+                GameObject go = CreateRoom(roommesh, position * Settings.SceneScaling, i, m_SharedMaterial, FloorAttribute.Solid);
                 go.transform.parent = RoomContainer;
                 m_RoomExs[i] = go.AddComponent<RoomEx>();
                 //build room object
                 List<GameObject> objects = InstantiateStaticObjects(tr2room, i, go.transform);
                 m_RoomExs[i].InitRoom(tr2room, objects);
-				
-				
-				if(leveldata.Rooms[i].Flags == 0x0001) //water filled room with no surface
-				{
-					 //override water holder material
-					MeshRenderer mr = go.GetComponent<MeshRenderer>();
-					mr.sharedMaterial = m_SharedMaterialWaterHolder;
-				}
-				else if((leveldata.Rooms[i].Flags == 65) || (leveldata.Rooms[i].Flags == 585)) //Is room water holder
-				{
+
+
+
+
+
+
+
+
+                if ((leveldata.Rooms[i].Flags == 0x0001) || (leveldata.Rooms[i].Flags == 65) || (leveldata.Rooms[i].Flags == 585)) //Is room water holder
+                {
                     //override water holder material
                     //MeshFilter mf = go.GetComponent<MeshFilter>();
                     //mf.mesh = MeshModifier.VertexWeild(mf.mesh);
 
-					MeshRenderer mr = go.GetComponent<MeshRenderer>();
-                    mr.sharedMaterial =  new Material(waterEffectShader); // Generate material instances for water holder using m_SharedMaterialWaterHolder
+                    MeshRenderer mr = go.GetComponent<MeshRenderer>();
+                    mr.sharedMaterial = new Material(waterEffectShader); // Generate material instances for water holder using m_SharedMaterialWaterHolder
                     mr.receiveShadows = false;
                     Vector3 center = m_RoomExs[i].GetCenterPoint();
                     mr.sharedMaterial.SetFloat("_CenterX", center.x);
@@ -162,20 +162,20 @@ public class Level
                 }
                 else //regular room
                 {
-                
+
                 }
 
-               //create room water surface
-                if(has_water) //surface?
+                //create room water surface
+                if (has_water) //surface?
                 {
-					//create water surface
-                     roommesh = MeshBuilder.CreateRoomWaterMesh(tr2room, m_leveldata);
-                     go = CreateRoom(roommesh, position * Settings.SceneScaling, i, m_SharedMaterialWater,FloorAttribute.Water);
-                     go.name = "water_" + i;
-                     go.transform.parent = WaterContainer;
+                    //create water surface
+                    roommesh = MeshBuilder.CreateRoomWaterMesh(tr2room, m_leveldata);
+                    go = CreateRoom(roommesh, position * Settings.SceneScaling, i, m_SharedMaterialWater, FloorAttribute.Water);
+                    go.name = "water_" + i;
+                    go.transform.parent = WaterContainer;
                 }
-				
-				
+
+
             }
 
             Transform ObjectContainer = new GameObject("ObjectContainer").transform;
