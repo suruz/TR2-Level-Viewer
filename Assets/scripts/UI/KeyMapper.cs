@@ -367,6 +367,7 @@ public class KeyMapper : MonoBehaviour {
 	
 	void Update()
 	{
+        if (Keys == null) return; //bug fix 
 		HandleKeyOrder();
 		ClearKey();
 	}
