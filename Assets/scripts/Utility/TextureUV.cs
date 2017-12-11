@@ -123,13 +123,20 @@ public class TextureUV  {
 		tex.filterMode  = FilterMode.Bilinear;
 		tex.wrapMode = TextureWrapMode.Clamp;
 		tex.anisoLevel = 9;
-		
-		for(int t = 0; t < leveldata.m_MaxTiles; t++)
-		{
-			Color[] cols = ColorTable[t];
-			uvRects[t] = new Rect(0,uvlength * t,1,uvlength);  //distorted uv error : reason careless uv stting
-			tex.SetPixels (0,256 * t, 256,256, cols, 0);
-		}
+
+        try
+        {
+            for (int t = 0; t < leveldata.m_MaxTiles; t++)
+            {
+                Color[] cols = ColorTable[t];
+                uvRects[t] = new Rect(0, uvlength * t, 1, uvlength);  //distorted uv error : reason careless uv stting
+                tex.SetPixels(0, 256 * t, 256, 256, cols, 0);
+            }
+        }
+        catch(System.Exception e)
+        {
+            Debug.LogError(e.Message); //log outof bound exception
+        }
 		
 		tex.Apply(true);
 		tex.name = "texAtlas";
