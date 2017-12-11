@@ -844,11 +844,33 @@ actually written
 	RoomEx.m_RoomBound is made public for serialization of room bound in case of edit mode level build...
 
 
+	8/12/2017
+	Handled outof index bug in SetupTrigers
+	Handled null refference exception in PrimaryActionHandler
+
+	9/12/2017
+	updated water filled room material selection logic in Level.cs. 
+
+	  if ((leveldata.Rooms[i].Flags == 0x0001) || (leveldata.Rooms[i].Flags == 65) || (leveldata.Rooms[i].Flags == 585)) //Is room water holder
+      {
+		// Generate material instances for water holder using m_SharedMaterialWaterHolder
+	  }
 
 
+	Segment terrian water surface using room bellow bound.
+	Create room normally. but keep room flag.
+	if room flag is 65 then look room above it
+	clip all triangles of room above using current room bound
 
 
+	11/12/2017
 
+	The original portal testing algorithm performs a breadth-first visibility check of the bounding boxes of the screen-projected portal vertices,
+	and also compares the vector from the camera to the first portal vertex to its normal. This works pretty fine, unless there are denormalized
+	bounding boxes, which the original TR solves by expanding the portal bounding box to its maximum if a projected edge crosses the screen 
+	plane or its boundaries.
+
+	In some TRLE levels attributes of room vertices  is set to zero. So alternative is using room visibiliy portal or room bounding box.
 
 
 
