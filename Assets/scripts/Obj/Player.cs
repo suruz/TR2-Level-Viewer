@@ -190,7 +190,7 @@ public class Player : ObjectExt
                             m_Room = room;
                             if (m_Room != null)
                             {
-                                Debug.Log("m_Room" + m_Room.name + "room flag " + m_Room.Flags);
+                               // Debug.Log("m_Room" + m_Room.name + "room flag " + m_Room.Flags);
                             }
                         }
                     }
@@ -355,7 +355,7 @@ public class Player : ObjectExt
                 m_bFreeFall = true;
                 physics.StartFreeFall(m_Transform.position);
                 m_FreeFallStartTime = Time.time;
-                Debug.Log("Start Free Fall");
+                //Debug.Log("Start Free Fall");
                 
             }
 			m_GroundHeightLast = m_GroundHeight;
@@ -401,13 +401,13 @@ public class Player : ObjectExt
         {
             m_bPullingUp = true;
             m_bJumping = physics.CalculateCurve(From, JumpVector, rot, sign);
-            Debug.Log("Jump Physics Handler" + "pulling up");
+            //Debug.Log("Jump Physics Handler" + "pulling up");
 
         }
         else
         {
             m_bJumping = physics.CalculateCurve(From, To, rot, sign);
-            Debug.Log("Jump Physics Handler" + "Normal Jump");
+            //Debug.Log("Jump Physics Handler" + "Normal Jump");
         }
 
         
@@ -435,7 +435,7 @@ public class Player : ObjectExt
         }
         else if (m_Transform.position.y < m_GroundHeight) //landed
         {
-            Debug.Log("Landed");
+            //Debug.Log("Landed");
             StopImmediate(m_Room.gameObject);
             m_Transform.position = new Vector3(m_Transform.position.x, m_GroundHeight, m_Transform.position.z);
             ResetJump();
@@ -618,10 +618,10 @@ public class Player : ObjectExt
             {
                 if (m_bWallHitTest)
                 {
-                    Debug.Log("Hit Test:");
+                   // Debug.Log("Hit Test:");
                     m_bWallHitTest = false;
                     keystate = PrimaryActionHandler();
-					Debug.Log("Swimm State:" + m_SwimState);
+					//Debug.Log("Swimm State:" + m_SwimState);
                 }
             }
 			
@@ -716,7 +716,7 @@ public class Player : ObjectExt
         {
             if (m_SwimState == SwimmingState.InWaterSurface)
             {
-                Debug.Log("Getting outof water");
+                //Debug.Log("Getting outof water");
             }
             return;
         }
@@ -739,7 +739,7 @@ public class Player : ObjectExt
         {
             RoomEx.RoomType type = room.GetRoomType();
 			m_WaterLevel = room.GetCenterPoint().y;
-            Debug.Log("Room Type:" + type);
+            //Debug.Log("Room Type:" + type);
 			Vector3 heappos = GetHipPosition();
 			
 			Bounds room_bound = room.GetBound();
@@ -878,7 +878,7 @@ public class Player : ObjectExt
 
     void SetSwimStateDeepWater()
     {
-		Debug.Log("SetSwimStateDeepWater");
+		//Debug.Log("SetSwimStateDeepWater");
         m_SwimState = SwimmingState.InDeepWater;
         if (m_AnimStatePlayer != null)
         {
@@ -891,7 +891,7 @@ public class Player : ObjectExt
 
     void SetSwimStateShallowWater()
     {
-		Debug.Log("SetSwimStateShallowWater");
+		//Debug.Log("SetSwimStateShallowWater");
         m_SwimState = SwimmingState.InShallowWater;
         if(m_AnimStatePlayer!= null)
 		{
@@ -903,7 +903,7 @@ public class Player : ObjectExt
 
     void SetSwimStateSurfaceWater()
     {
-		Debug.Log("SetSwimStateSurfaceWater");
+		//Debug.Log("SetSwimStateSurfaceWater");
         m_SwimState = SwimmingState.InWaterSurface;
         if(m_AnimStatePlayer!= null)
 		{
@@ -915,7 +915,7 @@ public class Player : ObjectExt
 
     void SetSwimStateNone()
     {
-		Debug.Log("SetSwimStateNone: Setting Normal Physics (e.g standing jump)");
+		//Debug.Log("SetSwimStateNone: Setting Normal Physics (e.g standing jump)");
         m_SwimState = SwimmingState.None;
         if(m_AnimStatePlayer!= null)
 		{
@@ -931,7 +931,7 @@ public class Player : ObjectExt
 
     void SetSwimStateDiving()
     {
-        Debug.Log("SetSwimStateDiving: Diving");
+        //Debug.Log("SetSwimStateDiving: Diving");
         m_SwimState = SwimmingState.Diving;
         if (m_AnimStatePlayer != null)
         {
@@ -1088,13 +1088,13 @@ public class Player : ObjectExt
 
     void DidReachedMaxJumpHeight()
     {
-        Debug.Log("Reached Max Height");
+        //Debug.Log("Reached Max Height");
         //Time to check we are diving in water!
 
         if (m_Room != null)
         {
             RoomEx.RoomType type = m_Room.GetRoomType();
-            Debug.Log("Are we diving in :" + type);
+            //Debug.Log("Are we diving in :" + type);
 
             if(type == RoomEx.RoomType.DeepWater)
             {
