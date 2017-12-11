@@ -65,7 +65,7 @@ public class Browser : MonoBehaviour {
             m_showingUrlWindow = true;
 		}
 
-#if UNITY_WEBGL_
+#if UNITY_WEBGL
 
         //do nothing
 #else
