@@ -498,6 +498,8 @@ public class Level
                     }
                 }
 
+                if (i >= m_DynamicPrefabs.Count) continue; //bug fix: outof index
+
                 GameObject movableItem = (GameObject)GameObject.Instantiate(m_DynamicPrefabs[i].UnityObject);
                 movableItem.name = "Object";
                 movableItem.transform.parent = owner;
