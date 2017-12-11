@@ -101,6 +101,7 @@ public class MeshBuilder  {
                 nonSharedColor[vertOrUVIdx3] = Color.white * (1 - Vertices[Idx3].Lighting2 * 1.220852154804053e-4f);// ((0.5f - ((float)(Vertices[Idx3].Attributes & 0x1f) / 32f)) + 0.5f);
 
                 ushort texObjectIdx = Rectangles[rectCount].Texture;
+                if (texObjectIdx >= leveldata.ObjectTextures.Length) continue; //fixed:  outof bound exception for Parser.Tr2Level.ObjectTextures
                 Parser.Tr2ObjectTexture texObj = leveldata.ObjectTextures[texObjectIdx];
                 ushort texTileIdx = texObj.Tile;  //bind this textile in material?
 
@@ -168,6 +169,7 @@ public class MeshBuilder  {
 
 
                 ushort texObjectIdx = Triangles[triCount].Texture;
+                if (texObjectIdx >= leveldata.ObjectTextures.Length) continue; //fixed:  outof bound exception for Parser.Tr2Level.ObjectTextures
                 Parser.Tr2ObjectTexture texObj = leveldata.ObjectTextures[texObjectIdx];
 
                 //if(texTileIdx != prevTexture)
@@ -310,6 +312,7 @@ public class MeshBuilder  {
             nonSharedVertices[vertOrUVIdx3] = sharedVertices[Idx3];
 
             ushort texObjectIdx = Rectangles[rectCount].Texture;
+            if (texObjectIdx >= leveldata.ObjectTextures.Length) continue; //fixed:  outof bound exception for Parser.Tr2Level.ObjectTextures
             Parser.Tr2ObjectTexture texObj = leveldata.ObjectTextures[texObjectIdx];
             ushort texTileIdx = texObj.Tile;  //bind this textile in material?
 
@@ -376,6 +379,7 @@ public class MeshBuilder  {
             nonSharedVertices[strideVertIdx + vertOrUVIdx2] = sharedVertices[Idx2];
 
             ushort texObjectIdx = Triangles[triCount].Texture;
+            if (texObjectIdx >= leveldata.ObjectTextures.Length) continue; //fixed:  outof bound exception for Parser.Tr2Level.ObjectTextures
             Parser.Tr2ObjectTexture texObj = leveldata.ObjectTextures[texObjectIdx];
            
             //if(texTileIdx != prevTexture)
@@ -498,7 +502,8 @@ public class MeshBuilder  {
 			nonSharedVertices[vertOrUVIdx3] = sharedVertices[Idx3];
 			
 			ushort texObjectIdx = TexturedRectangles[rectCount].Texture;
-			Parser.Tr2ObjectTexture texObj =  leveldata.ObjectTextures[texObjectIdx];
+            if (texObjectIdx >= leveldata.ObjectTextures.Length) continue; //fixed:  outof bound exception for Parser.Tr2Level.ObjectTextures
+            Parser.Tr2ObjectTexture texObj =  leveldata.ObjectTextures[texObjectIdx];
 			ushort texTileIdx = texObj.Tile;  //bind this textile in material?
 			
 			//if(texTileIdx != prevTexture)
@@ -546,7 +551,8 @@ public class MeshBuilder  {
 			
 			
 			ushort texObjectIdx = tr2mesh.TexturedTriangles[triCount].Texture;
-			Parser.Tr2ObjectTexture texObj =  leveldata.ObjectTextures[texObjectIdx];
+            if (texObjectIdx >= leveldata.ObjectTextures.Length) continue; //fixed:  outof bound exception for Parser.Tr2Level.ObjectTextures
+            Parser.Tr2ObjectTexture texObj =  leveldata.ObjectTextures[texObjectIdx];
 			
 			
 			//if(texTileIdx != prevTexture)
