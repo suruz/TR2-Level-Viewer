@@ -41,7 +41,7 @@ Shader "WaterEffect" {
 		};
 		
 		 half4 LightingSimpleLambert (SurfaceOutput s, half3 lightDir, half atten) {
-          half NdotL = pow(dot(s.Normal, fixed3(1,0.5,1)), 4) * 0.25;
+          half NdotL = pow(dot(s.Normal, normalize(fixed3(1,0.5,1))), 4) * 0.25;
           half4 c;
           c.rgb = s.Albedo * _LightColor0.rgb * (NdotL * atten );
           c.a = s.Alpha;
