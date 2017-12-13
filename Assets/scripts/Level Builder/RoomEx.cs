@@ -278,7 +278,7 @@ public class RoomEx: MonoBehaviour  {
 
     RoomType DetectRoomType(Parser.Tr2Room room, Bounds b )
     {
-        if ((Flags & 1) == 1) //water room below
+        if ((room.Flags & 1) == 1) //water room below, bug: direct use of Flags causing error
         {
             //calculate water depth
             b = GetBound();

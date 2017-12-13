@@ -777,13 +777,9 @@ public class Player : ObjectExt
 			
 		}
 		
-		
-        
-		if (room != null && (room.Flags == 0x0001))//check if room filled with watere
-        {
-          SetSwimStateDeepWater();
-        }
-        else if (room != null && (room.Flags == 65))
+	
+
+        if (room != null && ((room.Flags & 1) == 1))
         {
             /*if(m_SwimState != SwimmingState.InShallowWater)
 			{
