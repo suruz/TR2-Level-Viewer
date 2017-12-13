@@ -872,6 +872,36 @@ actually written
 
 	In some TRLE levels attributes of room vertices  is set to zero. So alternative is using room visibiliy portal or room bounding box.
 
+	13/12/2017
+
+	A room could have multiple adjecent portals, use horizontal portals only ( note: horizontal portal normal lies in horizontal plane in TR)
+
+	Warning: scaling could be potential issue, when you dont realize that some value is already scaled, 
+	for example calculation was giving wrong scaled result,
+
+		m_PortalPolygon[i] = new Vector3(port.Vertices[i].x , m_CenterPoint.y, port.Vertices[i].z ) * Settings.SceneScaling;
+
+	where correct one will be,
+	    m_PortalPolygon[i] = new Vector3(port.Vertices[i].x * Settings.SceneScaling, m_CenterPoint.y, port.Vertices[i].z * Settings.SceneScaling);
+
+	during previos calculation I didnt care that, m_CenterPoint.y is already scaled  by  Settings.SceneScaling !
+
+
+	[Water surface exclusion algorithm]
+
+	- Added method RoomEx.GetWaterPortal() to get portal polygon for water room
+	- Exclude all faces in portal if face has alpha texture
+	    
+		    - Mark horizontal faces with alpha
+			- Mark Outer and inner boundary of alpha region
+			- Separate faces within marked boundary
+
+
+	    
+
+
+
+
 
 
 
