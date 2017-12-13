@@ -139,7 +139,7 @@ public class Level
 
 
 
-                if ((leveldata.Rooms[i].Flags == 0x0001) || (leveldata.Rooms[i].Flags == 65) || (leveldata.Rooms[i].Flags == 585)) //Is room water holder
+                if ((tr2room.Flags & 1) == 1) //Is room water holder
                 {
                     //override water holder material
                     //MeshFilter mf = go.GetComponent<MeshFilter>();

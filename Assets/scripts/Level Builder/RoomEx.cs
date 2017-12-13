@@ -19,7 +19,7 @@ public class RoomEx: MonoBehaviour  {
     public Vector3 m_CenterPoint = Vector3.zero;
     public Bounds m_RoomBound; // made public for serialization
     public short Flags = 0;
-
+    Vector3[] m_PortalPolygon;
     public enum RoomType
     {
         Land = 0,
@@ -43,7 +43,12 @@ public class RoomEx: MonoBehaviour  {
 
 	void Update()
 	{
-
+        if(m_PortalPolygon != null)
+        for(int i = 0; i < m_PortalPolygon.Length; i++)
+        {
+            int id = (i + 1) % m_PortalPolygon.Length;
+            Debug.DrawLine(transform.TransformPoint(m_PortalPolygon[i]), transform.TransformPoint(m_PortalPolygon[id]), Color.yellow);
+        }
 	}
 
 	public void  InitRoom(Parser.Tr2Room room, List<GameObject> objects)
@@ -82,6 +87,8 @@ public class RoomEx: MonoBehaviour  {
 
         m_RoomType = DetectRoomType(room, m_RoomBound);
         Flags = m_Tr2Room.Flags;
+
+        m_PortalPolygon = GetWaterPortal(room);
     }
 
 	public void DebugRoomSurface()
@@ -271,7 +278,7 @@ public class RoomEx: MonoBehaviour  {
 
     RoomType DetectRoomType(Parser.Tr2Room room, Bounds b )
     {
-        if ((room.Flags == 65) ||(room.Flags == 585)) //water room below
+        if ((Flags & 1) == 1) //water room below
         {
             //calculate water depth
             b = GetBound();
@@ -291,5 +298,36 @@ public class RoomEx: MonoBehaviour  {
     public RoomType GetRoomType()
     {
         return m_RoomType;
+    }
+
+    public static Vector3[] GetWaterPortal(Parser.Tr2Room room)
+    {
+        Vector3[] portal_polygon = null;
+        float surface = (-room.info.yTop * Settings.SceneScaling); //get scaled room surface point
+        int Flags = room.Flags;
+        if (Flags == 72  || (Flags & 1) == 1)
+        {
+            if (room.Portals != null)
+            {
+                for (int p = 0; p < room.Portals.Length; p++)
+                {
+                    Parser.Tr2RoomPortal port = room.Portals[p];
+                    Parser.Tr2Vertex n = port.Normal;
+                    if ((Vector3.Dot(new Vector3(n.y, n.y, n.z), Vector3.right) > 0.85f) && (port.Vertices != null))  // choose only horizontal portals
+                    {
+                        portal_polygon = new Vector3[port.Vertices.Length];
+                        for (int i = 0; i < portal_polygon.Length; i++)
+                        {
+                            portal_polygon[i] = new Vector3(port.Vertices[i].x * Settings.SceneScaling, surface, port.Vertices[i].z * Settings.SceneScaling);
+                        }
+
+                        break;
+                    }
+
+                }
+            }
+        }
+
+        return portal_polygon;
     }
 }
