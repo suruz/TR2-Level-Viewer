@@ -78,12 +78,13 @@ public class TextureUV  {
 	public static Texture2D GenerateTextureTile(Parser.Tr2Level leveldata)
 	{
 		int c16_index = 0;
+        int c16_pixel_count = 256 * 256; // pixel count optimization
 		Color[][] ColorTable = new Color[leveldata.m_MaxTiles][];
 		for(int tileCount = 0; tileCount < leveldata.m_MaxTiles; tileCount++)
 		{ 
 			
-			ColorTable[tileCount] = new Color[256 * 256];
-			for(int c = 0 ; c < (256 * 256); c++)
+			ColorTable[tileCount] = new Color[c16_pixel_count];
+			for(int c = 0 ; c < c16_pixel_count; c++)
 			{
 				ColorTable[tileCount][c] = Color.white;
 			}
@@ -91,12 +92,12 @@ public class TextureUV  {
 			
 			ushort[] tmparr = leveldata.Textile16[tileCount].Tile;
 			Color[] cols = ColorTable[tileCount];
-			for(c16_index = 0 ; c16_index < (256 * 256) ; c16_index++)
+			for(c16_index = 0 ; c16_index < c16_pixel_count; c16_index++)
 			{
 				//argb
 				ushort ucolor = tmparr[c16_index];
 				
-				if(((ucolor >> 15) & 0x1) == 1)
+				if((ucolor & 0x8000) == 0x8000) ////optimized bit shift and & operation ((ucolor >> 15) & 0x1) == 1 with direct & (ucolor & 0x8000) == 1 operation
 				{
 					cols[c16_index].a = 1.0f;
 				}
@@ -117,26 +118,21 @@ public class TextureUV  {
         }
 
 		//pack tiles
-		float uvlength = 1.0f/16.0f;
-		uvRects = new Rect[leveldata.m_MaxTiles];
-		Texture2D tex = new Texture2D (256, 256 * 16,TextureFormat.ARGB32,false,true);
+		float uvlength = 1.0f/ (float)(leveldata.m_MaxTiles); //bug fixed: used leveldata.m_MaxTiles instead of hardcoded value 16
+        uvRects = new Rect[leveldata.m_MaxTiles];
+		Texture2D tex = new Texture2D (256, 256 * leveldata.m_MaxTiles, TextureFormat.ARGB32,false,true);
 		tex.filterMode  = FilterMode.Bilinear;
 		tex.wrapMode = TextureWrapMode.Clamp;
 		tex.anisoLevel = 9;
 
-        try
+    
+        for (int t = 0; t < leveldata.m_MaxTiles; t++)
         {
-            for (int t = 0; t < leveldata.m_MaxTiles; t++)
-            {
-                Color[] cols = ColorTable[t];
-                uvRects[t] = new Rect(0, uvlength * t, 1, uvlength);  //distorted uv error : reason careless uv stting
-                tex.SetPixels(0, 256 * t, 256, 256, cols, 0);
-            }
+           Color[] cols = ColorTable[t];
+           uvRects[t] = new Rect(0, uvlength * t, 1, uvlength);  //distorted uv error : reason careless uv stting
+           tex.SetPixels(0, 256 * t, 256, 256, cols, 0);
         }
-        catch(System.Exception e)
-        {
-            Debug.LogError(e.Message); //log outof bound exception
-        }
+     
 		
 		tex.Apply(true);
 		tex.name = "texAtlas";
