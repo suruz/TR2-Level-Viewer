@@ -47,11 +47,13 @@ public class Mouse : MonoBehaviour {
         else
         {
             // Get the mouse delta. This is not in the range -1...1
-
+#if UNITY_WEBGL
             if(Input.mousePosition.x < 0 || Input.mousePosition.x > Screen.width || Input.mousePosition.y < 0 || Input.mousePosition.y > Screen.height)
             {
                 return;
             }
+#endif
+
 
             float x = Input.GetAxis("Mouse X") * 8;
             float y = Input.GetAxis("Mouse Y");
