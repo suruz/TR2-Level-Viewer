@@ -897,6 +897,51 @@ actually written
 			- Separate faces within marked boundary
 
 
+
+	18/12/2017
+
+	used  surface motion (e.g. texture animation on face) to flag surface as water.
+	not all animated surfaces are water although (e.g lava flow), so faces with normal
+	along world up vector is probale candidate of water surface.
+
+	optimization: consider following face atrribute checking....
+
+	     if (has_water)
+                {
+                    if (IsFaceInWater(is_water_vertex, Idx0, Idx1, Idx2, Idx3) )
+                    {
+                        continue;
+                    }
+                }
+                else
+                {
+                    if (IsFaceInWater(leveldata, Rectangles[rectCount].Texture))
+                    {
+                        continue;
+                    }
+                }
+
+
+     with this one....
+
+     if(IsFaceInWater(is_water_vertex, Idx0, Idx1, Idx2, Idx3) && has_water)
+                {
+                    continue;
+                }
+                else
+                {
+                    if(IsFaceInWater(leveldata, Rectangles[rectCount].Texture))
+                    {
+                        continue;
+                    }
+                }
+
+
+	 which one perform best in a loop?
+
+
+
+
 	    
 
 
