@@ -874,6 +874,7 @@ public class MeshBuilder
 
         if (animated_texture_found)
         {
+            if ((numids - 1) == 0) { return SearchIndex; } //bug fixed : division by zero
             int next_animated_texture_offset = ((textureframeid + 1) % (numids - 1)) + 1;
             return AnimatedTextures[headerindex + next_animated_texture_offset];
         }
