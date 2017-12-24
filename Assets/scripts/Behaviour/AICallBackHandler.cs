@@ -29,7 +29,7 @@ public class AICallBackHandler : MonoBehaviour {
             AICondition.SetActive(AI, true);
 			retval = true;
 		}
-		else if (ObjectID == 32)
+		else if (ObjectID == 16 ||  ObjectID == 31 || ObjectID == 32 )
 		{
 			GoonWithRoolerStatePlayer goon = AI.AddComponent<GoonWithRoolerStatePlayer>();
 			goon.m_FollowTransform = Player.transform;
@@ -37,7 +37,15 @@ public class AICallBackHandler : MonoBehaviour {
             AICondition.SetActive(AI, true);
             retval = true;
 		}
-		else if (ObjectID == 38)
+		else if(ObjectID == 48 ||  ObjectID == 49 || ObjectID == 34 || ObjectID == 52 )
+		{
+			GoonWithArmsStatePlayer goon = AI.AddComponent<GoonWithArmsStatePlayer>();
+			goon.m_FollowTransform = Player.transform;
+			goon.m_Tr2Item = tr2item;
+            AICondition.SetActive(AI, true);
+            retval = true;
+		}
+		else if (ObjectID == 38 || ObjectID == 37)
 		{
 			CrowStatePlayer crow = AI.AddComponent<CrowStatePlayer>();
 			crow.m_FollowTransform = Player.transform;
@@ -45,7 +53,6 @@ public class AICallBackHandler : MonoBehaviour {
             AICondition.SetActive(AI, true);
             retval = true;
 		}
-
 		else if (ObjectID == 39)
 		{
 			TigerStatePlayer tiger = AI.AddComponent<TigerStatePlayer>();
@@ -117,6 +124,23 @@ public class AICallBackHandler : MonoBehaviour {
 			ButtlerStatePlayer buttler = AI.AddComponent<ButtlerStatePlayer>();
 			buttler.m_FollowTransform = Player.transform;
 			buttler.m_Tr2Item = tr2item;
+            AICondition.SetActive(AI, true);
+            retval = true;
+		}
+		else if(ObjectID == 28 || ObjectID == 25)
+		{
+			
+			SharkGoldenStatePlayer shark_golden = AI.AddComponent<SharkGoldenStatePlayer>();
+			shark_golden.m_FollowTransform = Player.transform;
+			shark_golden.m_Tr2Item = tr2item;
+            AICondition.SetActive(AI, true);
+            retval = true;
+		}
+		else if (ObjectID == 21 || ObjectID == 36)
+		{
+			RatStatePlayer rat = AI.AddComponent<RatStatePlayer>();
+			rat.m_FollowTransform = Player.transform;
+			rat.m_Tr2Item = tr2item;
             AICondition.SetActive(AI, true);
             retval = true;
 		}
