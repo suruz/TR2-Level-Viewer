@@ -29,7 +29,26 @@ public class AICallBackHandler : MonoBehaviour {
             AICondition.SetActive(AI, true);
 			retval = true;
 		}
-		else if (ObjectID == 16 ||  ObjectID == 31 || ObjectID == 32 )
+		else if (ObjectID == 16 )
+		{
+			GoonWithMaskStatePlayer goon = AI.AddComponent<GoonWithMaskStatePlayer>();
+			goon.m_FollowTransform = Player.transform;
+			goon.m_Tr2Item = tr2item;
+            AICondition.SetActive(AI, true);
+            retval = true;
+
+		}
+		else if (ObjectID == 20 )
+		{
+			BartoliStatePlayer goon = AI.AddComponent<BartoliStatePlayer>();
+			goon.m_FollowTransform = Player.transform;
+			goon.m_Tr2Item = tr2item;
+            AICondition.SetActive(AI, true);
+            retval = true;
+
+		}
+
+		else if ( ObjectID == 31 || ObjectID == 32 )
 		{
 			GoonWithRoolerStatePlayer goon = AI.AddComponent<GoonWithRoolerStatePlayer>();
 			goon.m_FollowTransform = Player.transform;
@@ -37,7 +56,7 @@ public class AICallBackHandler : MonoBehaviour {
             AICondition.SetActive(AI, true);
             retval = true;
 		}
-		else if(ObjectID == 48 ||  ObjectID == 49 || ObjectID == 34 || ObjectID == 52 )
+		else if( ObjectID == 34 ||  ObjectID == 48 ||  ObjectID == 49 || ObjectID == 52 )
 		{
 			GoonWithArmsStatePlayer goon = AI.AddComponent<GoonWithArmsStatePlayer>();
 			goon.m_FollowTransform = Player.transform;
