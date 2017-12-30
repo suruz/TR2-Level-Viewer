@@ -17,13 +17,14 @@ Shader "WaterEffect" {
 		_CenterZ("Z Center", Float) = 0
 		_WaterPlaneY("Water Plane Y", Float) = 0
 		_InSideWater("In Water", Float) = 0
+		_Cutoff("Alpha cutoff", Range(0,1)) = 0.5
 	}
 	SubShader {
 		Tags {"Queue"="Geometry-1000" "IgnoreProjector"="True" "RenderType"="Opaque" }
 		LOD 200
 		
 		CGPROGRAM
-		#pragma surface surf SimpleLambert vertex:vert
+		#pragma surface surf SimpleLambert vertex:vert alphatest:_Cutoff
 
 		sampler2D _MainTex;
 		sampler2D _MainTex2;
