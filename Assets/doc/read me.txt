@@ -1,1 +1,0 @@
-Project includes a demo level HILTOP.TR2 with TR2LevelViewer.apk build in project folder -> Custom Demo Files.
