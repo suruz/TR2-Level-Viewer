@@ -941,6 +941,16 @@ actually written
 
 
 
+	 9/2/2018
+
+	 Logical error In surface-diving condition:  Float without dive
+
+	 Bug: FreeFallHandler() can not detect ground change,ground height is continuously updated, 
+	 but last-ground-height seems to be not updated properly
+
+
+
+
 
 	    
 
