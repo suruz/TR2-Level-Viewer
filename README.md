@@ -16,7 +16,7 @@
 
 <b>Upgrades: </b>
 
-- Auto dection of water in level.
+- Auto detection of water in level.
 - Added under water caustic lighting effect.
 - Added under water refraction effect.
 - Extended Character Controller with diving-swimming-pulling up support.
