@@ -1,0 +1,14 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\scripts\Behaviour\LaraLightStatePlayer.cs">
+    <Files>
+      <File FileName="Assets\scripts\Level Builder\Level.cs" Line="1" Column="1" />
+      <File FileName="Assets\scripts\Behaviour\Inventory Item\FlashLightStatePlayer.cs" Line="14" Column="18" />
+      <File FileName="Assets\scripts\Behaviour\LaraLightStatePlayer.cs" Line="4" Column="34" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

@@ -1,0 +1,1 @@
+Texture atlus for loaded level will be automatically generated in this folder. They can be used in complex shader.
