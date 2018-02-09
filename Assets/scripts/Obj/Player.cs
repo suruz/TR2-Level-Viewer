@@ -347,7 +347,7 @@ public class Player : ObjectExt
 		
 		SeekGround();
 		
-		if(m_GroundHeight != m_GroundHeightLast) // ground height changed. Time to check if we call free fall
+		if((m_GroundHeight != m_GroundHeightLast) || IsDiving()) // ground height changed. Time to check if we call free fall( fixed: allowed free dive)
 		{
 			if (!m_bFreeFall && ((m_Transform.position.y - m_GroundHeight > m_FreeFallStartHeight)) )  //m_bJumping check is not needed. Its already checked by  IsAvoidingFall();
             {
