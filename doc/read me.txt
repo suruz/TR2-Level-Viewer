@@ -1,14 +1,8 @@
 
-'Pre built App' folder contains pre built TR2 Level Viewer application for windows, web browser and android devices.
-TR2 Level Viewer.exe: Windows version of TR2 Level Viewer
-WebPlayer: Browser version of TR2 Level Viewer.
-TR2LevelViewer.apk: Android version of TR2 Level Viewer.
+'Pre built App' folder contains pre built TR2 Level Viewer application for windows.
 
-How to install TR2LevelViewer.apk:
-- This is prebuilt android app. Copy it to your android device.
-- Use your device's file manager app to browse this apk.
-- when found, select this apk and install it. if your device was not setup for installing apk from
-  unknown source, go to settings->security-> Device aminstration and check Unknown source.
+ - TR2.exe: Windows version of TR2 Level Viewer
+
 
 'Custom Demo Files' folder contains demo level used in this project. This demo level can also be played in
 original TR2 game engine.
