@@ -1,5 +1,7 @@
 // Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
 
+// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+
 Shader "Cutout-Diffuse" {
 Properties {
 	_Color ("Main Color", Color) = (1,1,1,1)
@@ -29,7 +31,7 @@ void vert(inout appdata_full v) {
 
 	if (_InSideWater == 1)
 	{
-		float4 vertex = mul(_Object2World, v.vertex);
+		float4 vertex = mul(unity_ObjectToWorld, v.vertex);
 		if (vertex.y > _WaterPlaneY)
 		{
 			float distance = length(vertex);

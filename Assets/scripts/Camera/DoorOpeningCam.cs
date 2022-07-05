@@ -14,7 +14,7 @@ public class DoorOpeningCam : MonoBehaviour {
 		m_MainCam = Camera.main;
 		m_DoorCam.depth = m_MainCam.depth + 1;
 		m_DoorCam.fieldOfView = m_MainCam.fieldOfView;
-		m_DoorCam.far = m_MainCam.far;
+		m_DoorCam.farClipPlane = m_MainCam.farClipPlane;
 		m_DoorCam.clearFlags = m_MainCam.clearFlags;
 		m_DoorCam.cullingMask = m_MainCam.cullingMask;
 		m_DoorCam.enabled = false;

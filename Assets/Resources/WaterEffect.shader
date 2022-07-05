@@ -6,6 +6,8 @@
 
 // Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
 
+// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+
 Shader "WaterEffect" {
 	
 	Properties {
@@ -57,7 +59,7 @@ Shader "WaterEffect" {
            //v.texcoord1.xy   = float2(_u, _v) ;
            //o.customColor = _vertex * 0.5 + float3(0.5,0.5,0.5);
 
-		  float4 vertex = mul(_Object2World, v.vertex);
+		  float4 vertex = mul(unity_ObjectToWorld, v.vertex);
 		  float distance = length(vertex.xyz - half3(_CenterX, _CenterY, _CenterZ));
 		  float rad = 3.14 * distance * _Time.y;
 		  v.normal += float3(sin(rad  * 0.25) + cos(rad  * 0.25),  0 , sin(rad  * 0.25) + cos(rad  * 0.25) ) ;
