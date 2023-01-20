@@ -1,0 +1,992 @@
+
+7/15/2014
+Parser class Modularization through dependency analysis and unit test. Discarding externally dependent members...
+7/16/2014
+Performing CRC analysis with class Level, MeshBuilder, TextureUV.
+
+Level: 
+Level Manages prefab and instantiated game objects, rooms, actor, static objects. This class uses helper class 
+MeshBuilder, TextureUV e,t,c
+
+MeshBuilder:
+Generates unity mesh from tr2 mesh.
+
+TextureUV:
+An utility class for texture manipulation.
+
+CRC using existing class:
+When analyzing mesh builder member function input, main input should correspond to an existing tr2 mesh. 
+Function should be helper in nature that will serve an entity type, not an ID. ID is not finite in nature and context sensitive. Example:
+
+CreateStaticObject(Mesh mesh, Vector3 position, Quaternion rotation, string name) 
+
+Here, Parameter should be Mesh type, not an ID type. ID type would restrict wide use of CreateStaticObject() ID is 
+bound to a specific context, such as an valid array of mesh. Here, CreateStaticObject() is not sensitive to such 
+array bound.
+
+
+7/19/2014
+Noticed object self collision while ray casing. Ignore attched collider to player.
+
+TODO:
+Handle out of index error while calculating animation clip count for a specific movable tr2 object.
+
+7/21/2014
+Attach AI with State Machine to NPC Object Tiger( Test purpose)
+
+
+
+7/23/2014
+Extending tr2 base class...
+Attaching custom properties to cloned unity object. One way to do this is assigning a object containing custom 
+properties as a variable to MonoBehaviour script of that cloned object and then initialize the cloned object and it's component with that variable.
+Example:
+
+public class GameObjectEx: MonoBehaviour 
+{
+	public ClassData data; // data holding custom properties
+
+	void Start()
+	{
+		//perform runtime initialization like animation clip setup
+           //with data
+	}
+
+}
+
+
+8/04/2014:
+
+An Note On CRC:
+A class does not need to know about another class, unless it’s task requires it. It will enforce strict 
+responsibility of a class. For example, an event system does not need to know how the event will be handled 
+and where.
+
+
+An object based approach for a game engine
+
+    GameObject* objects[]
+	GUIElement* elements[]
+	Player* player
+	Window* window
+	while (true) 
+	{
+	// read player input
+	if (key == DOWN) {
+	update player's position
+	}
+	if (joystick is moved) {
+	update player's position
+	}
+	// update each object belonging to the game objects
+	for (each game object) {
+	do physics simulation
+	do AI
+	}
+	// render each object belonging to the game objects
+	for (each game object in objects[]) {
+	Window->render(object)
+	}
+	// render each GUI element
+	for (each game element in elements[]) {
+	if (element has been updated) {
+	Window->render(element)
+   }
+   
+   }
+   }
+   
+What we got is a God object, a well known anti-pattern. As we add more features to our game, maintaining such 
+all-knowing objects becomes a bottleneck of the project. It is also worth noting that when doing rendering, 
+the renderer needs to go through all the game objects to know which objects have been updated. The same applies 
+to the GUI elements. We don't use Observer pattern, so we can not notify the renderer about individual updates 
+as soon as they happen.
+   
+//more on http://en.wikipedia.org/wiki/God_object
+   
+8/28/2014
+Writting data on SDCard could be potential source of error!
+Transparent/cutout/diffuse does not work for android?
+   
+9/1/2014
+Developing custom TR2 level with TRLE.
+Generating high frequency leave texture with ripple distortion and noise in PS. Texture highlight can be 
+enhanced by mid tone contrasting in PS.
+   
+
+9/3/2014
+   
+Handle SFX with animation
+   
+The highest level of these is the SoundMap[] array, which translates the internal sound index into an index into 
+SoundDetails[]. Each SoundDetails record contains such details as the sound intensity, how many samples to select 
+from, and an index into SampleIndices[]. This allows for selecting among multiple samples to produce variety; 
+that index is the index to the SampleIndices[] value of first of these, with the rest of them being having the 
+next indices in series of that array. Thus, if the number of samples is 4, then the TR engine looks in 
+Sample Indices[] locations Index, Index+1, Index+2, and Index+3. Finally, the SampleIndices[] array references 
+some arrays of sound samples. In TR1, these samples are embedded in the level files, and SampleIndices[] contains 
+the displacements of each one in bytes from the beginning of that embedded block. 
+
+In TR2 and TR3, these samples are concatenated in the file "MAIN.SFX" with no additional information; 
+SampleIndices[] contains sequence numbers (0, 1, 2, 3, ...) in MAIN.SFX. Finally , the samples themselves are 
+all in Microsoft WAVE format. 
+   
+   
+   typedef struct { // 2 bytes
+    bit16 Value;
+    } tr2_anim_command;
+
+Here are all the AnimCommand opcodes and their operands:
+// 1: 3 operands. Position reference: (x,y,z); found in grab and block-move animations
+// 2: 2 operands. Position reference on surface for jumping: (x,z) for horizontal and (y,z) for vertical surfaces(?)
+// 3: No operands. Not clear; occurs in animations that are "slaved" to other animations, such as Lara throwing switches or moving blocks.
+// 4: No operands. Not clear; occurs in some death and settling-down animations, but not all.
+// 5: 2 operands. The first one is a frame number, and the second one is the ID of the sound to play at that frame (internal sound index).
+In TR2 and TR3, one of the sound indices two highest bits may be set; when they are, their meanings are
+
+0x4000 -- play this sound when on dry land (example: footsteps)
+0x8000 -- play this sound when in water (example: running through shallow water) 
+
+
+9.8.2014
+Developing custom TR2 level with TRLE
+Trapdoor not working! Help!
+
+You have placed a trapdoor object covering a door to the room below. You have placed a switch to it, all works ok, 
+but in game when the trapdoor is closed it is not solid and Lara go through it.
+For trapdoors and similar objects you have to do an additional step to make them solid stand-able, you have to 
+put in the solid sector below the trapdoor object a TRAPDOOR trigger with the command Item(x) where x is the 
+trapdoor object you are making solid.
+
+
+9.16.2014
+Realize engine architecture.
+
+Elegant way to using Game Engine is to use its query mechanism. Engine maintains a list of Objects with component. 
+Why not let engine handle them. Push Object to engine and If anything to know ask it for that. Let’s extend room 
+objects with MonoBehabiour component holding important room info. Let’s convert RoomEx in to Monobehabiour. Let’s 
+limit Responsibility of Level class as component object factory and passing them to engine.
+
+Learned: It takes time to make an update which has measurable cost!
+
+Define Player Events:
+OnPositionChanged()
+OnSectorChanged()
+OnRoomChanged()
+CanHandlePrimaryAction() 
+
+Smartly determine possibility(Grab Ledge, Pull self up, Pull Push block e.g.) analyzing surface geometry
+
+9.20.2014
+Physics Generated events:
+OnCollision() //Handled case collision generated during flying, jumping, landing time collision //General handled 
+case is going to idle state;
+
+
+9.21.2014
+Updating AnimationStatePlayer! Mostly cleanup tasks! All Physics handlers are moved to Player Class. Now 
+AnimationStatePlayer is just a view of Player class. Added Event for Animation states that Player class will handle. For example, OnJump event. Collision checks are mostly done on movement events. That’s a great saving against continuous collision check!
+
+FIXED: Lara is initially in negative height position in some level. but mistakenly her initial setup height 
+position was 0. So while landing (without ground collision check!) Lara was trying to reach 0 position 
+her assumed landing position!). Which is higher than her initial jump position? This was giving floating on 
+air error.
+
+   
+FIXED: Every transform that gets hit in room by Lara is not room transform.
+
+9.22.2014
+Pull Up Movement State Should be generated with DPAD + Action Key combination
+
+9.23.2014
+Write algorithm to detect ladder step (platform) and find highest step from triangle network.
+
+First select a triangle from triangle network
+Then find a edge that is normal to ground. 
+      If normal direction going upward than this triangle does 
+         not have platform edge.
+           Look for diagonal edge. 
+           Select another triangle sharing this diagonal edge 
+           Where selected triangle does not share any other vertex
+           from base triangle except vertex on diagonal edge.
+      else Select third vertex of triangle that does not lie 
+           on normal  edge.
+           Select highest vertex along normal edge. 
+           Connect it with third vertex to create platform edge.
+           Select another triangle sharing this platform edge 
+           where selected tri does not share any other vertex 
+           from base triangle execpt vertex on platform edge. 
+           Calculate curvature along edge. If it is flat then run 
+           the whole procedure again
+
+           
+9.27.2014
+FIXED: Get back to free position bug. Actually last freeposition must recorded unconditionally after every 
+movement processing.
+weather collision happens or not. It must be unconditional. freeposition must also be checked in idle state and 
+start game.   
+
+10.1.2014
+
+FIXED: Ladder Step Detection algorithm
+
+  First, select a face from face network
+  Then, find a edge that is normal to ground. 
+				
+  If normal going upward and found next edge diagonal - > go to mirrored face.
+  If normal going upward and found next edge horizontal - > Next edge ladder step
+                                                    -> if ladder step found check it is topmost go to mirror face.
+
+  else
+
+  If normal going downward and found next edge horizontal - > go to mirror face.
+  If normal going downward and found next edge diagonal - > third edge is ladder step
+                                                  -> if lader step found check it is topmost go to mirror face 
+
+10.3.2014
+FIXED: Stand position after pulling self up on a Block. Unfortunately, I added Block height with last hanging 
+height (of foot). In fact it will be hanging height (of foot) + body height, so that stand position is exactly 
+on top of block.
+Note:  Pivot point is Lara's foot.  
+
+New Bug: Flickering after height adjustment!! 
+When pull up animation going there is difference between foot position
+and actual pivot position. Difference remains at the end of animation. When we try to reposition pivot to expected 
+foot position, model body is translated to new height. When animation is reset or new animation is applied, pivot
+gets back to actual position. This back and forth translation causes Flickering.
+                    
+10/22/2014
+static event in DayNight system still refferencing invalid event handler! should use singleton type DayNight 
+system for easy access.
+
+10/24/2014
+TODO: Implement ladder step alorithm for boulder block. Perform raycast on boulder mesh. Build manifold mesh. 
+Get shared triangle.Calculate vertex triangle network for boulder mesh.
+
+11/6/2014
+Planed to add event managment system OVRMessenger.cs to handle event listner and refference. Some time event listner or 
+call back handler gets invalid because of delegator object distruction. This commonly happens for static events.
+
+11/8/2014
+Checked for valid tr2 file type on level load by checking file version! Otherwise returned to Level Load Screen 
+with massasge.Added Last Loaded Level path to Player Pref with last successfull level load! Checked if directory 
+exsists or empty.
+
+FIXED: SetRoomForPlayer() in class level. Downward raycast was unable to hit room plane. Because raycast origin 
+was started on room plane. Setting raycast origin slight above room plane solved the problem.Same error could 
+happen in PositionChanged() in Player class.
+
+Thinking to create custom wrapper class as raycast utility handle ground hit ditection by player.
+
+1/5/2015
+Disabled room shadow casting on interior objects
+
+1/27/2015
+m_Room.DebugRoomSurface(facing_edeges) causing null refference exception when playing level generated in edit mode.
+Disabling Lara stops this exception.
+
+2/7/2015
+Changed Class name AnimationStatePlayer to LaraStatePlayer. It was handling specially Lara's animation state changes.
+So I though it would be right naming and intutive also :)
+
+Most of the AI should inherit a common visibility function. May use ray cast to determine proximity of player.
+
+2/7/2015
+Some thoughts that made me sleepless :)
+Software should mean softlywared, meaning loosely coupled and detachable when required by other.Because people
+may not be intersted to system as a whole, they could be interested some donatable self sufficient part of system.
+Thats the perspective of object orientation should be I think.
+
+Best practice of objec orientation could be acheived by reusibility improvment, instead of practicing
+differented implementation (or reinventing the wheel) all the time. For example, here I used totally
+different camera for door opening, where funtionality like smooth movement that I implemented in main camera
+is missing. Instead of implementing whole functionality for scratch, why not reuse main camera handler.
+
+Now question of improvment practice come here. Develope main camera handler such that it could be open
+for reusibility and extention.
+
+Moved BuildAnimationStateMap() utility function LaraStatePlayer class to its own AnimationStateMapper class.
+This is more meaningful.
+
+
+2/8/2015
+Noticed unstable behaviour when LaraStatePlayer is enabled before component Player. Trying
+to look for dependency here. Turned out, key mapper should be initialised first.
+Animation state codes are coupled with keycodes. Initialise Keymapper first.
+
+Required instaniation:
+
+ThirdPersonCam (Prefav camera)
+KeyMapper (Prefav KeyMapper)
+Mouse (Prefav Mouse)
+Gui
+DayNightSystem
+Ambient light
+
+
+
+TODO: Generate prefab for Lara with minimalistic requirement
+
+2/13/2015
+FIXED: Free fall movement error by allowing free fall if not already free falling or jumping in Player.cs
+if(!m_bFreeFall && !m_bJumping)
+{
+	if(hit.point.y != m_GroundHeight)//try free fall
+	{
+		m_bFreeFall = (transform.position.y - hit.point.y > m_FreeFallStartHeight) ;
+		physics.StartFreeFall(transform.position);
+		m_FreeFallStartTime = Time.time;
+		Debug.Log("Start Free Fall");
+	}
+}
+
+
+2/25/2015
+Is there any way to set Time.fixedTime from script? Otherwise  random fixed time setting in projec t   can effect animation keyframe timing.
+
+some built in component variables (like light, camera) has been deprecated. Now I have to use GetComponent to access
+those components. wtf! 
+
+4/4/2017
+
+After so many days!
+
+Fixed error obsolete constant Physics.kDefaultRaycastLayers for for unity version 5.3 or higher
+Fixed load ligacy animation clip for unity version 5.3 or higher by setting clip.legacy = true in Animator.cs
+Fixed error concave room mesh can not be used as trigger for unity version 5.3 or higher
+
+Fixed: remove behabiour scripts for movable object while creating level in Editor
+Fixed error while interacting uninitialised script and game object
+Fixed stand alone unity player's runtime exception due to legacy material use in level.cs for unity version 5.3 or higher.
+
+4/5/2017
+
+Upgrade for Unity 5.3 and new GI system
+
+Scaled down rooms , objects and animation to simulate real world measurement.
+Added a scaling factor Settings.SceneScaling in Settins.cs 
+scaled level for real world size, fixed zone and trigger. Added legacy material support.
+Effected classes are 
+- Player.cs
+- Level.cs
+- Animator.cs
+
+Negative Effect of this scalling down,
+Original floor data for room gets invalid due to improper dimension.
+
+
+
+4/7/2017
+Check Collider component before adding new component in trigger
+Door cam missing main camera refference if main camera is disabled
+main camera near clip distance should be in range >= .01 to avoid error
+
+Zone and Triggers are marked using Unity Box Collider
+Fixed Jump speed scale OnJump event in LaraStatePlayer.cs
+
+4/10/2017
+
+Test Real Time GI on level Lara's home. light entrance with with alpha blocks GI.
+Planing to developer a cutter to detect such entrance and cut mesh to aproximate portal
+
+TODO:
+Image based material detection and apply custom material and shader.
+Color correction and alpha keying in TextureUV.GenerateTextureTile()
+
+4/15/2017
+Fixed metadata conflict in unity version 3.5 and 5.3 or higher
+by deleting and updating library. git commit was needed.
+
+fixed shadow casting and scaled shadow distance in DayNightSystem.
+
+4/30/ 2017
+
+Check if current room is null, before adjusting /setting Lara's room in  void PositionChanged(Vector3 position)
+Added MeshModifier.CullAlphaFace() to remove door/window faces with alpha texture. This will help 
+Unity GI to mark transparent objects.
+
+8/5/2017
+Checking WEB GL Build....
+
+using MeshModifier.CullAlphaFace taking too much vertex/uv memmory allocation.
+This is happening due to copying vertex/uv data of whole mesh for each alpha_face
+
+Optimize room material for batch processing...
+Supply room material while contructing level.
+Error ocurred after try to set global material of level. because  mean while level is created
+
+
+Why a render material truned into instance material?
+
+Trying to set assigned render material property marks shared material as instance.
+So change property of shared material before assign it to renderer
+
+8/8/2017
+TODO:
+Check room material import error with custom shader in Unity 5 and higher.
+Set material in loader properly
+
+8/20/2017
+
+Moved encode to png procedure in TextureUV.GenerateTextureTile() to editor  
+method Loader.Create()
+
+This resposibility redefination simplified the procedure by removing 
+build target or runtime platform check e.t.c Because encoding procedure 
+is only allowed with in Editor
+
+[simplification done from]
+
+#if UNITY_WEBPLAYER
+				//do nothing. casue web player can not access disk
+#elif UNITY_EDITOR
+		
+		if(!Settings.LoadLevelFileFromUrl)
+		{
+			if(!Directory.Exists(Application.dataPath + "/LevelTexture/"))
+			{
+				Directory.CreateDirectory(Application.dataPath + "/LevelTexture/");
+			}
+			//if(!File.Exists(Application.dataPath + "/LevelTexture/" + Level.m_LevelName + ".png"))
+			File.WriteAllBytes(Application.dataPath + "/LevelTexture/" + Level.m_LevelName + ".png",tex.EncodeToPNG());
+		}
+#endif
+
+
+[to]
+
+if(!Directory.Exists(Application.dataPath + "/LevelTexture/"))
+{
+	Directory.CreateDirectory(Application.dataPath + "/LevelTexture/");
+}
+//if(!File.Exists(Application.dataPath + "/LevelTexture/" + Level.m_LevelName + ".png"))
+File.WriteAllBytes(Application.dataPath + "/LevelTexture/" + Level.m_LevelName + ".png",tex.EncodeToPNG());
+	
+	
+	
+About non standard resource access path in Unity...
+All path in AsseteDataBase starts with "Assets" with proper extension at the end.
+Double slash does not work.
+
+On the other hand,
+All path in Resources.Load API starts relative to "Resources" and extension at the end is not allowed
+
+8/22/2017
+
+Adding back button support to load new level...
+
+TODO:
+Unregister static event handlers in Player.cs 
+Redefine them as instance event handler....
+
+Change following event defination in LaraStatePlayer
+
+	public  static event OnJumpDelegate OnJump;
+	public  static event OnMovementDelegate OnMovement;
+	public  static event OnJumpingDelegate OnJumping;
+	public  static event OnPrimaryActionDelegate OnPrimaryAction;
+
+Into
+
+	public   event OnJumpDelegate OnJump;
+	public   event OnMovementDelegate OnMovement;
+	public   event OnJumpingDelegate OnJumping;
+	public   event OnPrimaryActionDelegate OnPrimaryAction;
+
+This changes can potentially break existing implementation. but 
+fixes null refferenced handler due to gameobject destruction.
+
+Another way to ressolve the issue without breaking it is,
+releasing handler on destruction of game object and notify
+event generator.
+
+Purify Player.cs and make it representative of player model
+by removing resposibilty external to this class
+
+12/10/2017
+
+Filtering room water mesh by using  Attributes property of Tr2VertexRoom.Tr2VertexRoom.
+water surface is composed of two meshes front facing mesh and backfacing mesh.
+back facing mesh using usially includes tub wall 
+
+16/10/2017
+Update KeyMapper.cs to adapt new swimming actions. Added new algorithm to generate 
+defragmented interface code. In turn it reduces interface array length. So, it is possible
+add new layers of interface. This fix reduces number of interfac key to reduce memory 
+foot print. keymaper statecode generator using simple keycount....
+
+17/10/2017
+Adding method MeshBuilder.GetAnimatedTextureIndex() to genarate second
+UV set for animated frame in texture atlas. This was used for ripple
+texture animation on water surface.
+
+Animated Textures : list of texture sequence
+ObjectTextures array
+I have to generate a list of animatable alternet uvs  for mesh. set shader flag water toggle to choose uv set
+
+Each face chooses as replacable texture id,
+If a texture id animatable we have to lookup it into AnimatedTexture group
+
+
+22/10/2017
+Determined swmimming sates in water using water surfce and room info. In the process
+I had to fix bug in Parser.Tr2RoomInfo(), It was a typo bug while parsing
+Parser.Tr2RoomInfo. This bug was giving wrong Parser.Tr2RoomInfo.yTop. As a result
+it was creating problem in water room depth measurement.
+
+Updaing LaraStatePlayer.cs to add new layers in Lara's state machine, to support her 
+polymorfic action at various depth in water.
+
+Layers:
+Normal
+Shallow water movement(idle, 177 wading, 192 jump up transition)
+Inwater movement   (108 idle, 86 swim, jumpx, 130, 206 pickup)
+water surface movement (110 idle, 116 move,jumpx, pullup)
+
+Select shallow layers
+if lara in water filled room && Lara's hip < room surface height
+
+Debug.Log("Anim ID: inwater swimming " + "86" + " " + "State ID:" +  tranimations[86].stateid);    //17
+		Debug.Log("Anim ID: inwater idle " + "108" + " " + "State ID:" +  tranimations[108].stateid);    //13
+
+
+spote bug in following code, hint: disable debug log
+
+if(from == statemap[KeyMapper.Idle])
+Debug.Log("Cross fade from: " + from.AnimationID + " to:" + unitystatechange.stateid + " nstatechange: "+ nstatechange );
+CrossFadeHandler();
+
+
+23/10/2017
+We need fluid transition swmimming state and normal movement.
+
+state transition we should handle:
+1. water dive (in shallow water, in deep water).
+2. pull up (from deep water).
+3. walkup (from shallow water).
+4. deep water to shalow water movement( vice versa), considering underwater surface and wall collision system allowing free swimming
+
+
+we need adjust follow camera allowing third persion under deep under water swimming view, where forward and back will controll character tilt,
+jump will thurst character forward
+
+
+Fixed unable to change height in deepwater swimming due to addition height fix in Update, this height fix could be easily done by
+standard free fall algorithm.
+
+ if (m_SwimState != SwimmingState.InDeepWater)
+ {
+        float h = Mathf.Lerp(transform.position.y, m_GroundHeight, Time.deltaTime * 10.0f);// + 0.1f;
+        transform.position = new Vector3(transform.position.x, h, transform.position.z);
+  }
+
+
+28/10/2017
+
+Water effect shader AlphaTest-Water is not working when AlphaTest-Diffuse is used for room. strange!
+
+29/10/2017
+
+After carefull looking trough shader files it truned out that  AlphaTest-Diffuse and AlphaTest-Water using same
+render sorting order. I changed AlphaTest-Water sort order higher than that of AlphaTest-Diffuse. 
+Problem Solved!
+
+Optimizing Water Effect controller by using it as singleton.... 
+Creating Water Effect prefav....
+
+30/10/2017
+
+planing transition while swmimming, surface water movement:
+During this state, 
+
+- player tilt is not allowed.
+- player can pull up her using nearby platform
+- player can dive in deep water
+- player can move to shallow water ( transition from treading to wadding)
+
+While in shallow water,
+- player can move to deep water surface ( transition from wadding to treading)
+
+2/11/2017
+
+ Devloping shader for underwater caustic effect.
+ shader works by taking center point of the room and modifing
+ vertex according to distance of vertex from center. 
+ generates spherical uv coord by normalizing vertex, generate lat-long
+ values using normalized vertex.
+
+ Adding new method RoomEx.GetCenterPoint() to support vertex modulation in
+ shader.
+ 
+ Calculating center point in  RoomEx.Init()
+
+ Note: Vertex shader input data provide vertex stream in model space...
+
+ 9/11/2017
+ 
+ modified under water vertex normals using world space vertex distance from world center, thus avoided
+ need to model space center per under water mesh. now it is also possible to use shared material for
+ underwater mesh.
+
+ conditional vertex modification... based on _InSideWater shader property.
+ During creation of level _InSideWater is set to 0
+
+ RoomEx.GetCenterPoint() now provide room center position in world space. It helps to determine
+ water plane Y position. Used this value for vertex modification bellow/over water surface. 
+
+ThirdPersonCam.CheckCameraInWater() determines _InSideWater value, Also added Level.GetWaterHolderMaterial() 
+for easy access of shared under water surface material.
+
+10/11/2017
+
+Refactored room bound calculation in ThirdPersonCam.CheckCameraInWater()
+
+Added method OnDestroy() in Player.cs to fix event handler access exception on destroy
+player.
+
+
+11/11/2017
+
+Swim state layering is done inside LaraStatePlayer based on original movement state + m_SwimState,
+In early version Player.cs was modified input state-code for layering, which was kinda hack!
+
+
+11/13/2017
+
+Removed  call back PrimaryAction of LaraStatePlayer. this call back lets player.cs return proxy state code
+to LaraStatePlayer. Instead of originating this call back in LaraStatePlayer and then handling in player.cs,
+PrimaryAction call is wraped in  player.cs on StateCodeHandler.
+
+Fixed pull up height calculation bug due to Lara's pivot position change in different swimming event
+(e.g, pivot on head during water surface movement)
+
+TODO:
+
+- define Wall hit test variable 
+
+- use Wall hit test flag to make system wait for end of existing state excution
+
+- variable for raycast length
+- wrap primary action handler for primary action in different swim state
+- add offset in LaraStateMap defination array, instead of hard coded array for better code reusibility
+
+
+possible issue could be OnStandingUp() ->  FlickerPos = new Vector3(t.position.x, PullUpTarget.y + m_JumpHeight, t.position.z);
+
+Use common wrapper method for raising custom state code. but problem is  m_AnimStatePlayer.StateCodeHandler is not easily customizable
+    void FireStateCode(int keystate, int otherkey, float time)
+    {
+        if (m_AnimStatePlayer != null)
+        {
+            m_AnimStatePlayer.StateCodeHandler(keystate, otherkey, time);
+        }
+    }
+
+
+Renamed Player.JumpTarget as JumpVector for better meanning
+
+Added Common movement checker method Player.IsInMovement()
+
+  bool IsInMovement()
+    {
+        return   (m_bJumping || m_bPullingUp || m_bWalkingUp || m_bStandingUp) ;
+    }
+
+
+11/14/2017
+
+Considering while in water player have to go through different water layer. How to handle that?
+
+
+      /*
+             * TODO:
+             * Extension: check here for possible room change ( e.g dive in water room)
+             * 
+             * */
+
+11/15/2017
+
+Noticed unexpected cross level effect due to 
+
+static float DayNightSystem:: _AmbientTint ;
+static SwimmingState LaraStatePlayer:: m_SwimState;
+
+m_SwimState carried swimming state from one level to another,
+_AmbientTint  carried water color tint  from one level to another.
+
+Even after scene unload.
+
+static is a power tool. But use it carefully. Use static only in singleton use case.
+
+11/19/2017
+
+Used instanced waterholder material to handle vertex modulation bellow water surface for
+water holders with different water level. Added method in Level.SetInstancedWaterHolderMaterials(int inwater)
+
+Remapped KeyMapper.cs to allow more actions (e.g. free fall, diving into water)
+
+Fixed free fall physics Update()
+
+found interesting typo in Player.InputUpdate()
+
+intended syntax 
+
+if(condition)
+{
+	return;
+}
+
+actually written
+
+ if (condition) return;
+ {
+
+ }
+
+
+	public void InputUpdate()
+    {
+        if (m_bFreeFall || IsInMovement()) return; // intended to return, but not intended to include rest of the code, but still it works! guess why? 
+
+        {
+            m_PlayerYaw += mouse_dx * 0.5f;
+            mouse_dx = 0;
+            //Debug.Log("m_PlayerYaw " + m_PlayerYaw);
+
+            if (m_SwimState == SwimmingState.InDeepWater)
+            {
+                m_PlayerTilt -= mouse_dy;
+                mouse_dy = 0;
+            }
+            else //dont tilt up in water surface or on land
+            {
+                m_PlayerTilt = 0;
+            }
+          
+            transform.rotation = Quaternion.Euler(m_PlayerTilt, m_PlayerYaw, 0.0f);
+
+        }
+    }
+
+
+	20/11/2017
+
+	Remapped KeyMapper.cs to allow more actions (e.g. free fall, diving into water)
+	TODO:
+	- Compose jump physics using normal jump and free fall ( another word detect falling part of jump physics)
+	- Change falling animation depending on current fall displacement
+
+	Devloping diving state machine....
+
+	156-158 (will dive)
+	153 (diving)
+	152 (did dive)
+	87 (did dive)
+
+
+	23/11/2017
+
+	Fixed double instances of Lara in some TRLE level. This casued movement speed issue while updating player.
+
+
+	25/11/2017
+
+	Fixed diving into water bug due to early return of Player.SetSwimState() while checking m_bJumping == true
+	Dont goto swimming state again while worling against gravity (e.g trying to getout of water), except case, jumping into water.
+
+	Fixed animation frame rate using original engine time per frame.
+
+	27/11/2017
+
+	Entity relative frames are sum of frames  in all animation clips in Entity (e.g. Lara)
+
+	Added method LaraStatePlayer.SelectDispatcher() to select proper dispatcher for state change based on
+	entity relative frame index. current unity animation clip frame index is converted to entity relative 
+	frame index.
+
+	Updated TRAnimationClip class to support clip space frame index to entity space frame index
+
+	Fixed: jump tumble bug by performing post ground seeking in Player.JumpingHandler(), pre ground
+	seeking causing bug due to the fact that, seeked ground level is higher than player's y positon
+	player will not jump;
+
+	28/11/2017
+	
+	Added method Loader.BuildLevel....
+
+	Added class LevelManager to manage serialized level data (e.g Materials),
+	Initially I tried to serialize public data inside LevelManager through
+	a static method. but static variables in monoderived class can not be serialized,
+
+	So I took object based approch, I created a level manager game object with component
+	<LevelManager> in Loader.BuildLevel, then initialized (or serialized)  LevelManager's 
+	public variables.
+
+
+
+
+	From now on all material data will be access through LevelManager
+
+	Now room data is accessible through inspector (e.g room type)
+
+
+	30/11/2017
+
+	Moved underwater camera check method ThirdPersonCam.CheckCameraInWater()  to LevelManager.CheckCameraInWater()...
+	Also CheckCameraInWater is done depending on a flag m_bCameraInWater, instead of continueous checking for performance...
+	Removed component WaterEffect from water surfaces while level build, instead a global Water Effect Controller is used for performance...
+	
+	Added class SoundMananger to manage SFX and ambient background sound...
+	Added Component SoundMananger to Main Camera, which addes Audio source to camera to handle distance independent sfx.
+	
+	Used main camera as sfx aduio source for distance independent sfx
+
+	RoomEx.m_RoomBound is made public for serialization of room bound in case of edit mode level build...
+
+
+	8/12/2017
+	Handled outof index bug in SetupTrigers
+	Handled null refference exception in PrimaryActionHandler
+
+	9/12/2017
+	updated water filled room material selection logic in Level.cs. 
+
+	  if ((leveldata.Rooms[i].Flags == 0x0001) || (leveldata.Rooms[i].Flags == 65) || (leveldata.Rooms[i].Flags == 585)) //Is room water holder
+      {
+		// Generate material instances for water holder using m_SharedMaterialWaterHolder
+	  }
+
+
+	Segment terrian water surface using room bellow bound.
+	Create room normally. but keep room flag.
+	if room flag is 65 then look room above it
+	clip all triangles of room above using current room bound
+
+
+	11/12/2017
+
+	The original portal testing algorithm performs a breadth-first visibility check of the bounding boxes of the screen-projected portal vertices,
+	and also compares the vector from the camera to the first portal vertex to its normal. This works pretty fine, unless there are denormalized
+	bounding boxes, which the original TR solves by expanding the portal bounding box to its maximum if a projected edge crosses the screen 
+	plane or its boundaries.
+
+	In some TRLE levels attributes of room vertices  is set to zero. So alternative is using room visibiliy portal or room bounding box.
+
+	13/12/2017
+
+	A room could have multiple adjecent portals, use horizontal portals only ( note: horizontal portal normal lies in horizontal plane in TR)
+
+	Warning: scaling could be potential issue, when you dont realize that some value is already scaled, 
+	for example calculation was giving wrong scaled result,
+
+		m_PortalPolygon[i] = new Vector3(port.Vertices[i].x , m_CenterPoint.y, port.Vertices[i].z ) * Settings.SceneScaling;
+
+	where correct one will be,
+	    m_PortalPolygon[i] = new Vector3(port.Vertices[i].x * Settings.SceneScaling, m_CenterPoint.y, port.Vertices[i].z * Settings.SceneScaling);
+
+	during previos calculation I didnt care that, m_CenterPoint.y is already scaled  by  Settings.SceneScaling !
+
+
+	[Water surface exclusion algorithm]
+
+	- Added method RoomEx.GetWaterPortal() to get portal polygon for water room
+	- Exclude all faces in portal if face has alpha texture
+	    
+		    - Mark horizontal faces with alpha
+			- Mark Outer and inner boundary of alpha region
+			- Separate faces within marked boundary
+
+
+
+	18/12/2017
+
+	used  surface motion (e.g. texture animation on face) to flag surface as water.
+	not all animated surfaces are water although (e.g lava flow), so faces with normal
+	along world up vector is probale candidate of water surface.
+
+	optimization: consider following face atrribute checking....
+
+	     if (has_water)
+                {
+                    if (IsFaceInWater(is_water_vertex, Idx0, Idx1, Idx2, Idx3) )
+                    {
+                        continue;
+                    }
+                }
+                else
+                {
+                    if (IsFaceInWater(leveldata, Rectangles[rectCount].Texture))
+                    {
+                        continue;
+                    }
+                }
+
+
+     with this one....
+
+     if(IsFaceInWater(is_water_vertex, Idx0, Idx1, Idx2, Idx3) && has_water)
+                {
+                    continue;
+                }
+                else
+                {
+                    if(IsFaceInWater(leveldata, Rectangles[rectCount].Texture))
+                    {
+                        continue;
+                    }
+                }
+
+
+	 which one perform best in a loop?
+
+
+
+	 9/2/2018
+
+	 Logical error In surface-diving condition:  Float without dive
+
+	 Bug: FreeFallHandler() can not detect ground change,ground height is continuously updated, 
+	 but last-ground-height seems to be not updated properly
+
+
+
+
+
+	    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

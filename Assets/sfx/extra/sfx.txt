@@ -1,0 +1,408 @@
+footstep?
+Lara footstep
+Lara footstep
+Lara footstep
+Lara grunt
+Lara "no"
+Lara sliding
+Lara landing on feet
+Lara grunt (pulling up)
+Lara unholstering pistols/magnums/UZIs
+Lara holstering pistols/magnums/UZIs
+Lara firing pistols
+Lara cocking shotgun/pistol
+bullet ricochet
+bullet ricochet
+Lara lighting flare
+flare burning
+harpoon ricochet
+harpoon reload
+walk shallow water (Lara/enemies)
+walk shallow water (Lara/enemies)
+walk shallow water (Lara/enemies)
+walk shallow water (Lara/enemies)
+wade shallow water (forward; light)
+wade shallow water (forward; deep)
+Lara treading water
+Lara firing magnums
+harpoon reload (underwater?)
+fire harpoon (underwater)
+explosion
+Lara pressing button
+Lara moan (pulling up)
+Lara grunt (hitting wall)
+Lara grunt (hitting wall)
+click (?)
+click (?)
+Lara grunt (jumping)
+Lara scream (falling)
+Lara "hih-ah!" (running into something that hurts)
+Lara "ah!" (running into something that hurts)
+Lara roll
+splash (Lara jumping into water)
+splash (Lara surfacing from underwater)
+swish (Lara swimming underwater)
+Lara catching breath
+underwater gurgle (air bubble?)
+Lara pulling metal lever
+Lara inserting key/card
+Lara inserting chip/prayer scroll/gem/other
+Lara groan (kill)
+Lara groan (kill)
+Lara firing Uzis
+gunshot echo?
+Lara (only?) firing shotgun
+Lara grunt (pushing block only?)
+Lara grunt (pushing block)
+Lara gasp (pushing block)
+Lara grunt (pushing block)
+click (?)
+harpoon or bullet hitting Lara?
+bullet hitting Lara?
+Lara "heh!" (pulling up?)
+Lara treading water
+Lara's bones cracking (kill)
+ledge grab (Lara)?
+Lara "oomph!" (hitting wall after grabbing ledge)
+footstep/ledge shimmy (Lara)?
+metal lever reset(?)
+glass breaking
+waterfall and gurgle
+underwater ambience
+underwater lever pull
+Lara "aha!" (picking up something)
+block sliding
+door opening
+crate/? swinging
+brittle ground
+brittle ground breaking away/falling
+brittle ground hitting solid ground
+enemy footstep
+enemy footstep
+enemy footstep
+enemy grunt (getting up something)
+enemy hitting Lara
+enemy hitting Lara
+enemy groan (kill)
+enemy growl
+enemy grunt (getting up something?)
+enemy grunt (getting up something?)
+?
+fire M-16 (Lara)
+waterfall
+sword statue (drop)
+sword statue (lift)
+metal gate open
+metal gate close
+pop?
+enemy body slump (kill)
+enemy/bird body hit ground hard (kill)
+enemy/(only?) body slump (kill)
+dog bark
+footstep?
+footstep?
+footstep?
+dog bark
+dog yelp (kill)
+dog yelp, sharper (kill)
+dog whimper (kill)
+dog pant
+footstep?
+footstep?
+footstep?
+tiger growl
+tiger snarl
+tiger growl
+leopard/tiger growl-twitch (kill)
+tiger growl
+rat chirp
+rat chirp
+rat squeal (kill)
+leopard?
+leopard?
+leopard?
+leopard?
+leopard?
+echo?
+grenade explosion?
+grenade explosion?
+? growl
+footstep?
+menu option movement
+menu option (Lara's house) select
+menu/menu option popup
+menu option escape
+menu option (gun) select?
+menu option (gun) select
+menu game page turn
+Lara sigh (after health recharge)
+enemy footstep
+enemy footstep
+enemy footstep
+enemy footstep
+fire gun (with silencer; enemy)
+fire gun (with silencer; enemy)
+enemy "ah!" (kill)
+enemy "oo!" (kill)
+enemy punch?
+spider moving
+grenade launcher load (grenade entering)
+grenade launcher load (grenade settling)
+fire grenade launcher
+spider biting Lara?
+spiked metal door slide
+spiked metal door close
+falcon screech
+bird wing flap
+falcon screech (kill)
+crow "grok!"
+bird wing flap?
+crow "grak!"
+crunch?
+enemy gun cock?
+enemy gunshot?
+?
+?
+heavy breathing (?)
+enemy chuckling (after killing Lara)
+monk "poy-yaw!"
+monk "awu!" (kill?)
+Lara "oi-ah!" (kill, from spikes/?)
+Lara groan (kill, from flames/lava/?)
+boulder(s)/oildrum(s)/snowballs/? rolling
+sandbag snapping
+sandbag/? hitting ground
+burning
+snowmobile start
+snowmobile idle
+snowmobile accelerate
+snowmobile (high RPMs)
+snowmobile shut off
+gun shot (enemy)
+enemy groan (kill)
+enemy heavy breathing
+click?
+trap floor (open)
+trap floor (close)
+yeti? growl
+yeti? growl
+yeti chest beat
+yeti ?
+yeti grunt and chest beat
+yeti scream
+yeti scream (kill)
+yeti growl
+yeti growl
+yeti grunt
+yeti growl
+yeti footstep
+yeti footstep
+enemy heavy breathing
+enemy flame thrower flame
+enemy flame thrower reset?
+enemy flame thrower cycle?
+enemy groan (kill?)
+enemy flame thrower pack echo (kill)
+enemy belt(?) jingle
+wrench "ching" (enemy)
+footstep?
+footstep/Lara hit?
+cock shotgun (enemy)
+underwater ?
+enemy breathing (scuba)
+pulley crane-block movement
+curtain open/close
+enemy grunt (scuba; kill?)
+underwater ?
+boat start
+boat idle
+boat accelerate
+boat (high RPMs)
+boat shut off
+boat (engine hit)
+boat (body hit)
+boat (damage hit)
+boat (damage hit)
+boat (damage hit)
+door slide
+flesh wound (Lara only?)
+flesh wound (Lara only?)
+saw (high RPMs)
+saw shut off
+bell chime
+? creaking/hitting something
+? swinging
+? breaking?
+pulley movement
+plane engine idle
+underwater fan
+vent fan
+rope swing
+jump plate
+jump plate
+? breaking
+ball/rock/snowballs/? rolling
+ball/rock/snowballs/? settling
+?
+crash?
+crash (lower pitch)?
+? rolling
+? hitting wall/settling
+blade slice-hit
+blade "ching"
+rolling spike-wheel
+spider (kill)?
+blade cutting into Lara?
+circle handle loosen
+circle handle turn
+circle handle door latch open
+circle handle door creak and latch
+monk? footstep
+monk? footstep
+monk? footstep
+monk? footstep
+monk sword swing (single)
+monk sword swing (multi)
+monk "oie!"
+monk "hoo!"
+monk "hah!"
+monk "ooat!"
+monk "eeh!"
+monk "hwa!"
+monk "ayeih!"
+monk "solamadeah!"
+monk "ahhah!" (kill?)
+monk "oo!"
+monk "woo!"
+monk "ahh!" (kill?)
+? crunch
+? crunch
+enemy: "haye"
+splash (surfacing)
+waterfall
+footstep?
+footstep?
+footstep?
+gunshot?
+enemy gunshot
+enemy "ahaga-hoog-uh!" (kill)
+enemy grunt (kill?)
+shooting circle blade
+footstep?
+footstep?
+footstep?
+footstep?
+monk "oye!"
+monk "aweh!"
+shooting circle blade hit
+warrior footstep?
+monk blade swing?
+? swing
+monk blade swing
+monk? blade swing
+warrior growl
+warrior growl
+warrior hiccup?
+warrior burp?
+warrior "wuuhh!"
+warrior burp?
+warrior growl-burp?
+warrior awaken
+warrior growl-burp?
+lever pull
+chain pulley
+Lara zipline handle grab
+zipline slide
+zipline handle hit
+? body slump
+?
+crunch?
+waterfall?
+sliding door open
+sliding door close
+water something
+?
+?
+Talion guardian scream
+? gasp
+?
+? growl
+Talion guardian hoarse breathing
+Talion guardian footstep
+Talion guardian scream (kill)
+large spider ?
+helicopter
+dragon footstep
+dragon growl
+dragon growl
+dragon body fall
+dragon dying breath
+dragon growl
+dragon grunt
+dragon fire breathe
+dragon leg lift
+dragon leg hit
+warrior blade swing
+warrior blade swing (slow)
+warrior blade swing (fast)
+warrior breath?
+warrior hover engine
+warrior land
+warrior? blade hit
+warrior? blade slice
+warrior? blade slice
+birds
+birds
+? crunch
+? crunch
+? crunch
+? crunch
+door creak and close
+? breaking
+large spider snarl
+large spider footstep?
+large spider footstep?
+large spider footstep?
+large spider footstep?
+large spider snarl (kill)
+dragon? growl
+dragon?/T-Rex footstep
+dragon/T-Rex growl
+dragon/T-Rex growl
+water drip
+water drip
+water drip
+stage backdrop
+stone door slide
+platform alarm
+Lara's grandfather clock tick
+Lara's house front door chime
+Lara's house alarm
+?
+? water
+?
+?
+?
+?
+?
+hit?
+Jeeves "ahuh!"
+Jeeves "ehuh!"
+Jeeves "euh!"
+Jeeves "ehuh-uh!"
+Jeeves "ehah!"
+Jeeves grunt
+Jeeves "heuh!"
+Jeeves fart "ehoo!"
+Jeeves "heuh!"
+Jeeves "auh!"
+Jeeves "aoh!"
+Jeeves cup chatter
+Jeeves cup chatter
+brittle ground breaking
+spider explode (kill)/Lara bullet hit?
+shark bite
+lava?
+loud hit (?)
+enemy cars pulling up, doors shutting, dogs barking, glass breaking (at beginning of Home Sweet Home)
+zipper?

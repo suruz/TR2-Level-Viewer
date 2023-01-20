@@ -1,0 +1,5 @@
+How to play Demo Level HILTOP.TR2 in original TR2 game:
+- Rename HILTOP.TR2 as ASSAULT.TR2
+- Backup original ASSAULT.TR2 file in DATA folder of TR2 game.
+- copy and replace renamed ASSAULT.TR2 with original ASSAULT.TR2 file in DATA folder of TR2 game.
+- Now, launch TR2 game and play Lara's Home level.
