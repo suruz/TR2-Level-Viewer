@@ -1025,786 +1025,1210 @@ public class Parser
     }
 
     static void ExtractMeshes(Tr2Level Level, byte[] MeshData, uint NumMeshPointers, uint[] MeshPointers)
-	{
-		bool  NegativeSize;
-		
-		//Tr2Level Level = Level;
-		Level.NumMeshes = (int) NumMeshPointers;
-		Level.Meshes = new Tr2Mesh[Level.NumMeshes];
-		
-		//create a stream reader
-		MemoryStream meshDataStream = new MemoryStream(MeshData);
-		BinaryReader meshReader = new BinaryReader(meshDataStream);
-		
-		// get mesh start 
-		//print("NumMeshPointers"+ NumMeshPointers);
-		
-		for (uint i = 0; i < NumMeshPointers; i++) 
-		{
-			//get mesh start 
-			//print("MeshPointers["+i+"]"+ (int)MeshPointers[i]);
-			
-			int meshDataStartIndex = (int)MeshPointers[i];			//seek to meshDataStartIndex -> MeshPointer
-			//byte meshDataStartByte = MeshData[meshDataStartIndex];
-			meshDataStream.Seek(meshDataStartIndex,SeekOrigin.Begin);
-			
-			//read mesh center
-			//int sizetr2Vertex =  6;
-			//int sizetr2Vertex =  Tr2VertexSize;
-			byte[] bcenter = meshReader.ReadBytes(Tr2VertexSize);
+    {
+        bool NegativeSize;
+
+        //Tr2Level Level = Level;
+        Level.NumMeshes = (int)NumMeshPointers;
+        Level.Meshes = new Tr2Mesh[Level.NumMeshes];
+
+        //create a stream reader
+        MemoryStream meshDataStream = new MemoryStream(MeshData);
+        BinaryReader meshReader = new BinaryReader(meshDataStream);
+
+        // get mesh start 
+        //print("NumMeshPointers"+ NumMeshPointers);
+
+        for (uint i = 0; i < NumMeshPointers; i++)
+        {
+            //get mesh start 
+            //print("MeshPointers["+i+"]"+ (int)MeshPointers[i]);
+
+            int meshDataStartIndex = (int)MeshPointers[i];          //seek to meshDataStartIndex -> MeshPointer
+                                                                    //byte meshDataStartByte = MeshData[meshDataStartIndex];
+            meshDataStream.Seek(meshDataStartIndex, SeekOrigin.Begin);
+
+            //read mesh center
+            //int sizetr2Vertex =  6;
+            //int sizetr2Vertex =  Tr2VertexSize;
+            byte[] bcenter = meshReader.ReadBytes(Tr2VertexSize);
             Level.Meshes[i] = new Tr2Mesh { Centre = (Tr2Vertex)Cast2Struct(bcenter, typeof(Tr2Vertex)) };
 
-			//dummy read for bunkown
-			meshReader.ReadBytes(4);
-			
-			//print("center:" + Level.Meshes[i].Centre.x+ " "+ Level.Meshes[i].Centre.y +" "+ Level.Meshes[i].Centre.z);
-			
-			//get number of vertices 
-			Level.Meshes[i].NumVertices = meshReader.ReadInt16();
-			//print("Level.Meshes["+i+"].NumVertices" + Level.Meshes[i].NumVertices);
-			Level.Meshes[i].NumVertices = (short) Mathf.Abs(Level.Meshes[i].NumVertices);
-			
-			//get vertex list
-			int sizeVertices = Tr2VertexSize * Level.Meshes[i].NumVertices;
-			Level.Meshes[i].Vertices = new  Tr2Vertex [sizeVertices];
-			
-			for(int vtxCnt = 0; vtxCnt < Level.Meshes[i].NumVertices ; vtxCnt++)
-			{
-				byte[] vtxData =  meshReader.ReadBytes(Tr2VertexSize);
-				Level.Meshes[i].Vertices[vtxCnt] = (Tr2Vertex) Cast2Struct(vtxData,typeof(Tr2Vertex));
-				
-			}
-			
-			//get number of normals
-			Level.Meshes[i].NumNormals = meshReader.ReadInt16();
-			NegativeSize = (Level.Meshes[i].NumNormals < 0);
-			Level.Meshes[i].NumNormals = (short)Mathf.Abs(Level.Meshes[i].NumNormals);
-			
-			//get normal list 
-			if (NegativeSize) 
-			{
-				//now Level.Meshes[i].NumNormals mean number of MeshLights
-				int numMeshLights = Level.Meshes[i].NumNormals;
-				Level.Meshes[i].MeshLights = new short[numMeshLights]; //could be turned in to byte array
-				for(int meshLightCount = 0; meshLightCount < numMeshLights ;  meshLightCount++)
-				{
-					Level.Meshes[i].MeshLights[meshLightCount] = meshReader.ReadInt16();
-				}
-				
-				NegativeSize = false;
-			}
-			else 
-			{
-				int numMeshNormals =  Level.Meshes[i].NumNormals;
-				Level.Meshes[i].Normals = new Tr2Vertex[numMeshNormals];
-				for(int nrmCount = 0 ; nrmCount < numMeshNormals; nrmCount++)
-				{
-					byte[] normData = meshReader.ReadBytes(Tr2VertexSize);
-					Level.Meshes[i].Normals[nrmCount] = (Tr2Vertex) Cast2Struct(normData,typeof(Tr2Vertex));
-				}
-			}
-			
-			// get list of textured rectangles 
-			Level.Meshes[i].NumTexturedRectangles = meshReader.ReadInt16();
-			Level.Meshes[i].NumTexturedRectangles = (short) Mathf.Abs(Level.Meshes[i].NumTexturedRectangles);
-			//print("Level.Meshes["+i+"].NumTexturedRectangles " + Level.Meshes[i].NumTexturedRectangles);
-			
-			if (Level.Meshes[i].NumTexturedRectangles > 0) 
-			{
-				Level.Meshes[i].TexturedRectangles = new Tr2Face4[Level.Meshes[i].NumTexturedRectangles];
-				
-				if (Level.EngineVersion == TR2VersionType.TombRaider_4) 
-				{
-					for (int j = 0; j < Level.Meshes[i].NumTexturedRectangles; j++) 
-					{
-						byte[] brectData = meshReader.ReadBytes(Tr2Face4Size);
-						Level.Meshes[i].TexturedRectangles[j] = (Tr2Face4)Cast2Struct(brectData,typeof(Tr2Face4));
-						
-						meshReader.ReadBytes(2);  //read 2 dummy bytes
-					}
-				}
-				else 
-				{
-					for (int j = 0; j < Level.Meshes[i].NumTexturedRectangles; j++) 
-					{
-						byte[] brectData = meshReader.ReadBytes(Tr2Face4Size);
-						Level.Meshes[i].TexturedRectangles[j] = (Tr2Face4)Cast2Struct(brectData,typeof(Tr2Face4));
-						//no dummy bytes
-					}
-				}
-			}
+            //dummy read for bunkown
+            meshReader.ReadBytes(4);
 
-			// get list of textured NumTexturedTriangles 
-			Level.Meshes[i].NumTexturedTriangles = meshReader.ReadInt16();
-			Level.Meshes[i].NumTexturedTriangles = (short) Mathf.Abs(Level.Meshes[i].NumTexturedTriangles);
-			//print("Level.Meshes["+i+"].NumTexturedTriangles  " + Level.Meshes[i].NumTexturedTriangles );
-			
-			if (Level.Meshes[i].NumTexturedTriangles  > 0) 
-			{
-				Level.Meshes[i].TexturedTriangles  = new Tr2Face3[Level.Meshes[i].NumTexturedTriangles ];
-				
-				if (Level.EngineVersion == TR2VersionType.TombRaider_4) 
-				{
-					
-					for (int j = 0; j < Level.Meshes[i].NumTexturedTriangles ; j++) 
-					{
-						byte[] btriData = meshReader.ReadBytes(Tr2Face3Size);
-						Level.Meshes[i].TexturedTriangles[j] = (Tr2Face3)Cast2Struct(btriData,typeof(Tr2Face3));
-						
-						meshReader.ReadBytes(2);  //read 2 dummy bytes
-					}
-				}
-				else 
-				{
-					for (int j = 0; j < Level.Meshes[i].NumTexturedTriangles; j++) 
-					{
-						byte[] btriData = meshReader.ReadBytes(Tr2Face3Size);
-						Level.Meshes[i].TexturedTriangles[j] = (Tr2Face3)Cast2Struct(btriData,typeof(Tr2Face3));
-						//no dummy bytes
-					}
-				}
-			}
-			
-			// get list of colored rectangles 
-			Level.Meshes[i].NumColouredRectangles = meshReader.ReadInt16();
-			Level.Meshes[i].NumColouredRectangles = (short) Mathf.Abs(Level.Meshes[i].NumColouredRectangles);
-			//print("Level.Meshes["+i+"].NumColouredRectangles " + Level.Meshes[i].NumColouredRectangles);
-			if(Level.Meshes[i].NumColouredRectangles > 0)
-			{
-				Level.Meshes[i].ColouredRectangles = new Tr2Face4[Level.Meshes[i].NumColouredRectangles];
-				
-				for(int j = 0; j < Level.Meshes[i].NumColouredRectangles; j++)
-				{
-					byte[] brectColorData = meshReader.ReadBytes(Tr2Face4Size);
-					Level.Meshes[i].ColouredRectangles[j] = (Tr2Face4)Cast2Struct(brectColorData,typeof(Tr2Face4));
-				}
-			}
-			
-			// get list of colored Triangles 
-			Level.Meshes[i].NumColouredTriangles = meshReader.ReadInt16();
-			Level.Meshes[i].NumColouredTriangles = (short) Mathf.Abs(Level.Meshes[i].NumColouredTriangles);
-			//print("Level.Meshes["+i+"].NumColouredTriangles " + Level.Meshes[i].NumColouredTriangles);
-			if(Level.Meshes[i].NumColouredTriangles > 0)
-			{
-				Level.Meshes[i].ColouredTriangles = new Tr2Face3[Level.Meshes[i].NumColouredTriangles];
-				
-				for(int j = 0; j < Level.Meshes[i].NumColouredTriangles; j++)
-				{
-					byte[] btriColorData = meshReader.ReadBytes(Tr2Face3Size);
-					Level.Meshes[i].ColouredTriangles[j] = (Tr2Face3)Cast2Struct(btriColorData,typeof(Tr2Face3));
-				}
-			}
-			
-		}
-		//done
-	}
-	
-	static TR2VersionType getTREngineVersionFromVersion(uint version)
-	{
-		TR2VersionType retval = TR2VersionType.TombRaider_UnknownVersion;
-		switch(version)
-		{
-		case 0x00000020: retval = TR2VersionType.TombRaider_1; break;
-		case 0x0000002d: retval = TR2VersionType.TombRaider_2; break;
-		case 0xff080038: retval = TR2VersionType.TombRaider_3; break;
-		case 0xff180038: retval = TR2VersionType.TombRaider_3; break;
-		case 0xfffffff0: retval = TR2VersionType.TombRaider_4; break; // bogus
-		case 0x00345254: retval = TR2VersionType.TombRaider_4; break; // "TR4\0"
-		case 0x00000000: retval = TR2VersionType.TombRaider_UnknownVersion; break;
-		}
-		return retval;
-	}
+            //print("center:" + Level.Meshes[i].Centre.x+ " "+ Level.Meshes[i].Centre.y +" "+ Level.Meshes[i].Centre.z);
 
-	public static Tr2Level Parse(byte[] unzippeddata)
-	{
-		m_Level = new Tr2Level();
-		MemoryStream  ms = new MemoryStream(unzippeddata);
-		BinaryReader br = new BinaryReader(ms);
+            //get number of vertices 
+            Level.Meshes[i].NumVertices = meshReader.ReadInt16();
+            //print("Level.Meshes["+i+"].NumVertices" + Level.Meshes[i].NumVertices);
+            Level.Meshes[i].NumVertices = (short)Mathf.Abs(Level.Meshes[i].NumVertices);
 
-		if(System.BitConverter.IsLittleEndian)
-		{
-			//readm_LevelVersion
-			m_Level.Version  =br.ReadUInt32();
-			//print("m_Level.Version " + m_Level.Version );
-			
-			m_Level.EngineVersion = getTREngineVersionFromVersion(m_Level.Version);
-			//print("m_Level.EngineVersion " +m_Level.EngineVersion );
-			if (m_Level.EngineVersion != TR2VersionType.TombRaider_2) 
-			{
-				return null;
-			}
-			
-			
-			m_Level.Palette8  = new Tr2Colour[256];
-			m_Level.Palette16 = new uint[256];
-			for(int colorIdx = 0 ; colorIdx < 256; colorIdx++)
-			{
-                m_Level.Palette8[colorIdx] = new Tr2Colour { Red = br.ReadByte(), Blue = br.ReadByte(), Green = br.ReadByte() };
+            //get vertex list
+            int sizeVertices = Tr2VertexSize * Level.Meshes[i].NumVertices;
+            Level.Meshes[i].Vertices = new Tr2Vertex[sizeVertices];
+
+            for (int vtxCnt = 0; vtxCnt < Level.Meshes[i].NumVertices; vtxCnt++)
+            {
+                byte[] vtxData = meshReader.ReadBytes(Tr2VertexSize);
+                Level.Meshes[i].Vertices[vtxCnt] = (Tr2Vertex)Cast2Struct(vtxData, typeof(Tr2Vertex));
+
             }
-			
-			
-			for(int colorIdx = 0 ; colorIdx < 256; colorIdx++)
-			{
-				m_Level.Palette16[colorIdx] = br.ReadUInt32();
-			}
 
-			//read NumTexTiles
-			m_Level.NumTextiles = br.ReadUInt32();//System.BitConverter.ToUInt32(m_TrLevelData.bytes, sizeof(uint));
-			//print("m_Level.NumTextiles " + m_Level.NumTextiles );
-				
-			//Tr2Textile8 
-			m_Level.Textile8 = new Tr2Textile8[m_Level.NumTextiles];
-			for(int texTilecount = 0 ;  texTilecount < m_Level.NumTextiles; texTilecount++)
-			{
-                m_Level.Textile8[texTilecount] = new Tr2Textile8 { Tile = br.ReadBytes(256 * 256) };
+            //get number of normals
+            Level.Meshes[i].NumNormals = meshReader.ReadInt16();
+            NegativeSize = (Level.Meshes[i].NumNormals < 0);
+            Level.Meshes[i].NumNormals = (short)Mathf.Abs(Level.Meshes[i].NumNormals);
+
+            //get normal list 
+            if (NegativeSize)
+            {
+                //now Level.Meshes[i].NumNormals mean number of MeshLights
+                int numMeshLights = Level.Meshes[i].NumNormals;
+                Level.Meshes[i].MeshLights = new short[numMeshLights]; //could be turned in to byte array
+                for (int meshLightCount = 0; meshLightCount < numMeshLights; meshLightCount++)
+                {
+                    Level.Meshes[i].MeshLights[meshLightCount] = meshReader.ReadInt16();
+                }
+
+                NegativeSize = false;
             }
-			
-			//Tr2Textile16 
-			m_Level.Textile16 = new Tr2Textile16[m_Level.NumTextiles];
-			for(int texTilecount = 0 ;  texTilecount < m_Level.NumTextiles; texTilecount++)
-			{
-                m_Level.Textile16[texTilecount] = new Tr2Textile16 { Tile = new ushort[256 * 256] };
-				for(uint shortcnt = 0; shortcnt < (256 * 256); shortcnt++)
-				{
-					m_Level.Textile16[texTilecount].Tile[shortcnt] = br.ReadUInt16();
-				}
-			}
-				
-			m_Level.m_TexWidth = m_Level.m_MaxWidth;
-			m_Level.m_TexHeight = (int)m_Level.NumTextiles * m_Level.m_TexWidth;
-			m_Level.m_MaxTiles = (int)m_Level.NumTextiles;
-			//padTiles = 16 - m_MaxTiles;
-				
-			m_Level.UnknownT = br.ReadUInt32(); //unused
-			m_Level.NumRooms = br.ReadUInt16();
-			//print("m_Level.NumRooms:"+m_Level.NumRooms);
-			//extract room details 
-			m_Level.Rooms = new Tr2Room[m_Level.NumRooms];
-			for (int i = 0; i < m_Level.NumRooms; ++i) 
-			{
-				//print("process  room:"+i);
-				//print("-------------:");
-				//print("-------------:");
-				
-				//get room global data of length 
-				//get room info
-				//m_Level.Rooms[i].info = new Tr2RoomInfo();
-				
-				byte[] tmpArr =  br.ReadBytes(Tr2RoomInfoSize);
-                m_Level.Rooms[i] = new Tr2Room { info = (Tr2RoomInfo)Cast2Struct(tmpArr, typeof(Tr2RoomInfo))};
+            else
+            {
+                int numMeshNormals = Level.Meshes[i].NumNormals;
+                Level.Meshes[i].Normals = new Tr2Vertex[numMeshNormals];
+                for (int nrmCount = 0; nrmCount < numMeshNormals; nrmCount++)
+                {
+                    byte[] normData = meshReader.ReadBytes(Tr2VertexSize);
+                    Level.Meshes[i].Normals[nrmCount] = (Tr2Vertex)Cast2Struct(normData, typeof(Tr2Vertex));
+                }
+            }
 
-				//print("m_Level.Rooms["+i+"].info length" + sizeData);
-				//print("m_Level.Rooms["+i+"].info x z: " + m_Level.Rooms[i].info.x + " " + m_Level.Rooms[i].info.z);
-				
-				m_Level.Rooms[i].NumDataWords = br.ReadUInt32(); 
-				int sizeRoomData = sizeof(ushort) * ((int)m_Level.Rooms[i].NumDataWords);
-				m_Level.Rooms[i].Data = br.ReadBytes(sizeRoomData);
-				//print("m_Level.Rooms["+i+"].Data" +System.Buffer.ByteLength(m_Level.Rooms[i].Data));
-				
-				
-				byte[] dataArr = m_Level.Rooms[i].Data;  //variable length data for this room
-				
-				//create a stream reader
-				MemoryStream roomDataStream = new MemoryStream(dataArr);
-				BinaryReader roomReader = new BinaryReader(roomDataStream);
+            // get list of textured rectangles 
+            Level.Meshes[i].NumTexturedRectangles = meshReader.ReadInt16();
+            Level.Meshes[i].NumTexturedRectangles = (short)Mathf.Abs(Level.Meshes[i].NumTexturedRectangles);
+            //print("Level.Meshes["+i+"].NumTexturedRectangles " + Level.Meshes[i].NumTexturedRectangles);
+
+            if (Level.Meshes[i].NumTexturedRectangles > 0)
+            {
+                Level.Meshes[i].TexturedRectangles = new Tr2Face4[Level.Meshes[i].NumTexturedRectangles];
+
+                if (Level.EngineVersion == TR2VersionType.TombRaider_4)
+                {
+                    for (int j = 0; j < Level.Meshes[i].NumTexturedRectangles; j++)
+                    {
+                        byte[] brectData = meshReader.ReadBytes(Tr2Face4Size);
+                        Level.Meshes[i].TexturedRectangles[j] = (Tr2Face4)Cast2Struct(brectData, typeof(Tr2Face4));
+
+                        meshReader.ReadBytes(2);  //read 2 dummy bytes
+                    }
+                }
+                else
+                {
+                    for (int j = 0; j < Level.Meshes[i].NumTexturedRectangles; j++)
+                    {
+                        byte[] brectData = meshReader.ReadBytes(Tr2Face4Size);
+                        Level.Meshes[i].TexturedRectangles[j] = (Tr2Face4)Cast2Struct(brectData, typeof(Tr2Face4));
+                        //no dummy bytes
+                    }
+                }
+            }
+
+            // get list of textured NumTexturedTriangles 
+            Level.Meshes[i].NumTexturedTriangles = meshReader.ReadInt16();
+            Level.Meshes[i].NumTexturedTriangles = (short)Mathf.Abs(Level.Meshes[i].NumTexturedTriangles);
+            //print("Level.Meshes["+i+"].NumTexturedTriangles  " + Level.Meshes[i].NumTexturedTriangles );
+
+            if (Level.Meshes[i].NumTexturedTriangles > 0)
+            {
+                Level.Meshes[i].TexturedTriangles = new Tr2Face3[Level.Meshes[i].NumTexturedTriangles];
+
+                if (Level.EngineVersion == TR2VersionType.TombRaider_4)
+                {
+
+                    for (int j = 0; j < Level.Meshes[i].NumTexturedTriangles; j++)
+                    {
+                        byte[] btriData = meshReader.ReadBytes(Tr2Face3Size);
+                        Level.Meshes[i].TexturedTriangles[j] = (Tr2Face3)Cast2Struct(btriData, typeof(Tr2Face3));
+
+                        meshReader.ReadBytes(2);  //read 2 dummy bytes
+                    }
+                }
+                else
+                {
+                    for (int j = 0; j < Level.Meshes[i].NumTexturedTriangles; j++)
+                    {
+                        byte[] btriData = meshReader.ReadBytes(Tr2Face3Size);
+                        Level.Meshes[i].TexturedTriangles[j] = (Tr2Face3)Cast2Struct(btriData, typeof(Tr2Face3));
+                        //no dummy bytes
+                    }
+                }
+            }
+
+
+            if (m_Level.EngineVersion == TR2VersionType.TombRaider_2)
+            {
+                // get list of colored rectangles 
+                Level.Meshes[i].NumColouredRectangles = meshReader.ReadInt16();
+                Level.Meshes[i].NumColouredRectangles = (short)Mathf.Abs(Level.Meshes[i].NumColouredRectangles);
+                //print("Level.Meshes["+i+"].NumColouredRectangles " + Level.Meshes[i].NumColouredRectangles);
+                if (Level.Meshes[i].NumColouredRectangles > 0)
+                {
+                    Level.Meshes[i].ColouredRectangles = new Tr2Face4[Level.Meshes[i].NumColouredRectangles];
+
+                    for (int j = 0; j < Level.Meshes[i].NumColouredRectangles; j++)
+                    {
+                        byte[] brectColorData = meshReader.ReadBytes(Tr2Face4Size);
+                        Level.Meshes[i].ColouredRectangles[j] = (Tr2Face4)Cast2Struct(brectColorData, typeof(Tr2Face4));
+                    }
+                }
+
+                // get list of colored Triangles 
+                Level.Meshes[i].NumColouredTriangles = meshReader.ReadInt16();
+                Level.Meshes[i].NumColouredTriangles = (short)Mathf.Abs(Level.Meshes[i].NumColouredTriangles);
+                //print("Level.Meshes["+i+"].NumColouredTriangles " + Level.Meshes[i].NumColouredTriangles);
+                if (Level.Meshes[i].NumColouredTriangles > 0)
+                {
+                    Level.Meshes[i].ColouredTriangles = new Tr2Face3[Level.Meshes[i].NumColouredTriangles];
+
+                    for (int j = 0; j < Level.Meshes[i].NumColouredTriangles; j++)
+                    {
+                        byte[] btriColorData = meshReader.ReadBytes(Tr2Face3Size);
+                        Level.Meshes[i].ColouredTriangles[j] = (Tr2Face3)Cast2Struct(btriColorData, typeof(Tr2Face3));
+                    }
+                }
+            }
+
+        }
+        //done
+    }
+
+    static TR2VersionType getTREngineVersionFromVersion(uint version)
+    {
+        TR2VersionType retval = TR2VersionType.TombRaider_UnknownVersion;
+        switch (version)
+        {
+            case 0x00000020: retval = TR2VersionType.TombRaider_1; break;
+            case 0x0000002d: retval = TR2VersionType.TombRaider_2; break;
+            case 0xff080038: retval = TR2VersionType.TombRaider_3; break;
+            case 0xff180038: retval = TR2VersionType.TombRaider_3; break;
+            case 0xfffffff0: retval = TR2VersionType.TombRaider_4; break; // bogus
+            case 0x00345254: retval = TR2VersionType.TombRaider_4; break; // "TR4\0"
+            case 0x00000000: retval = TR2VersionType.TombRaider_UnknownVersion; break;
+        }
+        return retval;
+    }
+
+    public static Tr2Level Parse(byte[] unzippeddata)
+    {
+        m_Level = new Tr2Level();
+        MemoryStream ms = new MemoryStream(unzippeddata);
+        BinaryReader br = new BinaryReader(ms);
+
+        if (System.BitConverter.IsLittleEndian)
+        {
+            //readm_LevelVersion
+            m_Level.Version = br.ReadUInt32();
+            Debug.Log("m_Level.Version " + m_Level.Version);
+
+            m_Level.EngineVersion = getTREngineVersionFromVersion(m_Level.Version);
+            //print("m_Level.EngineVersion " +m_Level.EngineVersion );
+            //if (m_Level.EngineVersion != TR2VersionType.TombRaider_2) 
+            //{
+            //return null;
+            //}
+
+            if (m_Level.EngineVersion == TR2VersionType.TombRaider_2)
+            {
+                Debug.Log("m_Level.Version " + TR2VersionType.TombRaider_2);
+                m_Level.Palette8 = new Tr2Colour[256];
+                m_Level.Palette16 = new uint[256];
+                for (int colorIdx = 0; colorIdx < 256; colorIdx++)
+                {
+                    m_Level.Palette8[colorIdx] = new Tr2Colour { Red = br.ReadByte(), Blue = br.ReadByte(), Green = br.ReadByte() };
+                }
+
+
+                for (int colorIdx = 0; colorIdx < 256; colorIdx++)
+                {
+                    m_Level.Palette16[colorIdx] = br.ReadUInt32();
+                }
+
+                //read NumTexTiles
+                m_Level.NumTextiles = br.ReadUInt32();//System.BitConverter.ToUInt32(m_TrLevelData.bytes, sizeof(uint));
+                                                      //print("m_Level.NumTextiles " + m_Level.NumTextiles );
+
+                //Tr2Textile8 
+                m_Level.Textile8 = new Tr2Textile8[m_Level.NumTextiles];
+                for (int texTilecount = 0; texTilecount < m_Level.NumTextiles; texTilecount++)
+                {
+                    m_Level.Textile8[texTilecount] = new Tr2Textile8 { Tile = br.ReadBytes(256 * 256) };
+                }
+
+                //Tr2Textile16 
+                m_Level.Textile16 = new Tr2Textile16[m_Level.NumTextiles];
+                for (int texTilecount = 0; texTilecount < m_Level.NumTextiles; texTilecount++)
+                {
+                    m_Level.Textile16[texTilecount] = new Tr2Textile16 { Tile = new ushort[256 * 256] };
+                    for (uint shortcnt = 0; shortcnt < (256 * 256); shortcnt++)
+                    {
+                        m_Level.Textile16[texTilecount].Tile[shortcnt] = br.ReadUInt16();
+                    }
+                }
+
+                m_Level.m_TexWidth = m_Level.m_MaxWidth;
+                m_Level.m_TexHeight = (int)m_Level.NumTextiles * m_Level.m_TexWidth;
+                m_Level.m_MaxTiles = (int)m_Level.NumTextiles;
+                //padTiles = 16 - m_MaxTiles;
+
+            }
+            else if (m_Level.EngineVersion == TR2VersionType.TombRaider_4)
+            {
+                Debug.Log("m_Level.Version " + TR2VersionType.TombRaider_4);
+
+                m_Level.NumRoomTextiles = br.ReadUInt16();
+                m_Level.NumObjTextiles = br.ReadUInt16();
+                m_Level.NumBumpTextiles = br.ReadUInt16();
+
+                Debug.Log(m_Level.NumRoomTextiles);
+                Debug.Log(m_Level.NumObjTextiles);
+                Debug.Log(m_Level.NumBumpTextiles);
+
+                m_Level.Textile32_UncompSize = br.ReadUInt32();
+                m_Level.Textile32_CompSize = br.ReadUInt32();
+                m_Level.Textile32_Compressed = br.ReadBytes((int)m_Level.Textile32_CompSize);
+
+                Debug.Log(m_Level.Textile32_UncompSize);
+                Debug.Log(m_Level.Textile32_CompSize);
+
+                byte[] Textile32_decompressed = Zlib.DecompressData(m_Level.Textile32_Compressed, m_Level.Textile32_UncompSize);  // Zlib.DecompressData(m_Level.Textile32_Compressed);
+                MemoryStream mstrm = new MemoryStream(Textile32_decompressed);
+                BinaryReader br2 = new BinaryReader(mstrm);
+
+                Debug.Log(Textile32_decompressed.Length);
+
+
+                m_Level.RoomTextiles = new Tr2Textile32[m_Level.NumRoomTextiles];
+                for (int i = 0; i < m_Level.NumRoomTextiles; i++)
+                {
+                    m_Level.RoomTextiles[i] = new Tr2Textile32();
+                    m_Level.RoomTextiles[i].Tile = new uint[256 * 256];
+
+                    for (int j = 0; j < 256 * 256; j++)
+                    {
+                        m_Level.RoomTextiles[i].Tile[j] = br2.ReadUInt32();
+                        //Debug.Log(m_Level.RoomTextiles[i].Tile[j]);
+                    }
+                }
+
+
+
+
+                m_Level.ObjTextiles = new Tr2Textile32[m_Level.NumObjTextiles];
+                for (int i = 0; i < m_Level.NumObjTextiles; i++)
+                {
+                    m_Level.ObjTextiles[i] = new Tr2Textile32();
+                    m_Level.ObjTextiles[i].Tile = new uint[256 * 256];
+
+                    for (int j = 0; j < 256 * 256; j++)
+                    {
+                        m_Level.ObjTextiles[i].Tile[j] = br2.ReadUInt32();
+                    }
+                }
+
+
+                m_Level.BumpTextiles = new Tr2Textile32[m_Level.NumBumpTextiles];
+                for (int i = 0; i < m_Level.NumBumpTextiles; i++)
+                {
+                    m_Level.BumpTextiles[i] = new Tr2Textile32();
+                    m_Level.BumpTextiles[i].Tile = new uint[256 * 256];
+
+                    for (int j = 0; j < 256 * 256; j++)
+                    {
+                        m_Level.BumpTextiles[i].Tile[j] = br2.ReadUInt32();
+                    }
+                }
+
+
+                br2.Close();
+
+
+                //read 16 bit textiles
+
+                m_Level.Textile16_UncompSize = br.ReadUInt32();
+                m_Level.Textile16_CompSize = br.ReadUInt32();
+                m_Level.Textile16_Compressed = br.ReadBytes((int)m_Level.Textile16_CompSize);
+
+                Debug.Log(m_Level.Textile16_UncompSize);
+                Debug.Log(m_Level.Textile16_CompSize);
+
+                byte[] Textile16_decompressed = Zlib.DecompressData(m_Level.Textile16_Compressed, m_Level.Textile16_UncompSize);
+
+                mstrm = new MemoryStream(Textile16_decompressed);
+                br2 = new BinaryReader(mstrm);
+
+                m_Level.Textile16 = new Tr2Textile16[m_Level.NumRoomTextiles];
+                for (int i = 0; i < m_Level.NumRoomTextiles; i++)
+                {
+                    m_Level.Textile16[i] = new Tr2Textile16();
+                    m_Level.Textile16[i].Tile = new ushort[256 * 256];
+
+                    for (int j = 0; j < 256 * 256; j++)
+                    {
+                        m_Level.Textile16[i].Tile[j] = br2.ReadUInt16();
+                    }
+                }
+
+
+                m_Level.ObjTextiles16 = new Tr2Textile16[m_Level.NumObjTextiles];
+                for (int i = 0; i < m_Level.NumObjTextiles; i++)
+                {
+                    m_Level.ObjTextiles16[i] = new Tr2Textile16();
+                    m_Level.ObjTextiles16[i].Tile = new ushort[256 * 256];
+
+                    for (int j = 0; j < 256 * 256; j++)
+                    {
+                        m_Level.ObjTextiles16[i].Tile[j] = br2.ReadUInt16();
+                    }
+                }
+
+
+                m_Level.BumpTextiles16 = new Tr2Textile16[m_Level.NumBumpTextiles];
+                for (int i = 0; i < m_Level.NumBumpTextiles; i++)
+                {
+                    m_Level.BumpTextiles16[i] = new Tr2Textile16();
+                    m_Level.BumpTextiles16[i].Tile = new ushort[256 * 256];
+
+                    for (int j = 0; j < 256 * 256; j++)
+                    {
+                        m_Level.BumpTextiles16[i].Tile[j] = br2.ReadUInt16();
+                    }
+                }
+
+                br2.Close();
+
+                //read 32bit misc textile
+                uint Textile32_UncompSize = br.ReadUInt32();
+                uint Textile32_CompSize = br.ReadUInt32();
+                byte[] Textile32_Compressed = br.ReadBytes((int)Textile32_CompSize);
+
+
+                byte[] Textile_misc_decompressed = Zlib.DecompressData(Textile32_Compressed, Textile32_UncompSize);
+
+                mstrm = new MemoryStream(Textile_misc_decompressed);
+                br2 = new BinaryReader(mstrm);
+
+                m_Level.Textile32Misc = new Tr2Textile32[2];
+                for (int i = 0; i < 2; i++)
+                {
+                    m_Level.Textile32Misc[i] = new Tr2Textile32();
+                    m_Level.Textile32Misc[i].Tile = new uint[256 * 256];
+
+                    for (int j = 0; j < 256 * 256; j++)
+                    {
+                        m_Level.Textile32Misc[i].Tile[j] = br2.ReadUInt32();
+                    }
+                }
+
+
+                int max_tiles = m_Level.NumRoomTextiles;// + m_Level.NumObjTextiles + m_Level.NumBumpTextiles;
+
+                m_Level.m_TexWidth = m_Level.m_MaxWidth;
+                m_Level.m_TexHeight = max_tiles * m_Level.m_TexWidth;
+                m_Level.m_MaxTiles = max_tiles;
+
+
+                //read level data
+                m_Level.LevelData_UncompSize = br.ReadUInt32();
+                m_Level.LevelData_CompSize = br.ReadUInt32();
+                m_Level.LevelData_Compressed = br.ReadBytes((int)m_Level.LevelData_CompSize);
+                m_Level.LevelData_Decompressed = Zlib.DecompressData(m_Level.LevelData_Compressed, m_Level.LevelData_UncompSize);
+
+                Debug.Log(m_Level.LevelData_UncompSize);
+                Debug.Log(m_Level.LevelData_CompSize);
+
+                br.Close();
+
+                ms = new MemoryStream(m_Level.LevelData_Decompressed);
+                br = new BinaryReader(ms);
+            }
+
+
+
+
+            /*ushort[] icolor = m_Level.RoomTextiles16[2].Tile;
+            Color[] color = new Color[256*256];
+
+            for(int i = 0; i < 256 * 256; i++)
+            {
+
+                float b = (byte)(icolor[i] & 0x1f) / 31f;
+                float g = (byte)((icolor[i] >> 5) & 0x1f) / 31f;
+                float r = (byte)((icolor[i] >> 10) & 0x1f) / 31f;
+                float a = (byte)((icolor[i] >> 15) & 0x1f) / 31f;
+
+                color[i] = new Color(r, g, b, 1);
+            }
+
+            Texture2D tex2d = new Texture2D(256, 256);
+            tex2d.SetPixels(color);
+            byte[] pngbyte = tex2d.EncodeToPNG();
+            File.WriteAllBytes("TR4 tex.png", pngbyte);
+            */
+
+
+
+
+            // read common level data
+            m_Level.UnknownT = br.ReadUInt32(); //unused
+            m_Level.NumRooms = br.ReadUInt16();
+            Debug.Log("m_Level.NumRooms:" + m_Level.NumRooms);
+
+            //extract room details 
+
+            //if (m_Level.EngineVersion == TR2VersionType.TombRaider_2)
+            //{
+
+            m_Level.Rooms = new Tr2Room[m_Level.NumRooms];
+            for (int i = 0; i < m_Level.NumRooms; ++i)
+            {
+                //print("process  room:"+i);
+                //print("-------------:");
+                //print("-------------:");
+
+                //get room global data of length 
+                //get room info
+                //m_Level.Rooms[i].info = new Tr2RoomInfo();
+
+                byte[] tmpArr = br.ReadBytes(Tr2RoomInfoSize);
+                m_Level.Rooms[i] = new Tr2Room { info = (Tr2RoomInfo)Cast2Struct(tmpArr, typeof(Tr2RoomInfo)) };
+
+                //Debug.Log("m_Level.Rooms["+i+"].info length" + sizeData);
+                //Debug.Log("m_Level.Rooms["+i+"].info x z: " + m_Level.Rooms[i].info.x + " " + m_Level.Rooms[i].info.z);
+
+                m_Level.Rooms[i].NumDataWords = br.ReadUInt32();
+                int sizeRoomData = sizeof(ushort) * ((int)m_Level.Rooms[i].NumDataWords);
+                m_Level.Rooms[i].Data = br.ReadBytes(sizeRoomData);
+                //print("m_Level.Rooms["+i+"].Data" +System.Buffer.ByteLength(m_Level.Rooms[i].Data));
+
+
+                byte[] dataArr = m_Level.Rooms[i].Data;  //variable length data for this room
+
+                //create a stream reader
+                MemoryStream roomDataStream = new MemoryStream(dataArr);
+                BinaryReader roomReader = new BinaryReader(roomDataStream);
 
                 //process ushort NumVertices;
                 m_Level.Rooms[i].RoomData = new Tr2RoomData();
                 m_Level.Rooms[i].RoomData.NumVertices = roomReader.ReadInt16();
-				
-				if(m_Level.Rooms[i].RoomData.NumVertices > 0)
-				{
-					//print("m_Level.Rooms["+i+"].RoomData.NumVertices" +m_Level.Rooms[i].RoomData.NumVertices);
-					m_Level.Rooms[i].RoomData.Vertices = new Tr2VertexRoom[m_Level.Rooms[i].RoomData.NumVertices];
-					
-					for(int vertAttribCount = 0; vertAttribCount < m_Level.Rooms[i].RoomData.NumVertices; vertAttribCount++)
-					{
-						byte[] bVertData = roomReader.ReadBytes(Tr2VertexRoomSize);
-						m_Level.Rooms[i].RoomData.Vertices[vertAttribCount] = (Tr2VertexRoom) Cast2Struct(bVertData, typeof(Tr2VertexRoom));
-						
-						//print("m_Level.Rooms["+i+"].RoomData.Vertices"+"["+ vertAttribCount +"]"+".Lighting1 value" + 
-						//m_Level.Rooms[i].RoomData.Vertices[vertAttribCount].Lighting1);
-						//DataOffset = DataOffset + (uint) sizeVertex;
-					}
-				}
 
-				//process NumRectangles	
-				m_Level.Rooms[i].RoomData.NumRectangles = roomReader.ReadInt16();
-				
-				//print("m_Level.Rooms["+i+"].RoomData.NumRectangles" +m_Level.Rooms[i].RoomData.NumRectangles);
-				
-				if(m_Level.Rooms[i].RoomData.NumRectangles > 0)
-				{
-					m_Level.Rooms[i].RoomData.Rectangles = new Tr2Face4[m_Level.Rooms[i].RoomData.NumRectangles];
-					for(int rectCount = 0; rectCount < m_Level.Rooms[i].RoomData.NumRectangles; rectCount++)
-					{
-						
-						byte[] bVertData = roomReader.ReadBytes(Tr2Face4Size);
-						m_Level.Rooms[i].RoomData.Rectangles[rectCount] = (Tr2Face4)Cast2Struct(bVertData,typeof(Tr2Face4));
-					}
-				}
-				
-				//process NumTriangles
-				m_Level.Rooms[i].RoomData.NumTriangles = roomReader.ReadInt16();
-				//print("m_Level.Rooms["+i+"].RoomData.NumTriangles" +m_Level.Rooms[i].RoomData.NumTriangles);
-				
-				if(m_Level.Rooms[i].RoomData.NumTriangles  > 0)
-				{
-					m_Level.Rooms[i].RoomData.Triangles = new Tr2Face3[m_Level.Rooms[i].RoomData.NumTriangles];
-					
-					for(int triCount = 0; triCount < m_Level.Rooms[i].RoomData.NumTriangles; triCount++)
-					{
+                if (m_Level.Rooms[i].RoomData.NumVertices > 0)
+                {
+                    //print("m_Level.Rooms["+i+"].RoomData.NumVertices" +m_Level.Rooms[i].RoomData.NumVertices);
+                    m_Level.Rooms[i].RoomData.Vertices = new Tr2VertexRoom[m_Level.Rooms[i].RoomData.NumVertices];
 
-						byte[] bVertData = roomReader.ReadBytes(Tr2Face3Size);
-						m_Level.Rooms[i].RoomData.Triangles[triCount] = (Tr2Face3)Cast2Struct(bVertData,typeof(Tr2Face3));
-					}
-				}
-				
-				
-				//process Numsprites
-				m_Level.Rooms[i].RoomData.Numsprites = roomReader.ReadInt16();
-				//print("m_Level.Rooms["+i+"].RoomData.Numsprites" +m_Level.Rooms[i].RoomData.Numsprites);
-				
-				if(m_Level.Rooms[i].RoomData.Numsprites > 0)
-				{
-					m_Level.Rooms[i].RoomData.Sprites = new Tr2RoomSprite[m_Level.Rooms[i].RoomData.Numsprites];
-					
-					for(int spriteCount = 0; spriteCount < m_Level.Rooms[i].RoomData.Numsprites; spriteCount++)
-					{
-						byte[] bVertData = roomReader.ReadBytes(Tr2RoomSpriteSize);
-						m_Level.Rooms[i].RoomData.Sprites[spriteCount] = (Tr2RoomSprite) Cast2Struct(bVertData,typeof(Tr2RoomSprite));
-					}
-				}
-				
-				//Done:
-				//class Tr2RoomData
-				//now can free room data
-				
-				m_Level.Rooms[i].NumPortals = br.ReadUInt16();
-				
-				//print("m_Level.Rooms["+i+"].NumPortals"+ m_Level.Rooms[i].NumPortals);
-				
-				if(m_Level.Rooms[i].NumPortals > 0)
-				{
-					m_Level.Rooms[i].Portals = new Tr2RoomPortal [m_Level.Rooms[i].NumPortals];
-					
-					for(int portalCount = 0; portalCount < m_Level.Rooms[i].NumPortals; portalCount++)
-					{
+                    for (int vertAttribCount = 0; vertAttribCount < m_Level.Rooms[i].RoomData.NumVertices; vertAttribCount++)
+                    {
+                        byte[] bVertData = roomReader.ReadBytes(Tr2VertexRoomSize);
+                        m_Level.Rooms[i].RoomData.Vertices[vertAttribCount] = (Tr2VertexRoom)Cast2Struct(bVertData, typeof(Tr2VertexRoom));
+
+                        //print("m_Level.Rooms["+i+"].RoomData.Vertices"+"["+ vertAttribCount +"]"+".Lighting1 value" + 
+                        //m_Level.Rooms[i].RoomData.Vertices[vertAttribCount].Lighting1);
+                        //DataOffset = DataOffset + (uint) sizeVertex;
+                    }
+                }
+
+                //process NumRectangles	
+                m_Level.Rooms[i].RoomData.NumRectangles = roomReader.ReadInt16();
+
+                //Debug.Log("m_Level.Rooms["+i+"].RoomData.NumRectangles" +m_Level.Rooms[i].RoomData.NumRectangles);
+
+                if (m_Level.Rooms[i].RoomData.NumRectangles > 0)
+                {
+                    m_Level.Rooms[i].RoomData.Rectangles = new Tr2Face4[m_Level.Rooms[i].RoomData.NumRectangles];
+                    for (int rectCount = 0; rectCount < m_Level.Rooms[i].RoomData.NumRectangles; rectCount++)
+                    {
+
+                        byte[] bVertData = roomReader.ReadBytes(Tr2Face4Size);
+                        m_Level.Rooms[i].RoomData.Rectangles[rectCount] = (Tr2Face4)Cast2Struct(bVertData, typeof(Tr2Face4));
+                    }
+                }
+
+                //process NumTriangles
+                m_Level.Rooms[i].RoomData.NumTriangles = roomReader.ReadInt16();
+                //print("m_Level.Rooms["+i+"].RoomData.NumTriangles" +m_Level.Rooms[i].RoomData.NumTriangles);
+
+                if (m_Level.Rooms[i].RoomData.NumTriangles > 0)
+                {
+                    m_Level.Rooms[i].RoomData.Triangles = new Tr2Face3[m_Level.Rooms[i].RoomData.NumTriangles];
+
+                    for (int triCount = 0; triCount < m_Level.Rooms[i].RoomData.NumTriangles; triCount++)
+                    {
+
+                        byte[] bVertData = roomReader.ReadBytes(Tr2Face3Size);
+                        m_Level.Rooms[i].RoomData.Triangles[triCount] = (Tr2Face3)Cast2Struct(bVertData, typeof(Tr2Face3));
+                    }
+                }
+
+
+                //process Numsprites
+                m_Level.Rooms[i].RoomData.Numsprites = roomReader.ReadInt16();
+                //print("m_Level.Rooms["+i+"].RoomData.Numsprites" +m_Level.Rooms[i].RoomData.Numsprites);
+
+                if (m_Level.Rooms[i].RoomData.Numsprites > 0)
+                {
+                    m_Level.Rooms[i].RoomData.Sprites = new Tr2RoomSprite[m_Level.Rooms[i].RoomData.Numsprites];
+
+                    for (int spriteCount = 0; spriteCount < m_Level.Rooms[i].RoomData.Numsprites; spriteCount++)
+                    {
+                        byte[] bVertData = roomReader.ReadBytes(Tr2RoomSpriteSize);
+                        m_Level.Rooms[i].RoomData.Sprites[spriteCount] = (Tr2RoomSprite)Cast2Struct(bVertData, typeof(Tr2RoomSprite));
+                    }
+                }
+
+                //Done:
+                //class Tr2RoomData
+                //now can free room data
+
+                m_Level.Rooms[i].NumPortals = br.ReadUInt16();
+
+                // Debug.Log("m_Level.Rooms["+i+"].NumPortals"+ m_Level.Rooms[i].NumPortals);
+
+                if (m_Level.Rooms[i].NumPortals > 0)
+                {
+                    m_Level.Rooms[i].Portals = new Tr2RoomPortal[m_Level.Rooms[i].NumPortals];
+
+                    for (int portalCount = 0; portalCount < m_Level.Rooms[i].NumPortals; portalCount++)
+                    {
                         //public ushort AdjoiningRoom;   // which room this "door" leads to 2 bytes
                         //public Tr2Vertex Normal;       // which way the "door" faces  6 bytes
                         //public Tr2Vertex[] Vertices;  // the 4 corners of the "door"  4 * 6 = 24 byte
                         m_Level.Rooms[i].Portals[portalCount] = new Tr2RoomPortal { AdjoiningRoom = br.ReadUInt16() };
-						byte[] dataPortalNormal = br.ReadBytes(Tr2VertexSize);
-						m_Level.Rooms[i].Portals[portalCount].Normal = (Tr2Vertex) Cast2Struct(dataPortalNormal,typeof(Tr2Vertex));
-						
-						m_Level.Rooms[i].Portals[portalCount].Vertices = new Tr2Vertex[4];
-						for(int vtxcount = 0;  vtxcount < 4 ;  vtxcount++)
-						{
-							byte[] dataPortalVertices = br.ReadBytes(Tr2VertexSize);
-							m_Level.Rooms[i].Portals[portalCount].Vertices[vtxcount] = 
-								(Tr2Vertex) Cast2Struct(dataPortalVertices,typeof(Tr2Vertex));
-						}
-						
-					}
-				}
-				
-				// read sector info 
-				m_Level.Rooms[i].NumZsectors = br.ReadUInt16();
-				m_Level.Rooms[i].NumXsectors = br.ReadUInt16();
-				int numsector = m_Level.Rooms[i].NumZsectors * m_Level.Rooms[i].NumXsectors;
-				
-				//print("m_Level.Rooms["+i+"].NumZsectors:"+ m_Level.Rooms[i].NumZsectors );
-				//print("m_Level.Rooms["+i+"].NumXsectors:"+ m_Level.Rooms[i].NumXsectors );
+                        byte[] dataPortalNormal = br.ReadBytes(Tr2VertexSize);
+                        m_Level.Rooms[i].Portals[portalCount].Normal = (Tr2Vertex)Cast2Struct(dataPortalNormal, typeof(Tr2Vertex));
 
-				if(numsector > 0)
-				{
-					m_Level.Rooms[i].SectorList = new Tr2RoomSector[numsector];
-					for(int sectorCount = 0 ; sectorCount < numsector; sectorCount++)
-					{
-						byte[] sectorData = br.ReadBytes(Tr2RoomSectorSize);
-						m_Level.Rooms[i].SectorList[sectorCount] =  (Tr2RoomSector) Cast2Struct(sectorData, typeof(Tr2RoomSector));
-					}
-				}
-				
-				//read room lighting & mode 
-				//TR2fread(&Level->Rooms[i].Intensity1, 6, 1, m_FP);
-				m_Level.Rooms[i].Intensity1 = br.ReadInt16();
-				m_Level.Rooms[i].Intensity2 = br.ReadInt16();
-				m_Level.Rooms[i].LightMode =  br.ReadInt16();
-					
-				//print("Light [TR2|[TR4][Intensity1] [Intensity2] [mode]:" + 
-				//m_Level.Rooms[i].Intensity1 + " " + 
-				//m_Level.Rooms[i].Intensity2 + " " + 
-				//m_Level.Rooms[i].LightMode);
-				
-				// read room lighting info 
-				m_Level.Rooms[i].NumLights = br.ReadUInt16();
-				//print("m_Level.Rooms["+i+"].NumLights:" + (int)m_Level.Rooms[i].NumLights);
-				
-				if (m_Level.Rooms[i].NumLights > 0) 
-				{
-					m_Level.Rooms[i].Lights = new  Tr2RoomLight[m_Level.Rooms[i].NumLights];
-					for(int lightCnt = 0; lightCnt < m_Level.Rooms[i].NumLights;  lightCnt++)
-					{
-						byte[] lightData = br.ReadBytes(Tr2RoomLightSize);
-						m_Level.Rooms[i].Lights[lightCnt] = (Tr2RoomLight) Cast2Struct(lightData,typeof(Tr2RoomLight));
-					}
-					
-				}
-				
-				//read Static Mesh Data
-				m_Level.Rooms[i].NumStaticMeshes = br.ReadUInt16();
-				//print("m_Level.Rooms["+i+"].NumStaticMeshes" +	m_Level.Rooms[i].NumStaticMeshes);
-				
-				if (m_Level.Rooms[i].NumStaticMeshes > 0) 
-				{
-					m_Level.Rooms[i].StaticMeshes =new Tr2RoomStaticMesh [m_Level.Rooms[i].NumStaticMeshes];
-					for (int meshCnt = 0; meshCnt < m_Level.Rooms[i].NumStaticMeshes; meshCnt++) 
-					{
-						byte[] meshData = br.ReadBytes(Tr2RoomSaticMeshSize);
-						m_Level.Rooms[i].StaticMeshes[meshCnt] = (Tr2RoomStaticMesh) Cast2Struct(meshData,typeof(Tr2RoomStaticMesh));
-					}
-				}
-	
-				//AlternateRoom settings
-				m_Level.Rooms[i].AlternateRoom = br.ReadInt16();
-				m_Level.Rooms[i].Flags = br.ReadInt16();
-								
-				//Done:
-			}
-		}
+                        m_Level.Rooms[i].Portals[portalCount].Vertices = new Tr2Vertex[4];
+                        for (int vtxcount = 0; vtxcount < 4; vtxcount++)
+                        {
+                            byte[] dataPortalVertices = br.ReadBytes(Tr2VertexSize);
+                            m_Level.Rooms[i].Portals[portalCount].Vertices[vtxcount] =
+                                (Tr2Vertex)Cast2Struct(dataPortalVertices, typeof(Tr2Vertex));
+                        }
 
-		//floor data
-		m_Level.NumFloorData = br.ReadUInt32();
-		//print("m_Level.NumFloorData"+ m_Level.NumFloorData);
-		if (m_Level.NumFloorData > 0) 
-		{
-			m_Level.FloorData = new ushort[m_Level.NumFloorData];
-			for(int floorDataCnt = 0; floorDataCnt < m_Level.NumFloorData;  floorDataCnt++)
-			{
-				m_Level.FloorData[floorDataCnt] = br.ReadUInt16();
-			}
-		}
-		
-		uint NumMeshDataWords; 
-		byte[] RawMeshData = null;;	
-		int dataSize = 0;
-		
-		NumMeshDataWords = br.ReadUInt32();	
-		if(NumMeshDataWords > 0)
-		{
-			dataSize = (int)(2 * NumMeshDataWords);
-			RawMeshData = br.ReadBytes(dataSize);
-		}
-		
-		m_Level.NumMeshPointers =br.ReadUInt32();
-		if(m_Level.NumMeshPointers > 0)
-		{	
-			m_Level.MeshPointerList = new uint[m_Level.NumMeshPointers];
-			for(int ptrCount = 0; ptrCount < m_Level.NumMeshPointers; ptrCount++)
-			{
-				m_Level.MeshPointerList[ptrCount] = br.ReadUInt32();
-			}
-		}
-		
-		ExtractMeshes(m_Level,RawMeshData, m_Level.NumMeshPointers, m_Level.MeshPointerList);		
-		//read animation data
-		m_Level.NumAnimations = br.ReadUInt32();
-		//print("m_Level.NumAnimations:" + m_Level.NumAnimations);	
-		
-		if (m_Level.NumAnimations > 0) 
-		{
-			m_Level.Animations = new Tr2Animation[m_Level.NumAnimations];
-			for(int animCnt = 0; animCnt < m_Level.NumAnimations; animCnt++)
-			{
-				byte[] animData = br.ReadBytes(Tr2AnimationSize);
-				m_Level.Animations[animCnt] = (Tr2Animation) Cast2Struct(animData, typeof(Tr2Animation));
-					
-				//print("m_Level.Animations["+animCnt+"].FrameOffset" +m_Level.Animations[animCnt].FrameOffset);     
-				//print("m_Level.Animations["+animCnt+"].FrameRate" + m_Level.Animations[animCnt].FrameRate);      
-				//print("m_Level.Animations["+animCnt+"].FrameSize" + m_Level.Animations[animCnt].FrameSize);       
-			}
-		}
-		
-		//read state changes
-		m_Level.NumStateChanges = br.ReadUInt32();
-		if (m_Level.NumStateChanges > 0) 
-		{
-			m_Level.StateChanges = new Tr2StateChange[m_Level.NumStateChanges];
-			for(int stateChangeCount = 0; stateChangeCount <m_Level.NumStateChanges;stateChangeCount++)
-			{
-				byte[] state_change_data = br.ReadBytes(Tr2StateChangeSize);
-				m_Level.StateChanges[stateChangeCount] = (Tr2StateChange) Cast2Struct(state_change_data,typeof(Tr2StateChange));
-				//print("m_Level.StateChanges["+stateChangeCount+"].StateID"+ m_Level.StateChanges[stateChangeCount] .StateID);
-			}
-		}
-		
-		//read AnimDispatches 
-		m_Level.NumAnimDispatches = br.ReadUInt32();
-		//print("m_Level.NumAnimDispatches:"+ m_Level.NumAnimDispatches);
-		if ( m_Level.NumAnimDispatches > 0) 
-		{
-			m_Level.AnimDispatches = new Tr2AnimDispatch[m_Level.NumAnimDispatches];
-			for(int animDispatchCount = 0; animDispatchCount < m_Level.NumAnimDispatches;animDispatchCount++)
-			{
-				byte[] anim_dispatch_data  = br.ReadBytes(Tr2AnimDispatchSize);
-				m_Level.AnimDispatches[animDispatchCount] = (Tr2AnimDispatch) Cast2Struct(anim_dispatch_data,typeof(Tr2AnimDispatch));
-			}
-		}
-		
-		//read anim commands
-		m_Level.NumAnimCommands = br.ReadUInt32();
-		//print("m_Level.NumAnimCommands" + m_Level.NumAnimCommands);
-		if (m_Level.NumAnimCommands > 0) 
-		{
-			m_Level.AnimCommands = new Tr2AnimCommand[m_Level.NumAnimCommands];
-			for(int animCommandCount = 0;  animCommandCount < m_Level.NumAnimCommands;   animCommandCount++)
-			{
-				byte[] anim_command_data =  br.ReadBytes(Tr2AnimCommandSize);
-				m_Level.AnimCommands[animCommandCount] = (Tr2AnimCommand) Cast2Struct(anim_command_data,typeof(Tr2AnimCommand));
-			} 
-		}  
-		
-		
-		// read MeshTrees
-		m_Level.NumMeshTrees = br.ReadUInt32();  //total number of ints, not Tr2MeshTree
-		//print("m_Level.NumMeshTrees" + m_Level.NumMeshTrees);
-	
-		//int numMeshTreeStruct =  (int)(m_Level.NumMeshTrees / sizeTr2MeshTree); 
-		//print("numMeshTreeStruct" + numMeshTreeStruct);
-		
-		if ( m_Level.NumMeshTrees > 0) 
-		{
-			m_Level.MeshTrees = new int[m_Level.NumMeshTrees];  //read as int
-			for(int meshtreecnt =0 ; meshtreecnt < m_Level.NumMeshTrees; meshtreecnt++)
-			{
-				m_Level.MeshTrees [meshtreecnt] = br.ReadInt32();
-			}
-		}
-		
-		// read frames 
-		m_Level.NumFrames = br.ReadUInt32(); 
-		//print( "m_Level.NumFrames" +  m_Level.NumFrames);
-		
-		if (m_Level.NumFrames > 0) 
-		{
-			m_Level.Frames = new ushort[m_Level.NumFrames];
-			for(int frmCount = 0; frmCount < m_Level.NumFrames;frmCount++)
-			{
-				m_Level.Frames[frmCount] = br.ReadUInt16();
-			}
-		}
-		
-		// read moveables 
-		m_Level.NumMoveables = br.ReadUInt32(); 
-		//print("m_Level.NumMoveables" + m_Level.NumMoveables);
-		if (m_Level.NumMoveables > 0) 
-		{	
-			m_Level.Moveables = new Tr2Moveable[m_Level.NumMoveables];
-			for(int movableCount = 0;  movableCount  < m_Level.NumMoveables; movableCount++)
-			{
-				byte[] moveable_item_data = br.ReadBytes(Tr2MoveableSize);
-				m_Level.Moveables[movableCount] = (Tr2Moveable) Cast2Struct(moveable_item_data,typeof(Tr2Moveable));
-			}
-		}
-	
-		//read static mesh
-		m_Level.NumStaticMeshes = br.ReadUInt32(); 
-		if (m_Level.NumStaticMeshes > 0) 
-		{ 
-			m_Level.StaticMeshes = new Tr2StaticMesh[m_Level.NumStaticMeshes];
-			for(int staticMeshCount = 0; staticMeshCount < m_Level.NumStaticMeshes;staticMeshCount++)
-			{
-                m_Level.StaticMeshes[staticMeshCount] = new Tr2StaticMesh { BoundingBox = new Tr2Vertex[4] };
-				m_Level.StaticMeshes[staticMeshCount].ObjectID = br.ReadUInt32(); 
-				m_Level.StaticMeshes[staticMeshCount].StartingMesh = br.ReadUInt16(); 
-				
-				for(int boundingBoxCount = 0;boundingBoxCount < 4;boundingBoxCount++)
-				{
-					byte[] staticBoxData = br.ReadBytes(Tr2VertexSize);
-					m_Level.StaticMeshes[staticMeshCount].BoundingBox[boundingBoxCount] =
-						(Tr2Vertex) Cast2Struct(staticBoxData,typeof(Tr2Vertex));
-				}
-				
-				m_Level.StaticMeshes[staticMeshCount].Flags = br.ReadUInt16(); 
-				//print("m_Level.StaticMeshes["+staticMeshCount+"].ObjectID " + m_Level.StaticMeshes[staticMeshCount].ObjectID);  
-			}
-		}
-		
-		// read object textures 
-		m_Level.NumObjectTextures = br.ReadUInt32(); 
-		//print("m_Level.NumObjectTextures:"+ m_Level.NumObjectTextures);
-		
-		if (m_Level.NumObjectTextures > 0) 
-		{
-			m_Level.ObjectTextures = new Tr2ObjectTexture[m_Level.NumObjectTextures];
-			for(int objTexCount = 0; objTexCount < m_Level.NumObjectTextures; objTexCount++)
-			{
-                m_Level.ObjectTextures[objTexCount] = new Tr2ObjectTexture { Vertices = new Tr2ObjectTextureVertex[4] };
-				m_Level.ObjectTextures[objTexCount].TransparencyFlags = br.ReadUInt16();
-				m_Level.ObjectTextures[objTexCount].Tile = br.ReadUInt16();
-					
-				for(int vtxcount = 0 ; vtxcount < 4; vtxcount++)
-				{
-					byte[] object_texture_vert_data = br.ReadBytes(Tr2ObjectTextureVertSize);
-					m_Level.ObjectTextures[objTexCount].Vertices[vtxcount] =
-							(Tr2ObjectTextureVertex) Cast2Struct(object_texture_vert_data, typeof(Tr2ObjectTextureVertex));
-				}
+                    }
+                }
 
-			}	
-		}
-		
-		//read sprite textures 
-		m_Level.NumspriteTextures = br.ReadUInt32(); 
-		//print("m_Level.NumspriteTextures"+ m_Level.NumspriteTextures);
-		if (m_Level.NumspriteTextures > 0) 
-		{
-			m_Level.SpriteTextures = new Tr2SpriteTexture[m_Level.NumspriteTextures];
-			
-			for(int spriteTexCount = 0;  spriteTexCount < m_Level.NumspriteTextures; spriteTexCount++)
-			{
-				byte[] spriteTexData = br.ReadBytes(Tr2SpriteTextureSize);
-				m_Level.SpriteTextures[spriteTexCount] = 
-					(Tr2SpriteTexture) Cast2Struct(spriteTexData, typeof(Tr2SpriteTexture));
-			}
-			
-		}
-		
-		//read sprite texture data
-		m_Level.NumSpriteSequences = br.ReadUInt32(); 
-		//print("m_Level.NumSpriteSequences"+ m_Level.NumSpriteSequences);
-		if (m_Level.NumSpriteSequences > 0) 
-		{
-			m_Level.SpriteSequences = new Tr2SpriteSequence[m_Level.NumSpriteSequences];
-			for(int spriteSeqCount = 0; spriteSeqCount < m_Level.NumSpriteSequences; spriteSeqCount++)
-			{
-				byte[] spriteSeqData = br.ReadBytes(Tr2SpriteSequenceSize);
-				m_Level.SpriteSequences[spriteSeqCount] = (Tr2SpriteSequence) Cast2Struct(spriteSeqData,typeof(Tr2SpriteSequence));
-			}
-		}   
-		
-		//read cameras
-		m_Level.NumCameras = br.ReadInt32(); 
-		//print("m_Level.NumCameras"+ m_Level.NumCameras);
-		
-		if (m_Level.NumCameras > 0) 
-		{
-			m_Level.Cameras = new Tr2Camera[m_Level.NumCameras];
-			for(int camCount = 0 ; camCount <m_Level.NumCameras; camCount++)
-			{
-				byte[] camData = br.ReadBytes(Tr2CameraSize);
-				m_Level.Cameras[camCount] = (Tr2Camera) Cast2Struct(camData,typeof(Tr2Camera));
-			}
-		}
-		
-		// read sound effects 
-		m_Level.NumsoundSources = br.ReadInt32(); 
-		//print("m_Level.NumsoundSources" + m_Level.NumsoundSources);
-		if (m_Level.NumsoundSources > 0) 
-		{
-			m_Level.SoundSources = new Tr2SoundSource[m_Level.NumsoundSources];
-			for(int soundSrcCount = 0; soundSrcCount < m_Level.NumsoundSources; soundSrcCount++)
-			{
-				byte[] sndSrcData = br.ReadBytes(Tr2SoundSourceSize);
-				m_Level.SoundSources[soundSrcCount] = 
-					(Tr2SoundSource) Cast2Struct(sndSrcData,typeof(Tr2SoundSource));
-				
-				//print("m_Level.SoundSources[soundSrcCount] x y z" + m_Level.SoundSources[soundSrcCount].x);
-			}
-		}
-		
-		//read boxes 
-		m_Level.NumBoxes = br.ReadInt32(); 
-		//print("m_Level.NumBoxes:"+ m_Level.NumBoxes);
-		if (m_Level.NumBoxes > 0) 
-		{
-			m_Level.Boxes = new Tr2BBox[m_Level.NumBoxes];   
-			//load tr2box data
-			for( int tr2BoxCount = 0; tr2BoxCount <m_Level.NumBoxes; tr2BoxCount++)
-			{
-				byte[] tr2_boxData = br.ReadBytes(Tr2BBoxSize);
-				m_Level.Boxes[tr2BoxCount] = (Tr2BBox) Cast2Struct(tr2_boxData,typeof(Tr2BBox));
-			}
-		}
-		
-		//read overlaps 
-		m_Level.NumOverlaps =br.ReadInt32();
-		//print("m_Level.NumOverlaps" + m_Level.NumOverlaps);
-		
-		if (m_Level.NumOverlaps > 0) 
-		{
-			m_Level.Overlaps =  new short[m_Level.NumOverlaps ];
-			for(int overlapCnt = 0; overlapCnt < m_Level.NumOverlaps;overlapCnt++)
-			{
-				m_Level.Overlaps[overlapCnt] = br.ReadInt16();
-			}
-		}
-		
-		//read Zones 
-		if (m_Level.NumBoxes > 0) 
-		{
-			m_Level.Zones =  new short[10 * m_Level.NumBoxes]; //10 shorts == 20 byte
-			int sizeZones = 10 * m_Level.NumBoxes;
-			for( int zoneCount = 0; zoneCount < sizeZones; zoneCount++)
-			{
-				m_Level.Zones[zoneCount] = br.ReadInt16();
-			}
-			
-		}
-		
-		//read animation textures
-		m_Level.NumAnimatedTextures = br.ReadInt32();
-		if (m_Level.NumAnimatedTextures > 0) 
-		{
-			m_Level.AnimatedTextures = new short[m_Level.NumAnimatedTextures];
-			for( int animTexCount = 0; animTexCount < m_Level.NumAnimatedTextures ; animTexCount++)
-			{
-				m_Level.AnimatedTextures[animTexCount] = br.ReadInt16();
-			}
-		}
-		
-		//08-09-2011
-		//read items  
-		m_Level.NumItems = br.ReadInt32();
-		if(m_Level.NumItems > 0)
-		{
-			m_Level.Items = new Tr2Item[m_Level.NumItems];
-			for (int trItemCount = 0; trItemCount < m_Level.NumItems ; trItemCount++) 
-			{
-				byte[] tr_itemData = br.ReadBytes(Tr2ItemSize);
-				m_Level.Items[trItemCount] = (Tr2Item) Cast2Struct(tr_itemData,typeof(Tr2Item));	
-			}
-		}
-		
-		//read LightMaps 
-		int numLightMapData = 32 * 256;
-		m_Level.LightMap =  new byte[numLightMapData];
-		for(int byteCnt = 0; byteCnt < numLightMapData; byteCnt++)
-		{
-			m_Level.LightMap[byteCnt] = br.ReadByte();
-		}
-		
-		//read cinematic frames 
-		m_Level.NumCinematicFrames  = br.ReadUInt16();
-		if (m_Level.NumCinematicFrames > 0) 
-		{
-			m_Level.CinematicFrames = new  Tr2CinematicFrame[m_Level.NumCinematicFrames];
-			for(int frameCount = 0; frameCount < m_Level.NumCinematicFrames; frameCount++)
-			{
-				byte[] tr_cenematic_data = br.ReadBytes(Tr2CinematicFrameSize);
-				m_Level.CinematicFrames[frameCount] = (Tr2CinematicFrame) Cast2Struct(tr_cenematic_data, typeof(Tr2CinematicFrame));
-			}
-		}
+                // read sector info 
+                m_Level.Rooms[i].NumZsectors = br.ReadUInt16();
+                m_Level.Rooms[i].NumXsectors = br.ReadUInt16();
+                int numsector = m_Level.Rooms[i].NumZsectors * m_Level.Rooms[i].NumXsectors;
 
-		//read demodata
-		m_Level.NumDemoData = br.ReadInt16();
-		if (m_Level.NumDemoData > 0) 
-		{
-			m_Level.DemoData = new byte[m_Level.NumDemoData];
-			m_Level.DemoData = br.ReadBytes(m_Level.NumDemoData);
-		}
-		
-		return m_Level;
-	}
+                //Debug.Log("m_Level.Rooms["+i+"].NumZsectors:"+ m_Level.Rooms[i].NumZsectors );
+                //print("m_Level.Rooms["+i+"].NumXsectors:"+ m_Level.Rooms[i].NumXsectors );
+
+                if (numsector > 0)
+                {
+                    m_Level.Rooms[i].SectorList = new Tr2RoomSector[numsector];
+                    for (int sectorCount = 0; sectorCount < numsector; sectorCount++)
+                    {
+                        byte[] sectorData = br.ReadBytes(Tr2RoomSectorSize);
+                        m_Level.Rooms[i].SectorList[sectorCount] = (Tr2RoomSector)Cast2Struct(sectorData, typeof(Tr2RoomSector));
+                    }
+                }
+
+                //read room lighting & mode 
+                if (m_Level.EngineVersion == TR2VersionType.TombRaider_2)
+                {
+                    //TR2fread(&Level->Rooms[i].Intensity1, 6, 1, m_FP);
+                    m_Level.Rooms[i].Intensity1 = br.ReadInt16();
+                    m_Level.Rooms[i].Intensity2 = br.ReadInt16();
+                    m_Level.Rooms[i].LightMode = br.ReadInt16();
+                }
+                else if (m_Level.EngineVersion == TR2VersionType.TombRaider_4)
+                {
+                    br.ReadUInt32(); //uint32_t RoomColour;
+                }
+
+                //print("Light [TR2|[TR4][Intensity1] [Intensity2] [mode]:" + 
+                //m_Level.Rooms[i].Intensity1 + " " + 
+                //m_Level.Rooms[i].Intensity2 + " " + 
+                //m_Level.Rooms[i].LightMode);
+
+                // read room lighting info 
+                m_Level.Rooms[i].NumLights = br.ReadUInt16();
+                //Debug.Log("m_Level.Rooms["+i+"].NumLights:" + (int)m_Level.Rooms[i].NumLights);
+                if (m_Level.EngineVersion == TR2VersionType.TombRaider_2)
+                {
+                    if (m_Level.Rooms[i].NumLights > 0)
+                    {
+                        m_Level.Rooms[i].Lights = new Tr2RoomLight[m_Level.Rooms[i].NumLights];
+                        for (int lightCnt = 0; lightCnt < m_Level.Rooms[i].NumLights; lightCnt++)
+                        {
+                            byte[] lightData = br.ReadBytes(Tr2RoomLightSize);
+                            m_Level.Rooms[i].Lights[lightCnt] = (Tr2RoomLight)Cast2Struct(lightData, typeof(Tr2RoomLight));
+                        }
+
+                    }
+                }
+                else if (m_Level.EngineVersion == TR2VersionType.TombRaider_4)
+                {
+                    br.ReadBytes(46 * m_Level.Rooms[i].NumLights);  //tr4_room_light 
+                }
+
+                //read Static Mesh Data
+                m_Level.Rooms[i].NumStaticMeshes = br.ReadUInt16();
+                // Debug.Log("m_Level.Rooms["+i+"].NumStaticMeshes" +	m_Level.Rooms[i].NumStaticMeshes);
+
+                if (m_Level.Rooms[i].NumStaticMeshes > 0)
+                {
+                    m_Level.Rooms[i].StaticMeshes = new Tr2RoomStaticMesh[m_Level.Rooms[i].NumStaticMeshes];
+                    for (int meshCnt = 0; meshCnt < m_Level.Rooms[i].NumStaticMeshes; meshCnt++)
+                    {
+                        byte[] meshData = br.ReadBytes(Tr2RoomSaticMeshSize);
+                        m_Level.Rooms[i].StaticMeshes[meshCnt] = (Tr2RoomStaticMesh)Cast2Struct(meshData, typeof(Tr2RoomStaticMesh));
+                    }
+                }
+
+                //AlternateRoom settings
+                m_Level.Rooms[i].AlternateRoom = br.ReadInt16();
+                m_Level.Rooms[i].Flags = br.ReadInt16();
+
+                //Done:
+                if (m_Level.EngineVersion == TR2VersionType.TombRaider_4)
+                {
+
+                    br.ReadBytes(3);
+                }
+            }
+            // }
+
+
+
+            //floor data
+            m_Level.NumFloorData = br.ReadUInt32();
+            //print("m_Level.NumFloorData"+ m_Level.NumFloorData);
+            if (m_Level.NumFloorData > 0)
+            {
+                m_Level.FloorData = new ushort[m_Level.NumFloorData];
+                for (int floorDataCnt = 0; floorDataCnt < m_Level.NumFloorData; floorDataCnt++)
+                {
+                    m_Level.FloorData[floorDataCnt] = br.ReadUInt16();
+                }
+            }
+
+            uint NumMeshDataWords;
+            byte[] RawMeshData = null; ;
+            int dataSize = 0;
+
+            NumMeshDataWords = br.ReadUInt32();
+            if (NumMeshDataWords > 0)
+            {
+                dataSize = (int)(2 * NumMeshDataWords);
+                RawMeshData = br.ReadBytes(dataSize);
+            }
+
+            m_Level.NumMeshPointers = br.ReadUInt32();
+            if (m_Level.NumMeshPointers > 0)
+            {
+                m_Level.MeshPointerList = new uint[m_Level.NumMeshPointers];
+                for (int ptrCount = 0; ptrCount < m_Level.NumMeshPointers; ptrCount++)
+                {
+                    m_Level.MeshPointerList[ptrCount] = br.ReadUInt32();
+                }
+            }
+
+            ExtractMeshes(m_Level, RawMeshData, m_Level.NumMeshPointers, m_Level.MeshPointerList);
+            //read animation data
+            m_Level.NumAnimations = br.ReadUInt32();
+            //Debug.Log("m_Level.NumAnimations:" + m_Level.NumAnimations);	
+
+
+
+
+            if (m_Level.NumAnimations > 0)
+            {
+                if (m_Level.EngineVersion == TR2VersionType.TombRaider_2)
+                {
+                    m_Level.Animations = new Tr2Animation[m_Level.NumAnimations];
+                    for (int animCnt = 0; animCnt < m_Level.NumAnimations; animCnt++)
+                    {
+                        byte[] animData = br.ReadBytes(Tr2AnimationSize);
+                        m_Level.Animations[animCnt] = (Tr2Animation)Cast2Struct(animData, typeof(Tr2Animation));
+
+                        //print("m_Level.Animations["+animCnt+"].FrameOffset" +m_Level.Animations[animCnt].FrameOffset);     
+                        //print("m_Level.Animations["+animCnt+"].FrameRate" + m_Level.Animations[animCnt].FrameRate);      
+                        //print("m_Level.Animations["+animCnt+"].FrameSize" + m_Level.Animations[animCnt].FrameSize);       
+                    }
+                }
+                else if (m_Level.EngineVersion == TR2VersionType.TombRaider_4)
+                {
+                    m_Level.Animations = new Tr2Animation[m_Level.NumAnimations];
+                    for (int animCnt = 0; animCnt < m_Level.NumAnimations; animCnt++)
+                    {
+                        byte[] animData = br.ReadBytes(Tr2AnimationSize + 8);
+                        m_Level.Animations[animCnt] = (Tr2Animation)Cast2StructTR4(animData, typeof(Tr2Animation));
+
+                        //print("m_Level.Animations["+animCnt+"].FrameOffset" +m_Level.Animations[animCnt].FrameOffset);     
+                        //print("m_Level.Animations["+animCnt+"].FrameRate" + m_Level.Animations[animCnt].FrameRate);      
+                        //print("m_Level.Animations["+animCnt+"].FrameSize" + m_Level.Animations[animCnt].FrameSize);       
+                    }
+                }
+            }
+
+            //read state changes
+            m_Level.NumStateChanges = br.ReadUInt32();
+            //Debug.Log("m_Level.NumStateChanges:" + m_Level.NumStateChanges);
+            if (m_Level.NumStateChanges > 0)
+            {
+                m_Level.StateChanges = new Tr2StateChange[m_Level.NumStateChanges];
+                for (int stateChangeCount = 0; stateChangeCount < m_Level.NumStateChanges; stateChangeCount++)
+                {
+                    byte[] state_change_data = br.ReadBytes(Tr2StateChangeSize);
+                    m_Level.StateChanges[stateChangeCount] = (Tr2StateChange)Cast2Struct(state_change_data, typeof(Tr2StateChange));
+                    //print("m_Level.StateChanges["+stateChangeCount+"].StateID"+ m_Level.StateChanges[stateChangeCount] .StateID);
+                }
+            }
+
+            //read AnimDispatches 
+            m_Level.NumAnimDispatches = br.ReadUInt32();
+            //print("m_Level.NumAnimDispatches:"+ m_Level.NumAnimDispatches);
+            if (m_Level.NumAnimDispatches > 0)
+            {
+                m_Level.AnimDispatches = new Tr2AnimDispatch[m_Level.NumAnimDispatches];
+                for (int animDispatchCount = 0; animDispatchCount < m_Level.NumAnimDispatches; animDispatchCount++)
+                {
+                    byte[] anim_dispatch_data = br.ReadBytes(Tr2AnimDispatchSize);
+                    m_Level.AnimDispatches[animDispatchCount] = (Tr2AnimDispatch)Cast2Struct(anim_dispatch_data, typeof(Tr2AnimDispatch));
+                }
+            }
+
+            //read anim commands
+            m_Level.NumAnimCommands = br.ReadUInt32();
+            //print("m_Level.NumAnimCommands" + m_Level.NumAnimCommands);
+            if (m_Level.NumAnimCommands > 0)
+            {
+                m_Level.AnimCommands = new Tr2AnimCommand[m_Level.NumAnimCommands];
+                for (int animCommandCount = 0; animCommandCount < m_Level.NumAnimCommands; animCommandCount++)
+                {
+                    byte[] anim_command_data = br.ReadBytes(Tr2AnimCommandSize);
+                    m_Level.AnimCommands[animCommandCount] = (Tr2AnimCommand)Cast2Struct(anim_command_data, typeof(Tr2AnimCommand));
+                }
+            }
+
+
+            // read MeshTrees
+            m_Level.NumMeshTrees = br.ReadUInt32();  //total number of ints, not Tr2MeshTree
+                                                     //print("m_Level.NumMeshTrees" + m_Level.NumMeshTrees);
+
+            //int numMeshTreeStruct =  (int)(m_Level.NumMeshTrees / sizeTr2MeshTree); 
+            //print("numMeshTreeStruct" + numMeshTreeStruct);
+
+            if (m_Level.NumMeshTrees > 0)
+            {
+                m_Level.MeshTrees = new int[m_Level.NumMeshTrees];  //read as int
+                for (int meshtreecnt = 0; meshtreecnt < m_Level.NumMeshTrees; meshtreecnt++)
+                {
+                    m_Level.MeshTrees[meshtreecnt] = br.ReadInt32();
+                }
+            }
+
+            // read frames 
+            m_Level.NumFrames = br.ReadUInt32();
+            //print( "m_Level.NumFrames" +  m_Level.NumFrames);
+
+            if (m_Level.NumFrames > 0)
+            {
+                m_Level.Frames = new ushort[m_Level.NumFrames];
+                for (int frmCount = 0; frmCount < m_Level.NumFrames; frmCount++)
+                {
+                    m_Level.Frames[frmCount] = br.ReadUInt16();
+                }
+            }
+
+            // read moveables 
+            m_Level.NumMoveables = br.ReadUInt32();
+            //print("m_Level.NumMoveables" + m_Level.NumMoveables);
+            if (m_Level.NumMoveables > 0)
+            {
+                m_Level.Moveables = new Tr2Moveable[m_Level.NumMoveables];
+                for (int movableCount = 0; movableCount < m_Level.NumMoveables; movableCount++)
+                {
+                    byte[] moveable_item_data = br.ReadBytes(Tr2MoveableSize);
+                    m_Level.Moveables[movableCount] = (Tr2Moveable)Cast2Struct(moveable_item_data, typeof(Tr2Moveable));
+                }
+            }
+
+            //read static mesh
+            m_Level.NumStaticMeshes = br.ReadUInt32();
+            //Debug.Log("m_Level.NumStaticMeshes:" + m_Level.NumStaticMeshes);
+            if (m_Level.NumStaticMeshes > 0)
+            {
+                m_Level.StaticMeshes = new Tr2StaticMesh[m_Level.NumStaticMeshes];
+                for (int staticMeshCount = 0; staticMeshCount < m_Level.NumStaticMeshes; staticMeshCount++)
+                {
+                    m_Level.StaticMeshes[staticMeshCount] = new Tr2StaticMesh { BoundingBox = new Tr2Vertex[4] };
+                    m_Level.StaticMeshes[staticMeshCount].ObjectID = br.ReadUInt32();
+                    m_Level.StaticMeshes[staticMeshCount].StartingMesh = br.ReadUInt16();
+
+                    for (int boundingBoxCount = 0; boundingBoxCount < 4; boundingBoxCount++)
+                    {
+                        byte[] staticBoxData = br.ReadBytes(Tr2VertexSize);
+                        m_Level.StaticMeshes[staticMeshCount].BoundingBox[boundingBoxCount] =
+                            (Tr2Vertex)Cast2Struct(staticBoxData, typeof(Tr2Vertex));
+                    }
+
+                    m_Level.StaticMeshes[staticMeshCount].Flags = br.ReadUInt16();
+                    //print("m_Level.StaticMeshes["+staticMeshCount+"].ObjectID " + m_Level.StaticMeshes[staticMeshCount].ObjectID);  
+                }
+            }
+
+            if (m_Level.EngineVersion == TR2VersionType.TombRaider_2)
+            {
+                // read object textures 
+                m_Level.NumObjectTextures = br.ReadUInt32();
+                //print("m_Level.NumObjectTextures:"+ m_Level.NumObjectTextures);
+
+                if (m_Level.NumObjectTextures > 0)
+                {
+                    m_Level.ObjectTextures = new Tr2ObjectTexture[m_Level.NumObjectTextures];
+                    for (int objTexCount = 0; objTexCount < m_Level.NumObjectTextures; objTexCount++)
+                    {
+                        m_Level.ObjectTextures[objTexCount] = new Tr2ObjectTexture { Vertices = new Tr2ObjectTextureVertex[4] };
+                        m_Level.ObjectTextures[objTexCount].TransparencyFlags = br.ReadUInt16();
+                        m_Level.ObjectTextures[objTexCount].Tile = br.ReadUInt16();
+
+                        for (int vtxcount = 0; vtxcount < 4; vtxcount++)
+                        {
+                            byte[] object_texture_vert_data = br.ReadBytes(Tr2ObjectTextureVertSize);
+                            m_Level.ObjectTextures[objTexCount].Vertices[vtxcount] =
+                                    (Tr2ObjectTextureVertex)Cast2Struct(object_texture_vert_data, typeof(Tr2ObjectTextureVertex));
+                        }
+
+                    }
+                }
+            }
+
+            if (m_Level.EngineVersion == TR2VersionType.TombRaider_4)
+            {
+                br.ReadBytes(3);   //added S P R (0x53, 0x50, 0x52);
+            }
+
+            //read sprite textures 
+            m_Level.NumspriteTextures = br.ReadUInt32();
+            //print("m_Level.NumspriteTextures"+ m_Level.NumspriteTextures);
+            if (m_Level.NumspriteTextures > 0)
+            {
+                m_Level.SpriteTextures = new Tr2SpriteTexture[m_Level.NumspriteTextures];
+
+                for (int spriteTexCount = 0; spriteTexCount < m_Level.NumspriteTextures; spriteTexCount++)
+                {
+                    byte[] spriteTexData = br.ReadBytes(Tr2SpriteTextureSize);
+                    m_Level.SpriteTextures[spriteTexCount] =
+                        (Tr2SpriteTexture)Cast2Struct(spriteTexData, typeof(Tr2SpriteTexture));
+                }
+
+            }
+
+            //read sprite texture data
+            m_Level.NumSpriteSequences = br.ReadUInt32();
+            //print("m_Level.NumSpriteSequences"+ m_Level.NumSpriteSequences);
+            if (m_Level.NumSpriteSequences > 0)
+            {
+                m_Level.SpriteSequences = new Tr2SpriteSequence[m_Level.NumSpriteSequences];
+                for (int spriteSeqCount = 0; spriteSeqCount < m_Level.NumSpriteSequences; spriteSeqCount++)
+                {
+                    byte[] spriteSeqData = br.ReadBytes(Tr2SpriteSequenceSize);
+                    m_Level.SpriteSequences[spriteSeqCount] = (Tr2SpriteSequence)Cast2Struct(spriteSeqData, typeof(Tr2SpriteSequence));
+                }
+            }
+
+            //read cameras
+            m_Level.NumCameras = br.ReadInt32();
+            //print("m_Level.NumCameras"+ m_Level.NumCameras);
+
+            if (m_Level.NumCameras > 0)
+            {
+                m_Level.Cameras = new Tr2Camera[m_Level.NumCameras];
+                for (int camCount = 0; camCount < m_Level.NumCameras; camCount++)
+                {
+                    byte[] camData = br.ReadBytes(Tr2CameraSize);
+                    m_Level.Cameras[camCount] = (Tr2Camera)Cast2Struct(camData, typeof(Tr2Camera));
+                }
+            }
+
+
+            if (m_Level.EngineVersion == TR2VersionType.TombRaider_4)
+            {
+                int NumFlybyCameras = br.ReadInt32(); //NumFlybyCameras
+                br.ReadBytes(NumFlybyCameras * 40);
+            }
+
+            // read sound effects 
+            m_Level.NumsoundSources = br.ReadInt32();
+            //print("m_Level.NumsoundSources" + m_Level.NumsoundSources);
+            if (m_Level.NumsoundSources > 0)
+            {
+                m_Level.SoundSources = new Tr2SoundSource[m_Level.NumsoundSources];
+                for (int soundSrcCount = 0; soundSrcCount < m_Level.NumsoundSources; soundSrcCount++)
+                {
+                    byte[] sndSrcData = br.ReadBytes(Tr2SoundSourceSize);
+                    m_Level.SoundSources[soundSrcCount] =
+                        (Tr2SoundSource)Cast2Struct(sndSrcData, typeof(Tr2SoundSource));
+
+                    //print("m_Level.SoundSources[soundSrcCount] x y z" + m_Level.SoundSources[soundSrcCount].x);
+                }
+            }
+
+            //read boxes 
+            m_Level.NumBoxes = br.ReadInt32();
+            //print("m_Level.NumBoxes:"+ m_Level.NumBoxes);
+            if (m_Level.NumBoxes > 0)
+            {
+                m_Level.Boxes = new Tr2BBox[m_Level.NumBoxes];
+                //load tr2box data
+                for (int tr2BoxCount = 0; tr2BoxCount < m_Level.NumBoxes; tr2BoxCount++)
+                {
+                    byte[] tr2_boxData = br.ReadBytes(Tr2BBoxSize);
+                    m_Level.Boxes[tr2BoxCount] = (Tr2BBox)Cast2Struct(tr2_boxData, typeof(Tr2BBox));
+                }
+            }
+
+            //read overlaps 
+            m_Level.NumOverlaps = br.ReadInt32();
+            //print("m_Level.NumOverlaps" + m_Level.NumOverlaps);
+
+            if (m_Level.NumOverlaps > 0)
+            {
+                m_Level.Overlaps = new short[m_Level.NumOverlaps];
+                for (int overlapCnt = 0; overlapCnt < m_Level.NumOverlaps; overlapCnt++)
+                {
+                    m_Level.Overlaps[overlapCnt] = br.ReadInt16();
+                }
+            }
+
+            //read Zones 
+            if (m_Level.NumBoxes > 0)
+            {
+                m_Level.Zones = new short[10 * m_Level.NumBoxes]; //10 shorts == 20 byte
+                int sizeZones = 10 * m_Level.NumBoxes;
+                for (int zoneCount = 0; zoneCount < sizeZones; zoneCount++)
+                {
+                    m_Level.Zones[zoneCount] = br.ReadInt16();
+                }
+
+            }
+
+            //read animation textures
+            m_Level.NumAnimatedTextures = br.ReadInt32();
+            if (m_Level.NumAnimatedTextures > 0)
+            {
+                m_Level.AnimatedTextures = new short[m_Level.NumAnimatedTextures];
+                for (int animTexCount = 0; animTexCount < m_Level.NumAnimatedTextures; animTexCount++)
+                {
+                    m_Level.AnimatedTextures[animTexCount] = br.ReadInt16();
+                }
+            }
+
+
+            //
+            if (m_Level.EngineVersion == TR2VersionType.TombRaider_4)
+            {
+                byte AnimatedTexturesUVCount = br.ReadByte();
+                byte[] TEX = br.ReadBytes(3);  // T E X (0x54, 0x45, 0x58)
+            }
+
+            if (m_Level.EngineVersion == TR2VersionType.TombRaider_4)
+            {
+                // read object textures 
+                m_Level.NumObjectTextures = br.ReadUInt32();
+                Debug.Log("m_Level.NumObjectTextures:" + m_Level.NumObjectTextures);
+
+                if (m_Level.NumObjectTextures > 0)
+                {
+                    m_Level.ObjectTextures = new Tr2ObjectTexture[m_Level.NumObjectTextures];
+                    for (int objTexCount = 0; objTexCount < m_Level.NumObjectTextures; objTexCount++)
+                    {
+                        m_Level.ObjectTextures[objTexCount] = new Tr2ObjectTexture { Vertices = new Tr2ObjectTextureVertex[4] };
+                        m_Level.ObjectTextures[objTexCount].TransparencyFlags = br.ReadUInt16();
+                        m_Level.ObjectTextures[objTexCount].Tile = br.ReadUInt16();
+                        //Debug.Log("Tile:" + m_Level.ObjectTextures[objTexCount].Tile);
+
+                        ushort NewFlagsTR4 = br.ReadUInt16();
+
+                        for (int vtxcount = 0; vtxcount < 4; vtxcount++)
+                        {
+                            byte[] object_texture_vert_data = br.ReadBytes(Tr2ObjectTextureVertSize);
+                            m_Level.ObjectTextures[objTexCount].Vertices[vtxcount] =
+                                    (Tr2ObjectTextureVertex)Cast2Struct(object_texture_vert_data, typeof(Tr2ObjectTextureVertex));
+                        }
+
+
+                        br.ReadUInt32();
+                        br.ReadUInt32();
+                        br.ReadUInt32();
+                        br.ReadUInt32();
+
+
+                    }
+                }
+            }
+
+            //08-09-2011
+            //read items  
+            m_Level.NumItems = br.ReadInt32();
+            if (m_Level.NumItems > 0)
+            {
+                m_Level.Items = new Tr2Item[m_Level.NumItems];
+                for (int trItemCount = 0; trItemCount < m_Level.NumItems; trItemCount++)
+                {
+                    byte[] tr_itemData = br.ReadBytes(Tr2ItemSize);
+                    m_Level.Items[trItemCount] = (Tr2Item)Cast2Struct(tr_itemData, typeof(Tr2Item));
+                }
+            }
+
+
+            if (m_Level.EngineVersion == TR2VersionType.TombRaider_2)
+            {
+                //read LightMaps 
+                int numLightMapData = 32 * 256;
+                m_Level.LightMap = new byte[numLightMapData];
+                for (int byteCnt = 0; byteCnt < numLightMapData; byteCnt++)
+                {
+                    m_Level.LightMap[byteCnt] = br.ReadByte();
+                }
+
+                //read cinematic frames 
+                m_Level.NumCinematicFrames = br.ReadUInt16();
+                if (m_Level.NumCinematicFrames > 0)
+                {
+                    m_Level.CinematicFrames = new Tr2CinematicFrame[m_Level.NumCinematicFrames];
+                    for (int frameCount = 0; frameCount < m_Level.NumCinematicFrames; frameCount++)
+                    {
+                        byte[] tr_cenematic_data = br.ReadBytes(Tr2CinematicFrameSize);
+                        m_Level.CinematicFrames[frameCount] = (Tr2CinematicFrame)Cast2Struct(tr_cenematic_data, typeof(Tr2CinematicFrame));
+                    }
+                }
+
+                //read demodata
+                m_Level.NumDemoData = br.ReadInt16();
+                if (m_Level.NumDemoData > 0)
+                {
+                    m_Level.DemoData = new byte[m_Level.NumDemoData];
+                    m_Level.DemoData = br.ReadBytes(m_Level.NumDemoData);
+                }
+            }
+
+        }
+
+        return m_Level;
+    }
+
+    class Tr4ObjectTexture // 38 bytes
+    {
+        ushort Attribute;
+        ushort TileAndFlag;
+        ushort NewFlags;
+
+        Tr2ObjectTextureVertex[] Vertices; // The four corners of the texture
+
+        uint OriginalU;
+        uint OriginalV;
+        uint Width;     // Actually width-1
+        uint Height;    // Actually height-1
+    }
+
+    public class Tr4Animation
+    {
+        public uint SpeedLateral; // New field
+        public uint AccelLateral; // New field
+        public uint Speed;            //Freal=Pwhole+(Pfrac÷65536)
+        public uint Accel;            //Freal=Pwhole+(Pfrac÷65536)
+    }
+
+    public class Tr2Textile32 //262144 bytes
+    {
+        public uint[] Tile; //256 * 256
+    }
+
+
+    struct tr4_room_light   // 46 bytes
+    {
+        public int x, y, z;       // Position of light, in world coordinates
+        Tr2Colour Colour;        // Colour of the light
+
+        byte LightType;
+        byte Unknown;       // Always 0xFF?
+        byte Intensity;
+
+        float In;            // Also called hotspot in TRLE manual
+        float Out;           // Also called falloff in TRLE manual
+        float Length;
+        float CutOff;
+
+        float dx, dy, dz;    // Direction - used only by sun and spot lights
+    };
+
+    public class tr4Level
+    {
+        public int NumRoomTextiles;
+        public int NumObjTextiles;
+        public int NumBumpTextiles;
+        public uint Textile32_UncompSize;
+        public uint Textile32_CompSize;
+        public byte[] Textile32_Compressed;
+
+
+        public uint Textile16_UncompSize;
+        public uint Textile16_CompSize;
+        public byte[] Textile16_Compressed;
+
+        public uint Textile32Misc_UncompSize;
+        public uint Textile32Misc_CompSize;
+        public byte[] Textile32Misc_Compressed;
+
+        public uint LevelData_UncompSize;
+        public uint LevelData_CompSize;
+        public byte[] LevelData_Compressed;
+        public byte[] LevelData_Decompressed;
+
+        public Tr2Textile32[] RoomTextiles;                 // 32-bit (ARGB) textiles
+        public Tr2Textile32[] ObjTextiles;                 // 32-bit (ARGB) textiles
+        public Tr2Textile32[] BumpTextiles;                 // 32-bit (ARGB) textiles
+
+        public Tr2Textile16[] RoomTextiles16;                 // 16-bit (ARGB) textiles
+        public Tr2Textile16[] ObjTextiles16;                 // 16-bit (ARGB) textiles
+        public Tr2Textile16[] BumpTextiles16;                 // 16-bit (ARGB) textiles
+
+        public Tr2Textile32[] Textile32Misc;                 // 32-bit (ARGB) textiles
+
+    }
+
+    public static object Cast2StructTR4(byte[] buffer, System.Type type)
+    {
+        object obj = (object)null;
+
+        if (type == typeof(Tr2Animation))
+            obj = (object)new Tr2Animation()
+            {
+                FrameOffset = System.BitConverter.ToUInt32(buffer, 0),
+                FrameRate = buffer[4],
+                FrameSize = buffer[5],
+                StateID = System.BitConverter.ToInt16(buffer, 6),
+                Speed = System.BitConverter.ToUInt32(buffer, 8),
+                Accel = System.BitConverter.ToUInt32(buffer, 12),
+                SpeedLateral = System.BitConverter.ToUInt32(buffer, 16),
+                AccelLateral = System.BitConverter.ToUInt32(buffer, 20),
+
+                FrameStart = System.BitConverter.ToUInt16(buffer, 16 + 8),
+                FrameEnd = System.BitConverter.ToUInt16(buffer, 18 + 8),
+                NextAnimation = System.BitConverter.ToUInt16(buffer, 20 + 8),
+                NextFram = System.BitConverter.ToUInt16(buffer, 22 + 8),
+                NumStateChanges = System.BitConverter.ToUInt16(buffer, 24 + 8),
+                StateChangeOffset = System.BitConverter.ToUInt16(buffer, 26 + 8),
+                NumAnimCommands = System.BitConverter.ToUInt16(buffer, 28 + 8),
+                AnimCommand = System.BitConverter.ToUInt16(buffer, 30 + 8)
+            };
+        return obj;
+    }
 }
 

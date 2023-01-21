@@ -10,9 +10,9 @@ public class TextureUV  {
 	public static float AdjustTextureCoordinateX(byte pixel, sbyte offset, ushort texTileIdx)
 	{   		
 		if(uvRects == null) return 0;
+        if(texTileIdx >= uvRects.Length) return 0;
 
-
-		Rect uvRect = uvRects[texTileIdx];
+        Rect uvRect = uvRects[texTileIdx];
 		float uvspanx = Mathf.Abs(uvRect.xMax - uvRect.xMin);
 		if (offset >= 0)
 		{
@@ -44,8 +44,8 @@ public class TextureUV  {
 	public static float AdjustTextureCoordinateY(byte pixel, sbyte offset, ushort texTileIdx)
 	{
 		if(uvRects == null) return 0;
-
-		Rect uvRect = uvRects[texTileIdx];
+        if (texTileIdx >= uvRects.Length) return 0;
+        Rect uvRect = uvRects[texTileIdx];
 		float uvspany = Mathf.Abs(uvRect.yMin - uvRect.yMax);
 		
 		if (offset >= 0)
@@ -115,103 +115,107 @@ public class TextureUV  {
                     //cols[c16_index].a = 0.0f;
                 //}
             }
-			//render transparancy information into tile
-			int ntexObj = leveldata.ObjectTextures.Length;
-			for(int i = 0; i < ntexObj; i++)
-			{
-				Parser.Tr2ObjectTexture texobj = leveldata.ObjectTextures[i];
-				
-				
-				// texobj.TransparencyFlags means geometry level transparancy, not pixel level transparency
-				// this is used for geometry material batching
 
-				if(texobj.Tile == tileCount && texobj.TransparencyFlags == 0) 	
-				{
-					//interpolate pixels
-					//generate pixel bound
-					Parser.Tr2ObjectTextureVertex[] vertices =  texobj.Vertices;
-					
-					int minxi = vertices[0].Xpixel;
-					int maxxi = vertices[0].Xpixel;
-					int minyi = vertices[0].Ypixel;
-					int maxyi = vertices[0].Ypixel;
-					
-					for(int v = 0; v < vertices.Length - 1; v++)
-					{
-						if(vertices[v].Xcoordinate < minxi)
-						{
-							minxi = vertices[v].Xpixel;
-						}
-						
-						if(vertices[v].Xcoordinate > maxxi)
-						{
-							maxxi = vertices[v].Xpixel;
-						}
-						
-						if(vertices[v].Ycoordinate < minyi)
-						{
-							minyi = vertices[v].Ypixel;
-						}
-						
-						if(vertices[v].Ycoordinate > maxyi)
-						{
-							maxyi = vertices[v].Ypixel;
-						}
+            if (leveldata.EngineVersion == Parser.TR2VersionType.TombRaider_2)
+            {
+                //render transparancy information into tile
+                int ntexObj = leveldata.ObjectTextures.Length;
+                for (int i = 0; i < ntexObj; i++)
+                {
+                    Parser.Tr2ObjectTexture texobj = leveldata.ObjectTextures[i];
 
-					}
-					
-					//render transparancy in generated bound
-					
-					if(vertices.Length < 4)
-					{
-					
-						Vector3 p0 = new Vector3(vertices[0].Xpixel,  0, vertices[0].Ypixel );
-						Vector3 p1 = new Vector3(vertices[1].Xpixel,  0, vertices[1].Ypixel );
-						Vector3 p2 = new Vector3(vertices[2].Xpixel,  0, vertices[2].Ypixel );
 
-					
-						for(int y = minyi; y < maxyi; y++)
-						{
-							for(int x = minxi; x < maxxi; x++)
-							{
-				
-								if(IsUVInSide( p2, p1,p0, new Vector3(x,0, y) ))
-								{
-									int idx = y * 256 + x;  
-		
-									cols[idx].a = 1;
-								}
-					
-							}
-				
-						}
-						
-					}
-					else
-					{
-						for(int y = minyi; y < maxyi; y++)
-						{
-							for(int x = minxi; x < maxxi; x++)
-							{
-				
-								//if(IsUVInSide( p2, p1,p0, new Vector3(x,0, y) ))
-								//{
-									int idx = y * 256 + x;  
-		
-									cols[idx].a = 1;
-								//}
-					
-							}
-				
-						}
-						
-						
-					}
-						
+                    // texobj.TransparencyFlags means geometry level transparancy, not pixel level transparency
+                    // this is used for geometry material batching
 
-				
-				} //end transparancy flag check
-			}
+                    if (texobj.Tile == tileCount && texobj.TransparencyFlags == 0)
+                    {
+                        //interpolate pixels
+                        //generate pixel bound
+                        Parser.Tr2ObjectTextureVertex[] vertices = texobj.Vertices;
+
+                        int minxi = vertices[0].Xpixel;
+                        int maxxi = vertices[0].Xpixel;
+                        int minyi = vertices[0].Ypixel;
+                        int maxyi = vertices[0].Ypixel;
+
+                        for (int v = 0; v < vertices.Length - 1; v++)
+                        {
+                            if (vertices[v].Xcoordinate < minxi)
+                            {
+                                minxi = vertices[v].Xpixel;
+                            }
+
+                            if (vertices[v].Xcoordinate > maxxi)
+                            {
+                                maxxi = vertices[v].Xpixel;
+                            }
+
+                            if (vertices[v].Ycoordinate < minyi)
+                            {
+                                minyi = vertices[v].Ypixel;
+                            }
+
+                            if (vertices[v].Ycoordinate > maxyi)
+                            {
+                                maxyi = vertices[v].Ypixel;
+                            }
+
+                        }
+
+                        //render transparancy in generated bound
+
+                        if (vertices.Length < 4)
+                        {
+
+                            Vector3 p0 = new Vector3(vertices[0].Xpixel, 0, vertices[0].Ypixel);
+                            Vector3 p1 = new Vector3(vertices[1].Xpixel, 0, vertices[1].Ypixel);
+                            Vector3 p2 = new Vector3(vertices[2].Xpixel, 0, vertices[2].Ypixel);
+
+
+                            for (int y = minyi; y < maxyi; y++)
+                            {
+                                for (int x = minxi; x < maxxi; x++)
+                                {
+
+                                    if (IsUVInSide(p2, p1, p0, new Vector3(x, 0, y)))
+                                    {
+                                        int idx = y * 256 + x;
+
+                                        cols[idx].a = 1;
+                                    }
+
+                                }
+
+                            }
+
+                        }
+                        else
+                        {
+                            for (int y = minyi; y < maxyi; y++)
+                            {
+                                for (int x = minxi; x < maxxi; x++)
+                                {
+
+                                    //if(IsUVInSide( p2, p1,p0, new Vector3(x,0, y) ))
+                                    //{
+                                    int idx = y * 256 + x;
+
+                                    cols[idx].a = 1;
+                                    //}
+
+                                }
+
+                            }
+
+
+                        }
+
+
+
+                    } //end transparancy flag check
+                }
+            }
 			
         }
 
