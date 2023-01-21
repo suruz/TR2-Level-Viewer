@@ -256,7 +256,7 @@ public class Level
         return go;
     }
 
-    GameObject CreateObject(Mesh mesh, Vector3 position, Quaternion rotation, string name)
+    public virtual GameObject CreateObject(Mesh mesh, Vector3 position, Quaternion rotation, string name)
     {
         GameObject go = new GameObject(name);
         Renderer renderer = go.AddComponent<MeshRenderer>();

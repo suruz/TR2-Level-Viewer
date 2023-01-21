@@ -356,8 +356,8 @@ public class Parser
      */
 
 
-	public class Tr2Animation               // 32 bytes
-	{ 
+	public class Tr2Animation: Tr4Animation               // 32 bytes
+    { 
 		public 	uint 		FrameOffset;     // byte offset into Frames[] (divide by 2 for Frames[i])
 		public  byte  		FrameRate;       // "ticks" per frame
 		public 	byte  		FrameSize;       // number of words in Frames[] used by this animation
@@ -694,8 +694,8 @@ public class Parser
      * Structure to contain an entire level.
      */
 
-	public class Tr2Level 
-	{
+	public class Tr2Level: tr4Level
+    {
 		public byte[]  FileName;                          // filename (not in .TR2 file)
 		public uint Version;                              // .TR2 file version
 		public TR2VersionType EngineVersion;              // TombRaider_1, TombRaider_2, TombRaider_3
