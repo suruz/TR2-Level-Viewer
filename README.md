@@ -52,6 +52,7 @@
 </ul>
 
 <p>If you already have VS 2022 installed but need to add these workloads, open Visual Studio and navigate to the menu <b>"Tools" -> "Get Tools and Features..."</b> to manage your installation via Visual Studio Installer</a>.</p>
+<p><img src="doc/build-instructions/00-configure-vs2022.png"/></p>
 
 <h4>Install Unity3D Editor</h4>
 
@@ -74,9 +75,13 @@
 <ol>
     <li>Open the <b>Unity Hub</b> application.</li>
     <li>Go to the <b>Projects</b> tab on the left panel.</li>
-    <li>Click the blue <b>"Open"</b> button.</li>
+	<p><img src="doc/build-instructions/01-hub.png"/></p>
+    <li>Click the <b>"Open"</b> button.</li>
     <li>Browse to and select the folder you cloned or extracted that contains the <b>Assets</b> folder.</li>
-    <li>If Unity prompts a warning about the project version, you can usually select a later installed version from your installs list or hit <b>"Continue"</b> to automatically upgrade the project to your current editor version. The project should import without issues.</li>
+	<p><img src="doc/build-instructions/02-project-selection.png"/></p>
+    <li>If Unity prompts a warning about the project version, you can usually select a later installed version from your installs list and <b>"Continue"</b> to automatically upgrade the project to your current editor version. The project should import without issues.</li>
+	<p><img src="doc/build-instructions/03-missing-version-warning.png"/></p>
+	
 </ol>
 
 <h3>4. Generate the Visual Studio Solution File (.sln)</h3>
@@ -86,15 +91,17 @@
 <ol>
     <li>Once the project is open in the Unity Editor, locate the <b>Project</b> tab/window at the bottom of the Unity interface.</li>
     <li>Click on any C# script file (e.g., <code>Assets/Settings.cs</code>) to select it.</li>
+	<p><img src="doc/build-instructions/06-project-tab.png"/></p>
     <li>Double-click the script file to open it. This action automatically generates the Visual Studio solution file and opens the script within <b>Visual Studio 2022</b>.</li>
 </ol>
 
 <h4>Troubleshooting VS Integration:</h4>
 
-<p>If the file does not open in Visual Studio, or the <code>.sln</code> file isn't generated correctly:</p>
+<p>If C# files do not open in Visual Studio, or the <code>.sln</code> file isn't generated correctly:</p>
 <ol>
     <li>In the Unity Editor, go to the menu: <b>"Edit" -> "Preferences..."</b></li>
     <li>Select <b>"External Tools"</b> on the left panel.</li>
+	<p><img src="doc/build-instructions/05-preference.png"/></p>
     <li>From the <b>"External Script Editor"</b> drop-down box, select your installed <b>Visual Studio 2022</b> instance.</li>
     <li>Click the <b>"Regenerate Project Files"</b> button.</li>
 </ol>
@@ -108,14 +115,10 @@
     <li>Hit the <b>"Play"</b> GUI button located at the top center of the Unity interface (a small ▶ icon), or press <b><code>Ctrl</code> + <code>P</code></b> on your keyboard.</li>
 </ol>
 
-<hr>
-
-<p>Let me know if you need help <b>setting up your development environment</b> or understanding the <b>workflow between Unity and Visual Studio.</b></p>
 
 
 
-
-<h3>Frequently asked qustions about TR2 Level Viewer</h3>
+<h1>Frequently asked qustions about TR2 Level Viewer</h1>
 
 
 <b>Q. How can I browse a tr2 level file?</b>
@@ -225,7 +228,8 @@ Project was developed in Unity 3.5.If project import fails because of meta missi
 
 <b>Q.How to contact the authour?</b>
 
-Here is my mail address suruzkento@gmail.com, you can contact me to asked some thing I missed here, to share your ideas, or to simply say “Hi” :) 
+<p>Let me know if you need help <b>setting up your development environment</b> or understanding the <b>workflow between Unity and Visual Studio.</b></p>
+Here is my mail address <b>suruzkento@gmail.com </b>, you can contact me to asked some thing I missed here, to share your ideas, or to simply say “Hi” :) 
 
 
 
