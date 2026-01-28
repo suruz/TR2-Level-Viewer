@@ -26,6 +26,95 @@
 - WebGL build http://tickleheadstudios.com/demo/unity/tr2webgl/
 - Tomb Raider 2 Custom Level https://www.youtube.com/watch?v=P8GPi6-G9CM
 
+<h1>How to Build and Run the TR2-Level-Viewer Project</h1>
+
+<p>This project is built using the <a href="https://unity.com">Unity3D</a> engine. The C# code within the project is compiled into DLLs that Unity loads at runtime. This guide provides step-by-step instructions for setting up your environment and running the project.</p>
+
+<h2>Prerequisites</h2>
+
+<p>To build and run this project, you will need:</p>
+<ul>
+    <li><a href="https://gist.github.com/Chenx221/6f4ed72cd785d80edb0bc50c9921daf7">Visual Studio (older)</a>  <a href="https://visualstudio.microsoft.com/vs/older-downloads/">Visual Studio (official)</a> 2022 or later (Community edition is sufficient).</li>
+    <li><a href="https://unity.com/releases/editor/archive">Unity3D Hub and Editor</a> (version 2020.3.41f1 or later is recommended).</li>
+    <li>The project source code from <a href="https://github.com/suruz/TR2-Level-Viewer.git">GitHub</a>.</li>
+</ul>
+
+<h2>Step-by-Step Instructions</h2>
+
+<h3>1. Install Necessary Software</h3>
+
+<h4>Install Visual Studio and Workloads</h4>
+
+<p>Ensure you have Visual Studio 2022 installed with the required workloads:</p>
+<ul>
+    <li><b>.NET desktop development</b></li>
+    <li><b>Game development with Unity</b></li>
+</ul>
+
+<p>If you already have VS 2022 installed but need to add these workloads, open Visual Studio and navigate to the menu <b>"Tools" -> "Get Tools and Features..."</b> to manage your installation via Visual Studio Installer</a>.</p>
+
+<h4>Install Unity3D Editor</h4>
+
+<p>Download and install a compatible version of the Unity Editor (2020.3.41f1 or later) using the <a href="https://unity.com/releases/editor/archive">Unity release archive</a>. The <a href="https://unity.com/releases/editor/archive">Unity Hub</a> makes managing different versions easy.</p>
+
+<h3>2. Obtain the Project Source Code</h3>
+
+<p>Clone the repository to your preferred local folder using Git:</p>
+
+<pre><code>git clone https://github.com/suruz/TR2-Level-Viewer.git</code></pre>
+
+<p>Alternatively, you can download a ZIP file of the repository branch compatible with these instructions from this direct link:</p>
+
+<p><a href="https://codeload.github.com/suruz/TR2-Level-Viewer/zip/refs/heads/unity-2020-or-later">https://codeload.github.com</a></p>
+
+<p>Your final project folder must contain an <code>Assets</code> folder within it.</p>
+
+<h3>3. Open the Project in Unity</h3>
+
+<ol>
+    <li>Open the <b>Unity Hub</b> application.</li>
+    <li>Go to the <b>Projects</b> tab on the left panel.</li>
+    <li>Click the blue <b>"Open"</b> button.</li>
+    <li>Browse to and select the folder you cloned or extracted that contains the <b>Assets</b> folder.</li>
+    <li>If Unity prompts a warning about the project version, you can usually select a later installed version from your installs list or hit <b>"Continue"</b> to automatically upgrade the project to your current editor version. The project should import without issues.</li>
+</ol>
+
+<h3>4. Generate the Visual Studio Solution File (.sln)</h3>
+
+<p>Unity automatically manages the C# project and generates a Visual Studio solution file (<code>.sln</code>).</p>
+
+<ol>
+    <li>Once the project is open in the Unity Editor, locate the <b>Project</b> tab/window at the bottom of the Unity interface.</li>
+    <li>Click on any C# script file (e.g., <code>Assets/Settings.cs</code>) to select it.</li>
+    <li>Double-click the script file to open it. This action automatically generates the Visual Studio solution file and opens the script within <b>Visual Studio 2022</b>.</li>
+</ol>
+
+<h4>Troubleshooting VS Integration:</h4>
+
+<p>If the file does not open in Visual Studio, or the <code>.sln</code> file isn't generated correctly:</p>
+<ol>
+    <li>In the Unity Editor, go to the menu: <b>"Edit" -> "Preferences..."</b></li>
+    <li>Select <b>"External Tools"</b> on the left panel.</li>
+    <li>From the <b>"External Script Editor"</b> drop-down box, select your installed <b>Visual Studio 2022</b> instance.</li>
+    <li>Click the <b>"Regenerate Project Files"</b> button.</li>
+</ol>
+
+<h3>5. Run the Project</h3>
+
+<p>The project compiles automatically when you run it within the Unity Editor.</p>
+
+<ol>
+    <li>Ensure the Unity Editor is active.</li>
+    <li>Hit the <b>"Play"</b> GUI button located at the top center of the Unity interface (a small ▶ icon), or press <b><code>Ctrl</code> + <code>P</code></b> on your keyboard.</li>
+</ol>
+
+<hr>
+
+<p>Let me know if you need help <b>setting up your development environment</b> or understanding the <b>workflow between Unity and Visual Studio.</b></p>
+
+
+
+
 <h3>Frequently asked qustions about TR2 Level Viewer</h3>
 
 
